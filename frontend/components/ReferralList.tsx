@@ -142,7 +142,7 @@ export function ReferralList() {
             View and manage submitted student support referrals
           </p>
           <p className="text-xs text-gray-500">
-            Powered by Tier2Go from Remynd
+            Powered by Concern2Care from Remynd
           </p>
         </div>
 

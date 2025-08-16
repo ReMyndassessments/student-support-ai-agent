@@ -31,10 +31,10 @@ export function Navigation() {
             </div>
             <div>
               <h1 className="text-lg font-bold text-gray-900 hidden sm:block">
-                Tier2Go
+                Concern2Care
               </h1>
               <h1 className="text-lg font-bold text-gray-900 sm:hidden">
-                Tier2Go
+                Concern2Care
               </h1>
               <p className="text-xs text-gray-500 hidden sm:block">
                 from Remynd
