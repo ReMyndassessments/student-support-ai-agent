@@ -31,13 +31,13 @@ export function Navigation() {
             </div>
             <div>
               <h1 className="text-lg font-bold text-gray-900 hidden sm:block">
-                Student Support AI Agent
+                Tier2Go
               </h1>
               <h1 className="text-lg font-bold text-gray-900 sm:hidden">
-                Student Support
+                Tier2Go
               </h1>
               <p className="text-xs text-gray-500 hidden sm:block">
-                504/IEP Accommodation Assistant
+                from Remynd
               </p>
             </div>
           </div>

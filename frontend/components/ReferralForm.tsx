@@ -271,6 +271,9 @@ export function ReferralForm() {
           <p className="text-gray-600 max-w-2xl mx-auto text-sm sm:text-base">
             For AI-Generated Tier 2 Interventions
           </p>
+          <p className="text-xs text-gray-500">
+            Powered by Tier2Go from Remynd
+          </p>
         </div>
 
         {/* Student Information */}

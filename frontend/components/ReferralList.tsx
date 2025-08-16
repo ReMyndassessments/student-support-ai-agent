@@ -141,6 +141,9 @@ export function ReferralList() {
           <p className="text-gray-600 max-w-2xl mx-auto text-sm sm:text-base">
             View and manage submitted student support referrals
           </p>
+          <p className="text-xs text-gray-500">
+            Powered by Tier2Go from Remynd
+          </p>
         </div>
 
         {/* Filter Card */}
