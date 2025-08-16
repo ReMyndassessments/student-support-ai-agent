@@ -3,7 +3,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, AlertTriangle, Search, Calendar, User } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Loader2, AlertTriangle, Search, Calendar, User, FileText, Clock, GraduationCap } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import backend from '~backend/client';
 import type { Referral } from '~backend/referrals/list';
@@ -48,117 +49,216 @@ export function ReferralList() {
     });
   };
 
-  return (
-    <div className="max-w-6xl mx-auto space-y-6">
-      <div className="text-center">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
-          Student Referrals
-        </h1>
-        <p className="text-gray-600">
-          View and manage submitted student support referrals
-        </p>
-      </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Search className="h-5 w-5" />
-            Filter Referrals
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="max-w-md">
-            <Label htmlFor="teacherFilter">Filter by Teacher</Label>
-            <Input
-              id="teacherFilter"
-              value={teacherFilter}
-              onChange={(e) => setTeacherFilter(e.target.value)}
-              placeholder="Enter teacher name to filter..."
-            />
+  const formatRecommendations = (text: string) => {
+    // Split by lines and process each line
+    const lines = text.split('\n');
+    const formattedLines = lines.map((line, index) => {
+      const trimmedLine = line.trim();
+      
+      // Skip empty lines
+      if (!trimmedLine) return null;
+      
+      // Main headings (usually start with ##)
+      if (trimmedLine.startsWith('##') || trimmedLine.startsWith('# ')) {
+        return (
+          <h4 key={index} className="text-base font-bold text-gray-900 mt-4 mb-2 first:mt-0">
+            {trimmedLine.replace(/^#+\s*/, '')}
+          </h4>
+        );
+      }
+      
+      // Sub-headings (usually start with **text**)
+      if (trimmedLine.startsWith('**') && trimmedLine.endsWith('**')) {
+        return (
+          <h5 key={index} className="text-sm font-semibold text-blue-700 mt-3 mb-1">
+            {trimmedLine.replace(/\*\*/g, '')}
+          </h5>
+        );
+      }
+      
+      // Numbered lists
+      if (/^\d+\./.test(trimmedLine)) {
+        return (
+          <div key={index} className="mb-1">
+            <span className="font-medium text-gray-900 text-sm">{trimmedLine}</span>
           </div>
-        </CardContent>
-      </Card>
+        );
+      }
+      
+      // Bullet points
+      if (trimmedLine.startsWith('- ') || trimmedLine.startsWith('• ')) {
+        return (
+          <div key={index} className="ml-3 mb-1 flex items-start">
+            <span className="text-blue-500 mr-2 mt-1 text-xs">●</span>
+            <span className="text-gray-700 text-sm">{trimmedLine.replace(/^[-•]\s*/, '')}</span>
+          </div>
+        );
+      }
+      
+      // Regular paragraphs
+      return (
+        <p key={index} className="text-gray-700 mb-2 leading-relaxed text-sm">
+          {trimmedLine}
+        </p>
+      );
+    }).filter(Boolean);
+    
+    return formattedLines;
+  };
 
-      {loading ? (
-        <div className="flex items-center justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-          <span className="ml-2 text-gray-600">Loading referrals...</span>
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+      <div className="max-w-6xl mx-auto px-4 py-6 sm:py-8 space-y-6">
+        {/* Header */}
+        <div className="text-center space-y-3">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl shadow-lg mb-4">
+            <FileText className="h-8 w-8 text-white" />
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+            Student Referrals
+          </h1>
+          <p className="text-gray-600 max-w-2xl mx-auto text-sm sm:text-base">
+            View and manage submitted student support referrals
+          </p>
         </div>
-      ) : referrals.length === 0 ? (
-        <Card>
-          <CardContent className="text-center py-12">
-            <p className="text-gray-500">
-              {teacherFilter 
-                ? `No referrals found for teacher "${teacherFilter}"`
-                : "No referrals have been submitted yet."
-              }
-            </p>
+
+        {/* Filter Card */}
+        <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
+          <CardHeader className="bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-t-lg">
+            <CardTitle className="flex items-center gap-2">
+              <Search className="h-5 w-5" />
+              Filter Referrals
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-4 sm:p-6">
+            <div className="max-w-md">
+              <Label htmlFor="teacherFilter" className="text-sm font-medium text-gray-700">
+                Filter by Teacher
+              </Label>
+              <Input
+                id="teacherFilter"
+                value={teacherFilter}
+                onChange={(e) => setTeacherFilter(e.target.value)}
+                placeholder="Enter teacher name to filter..."
+                className="mt-1 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+              />
+            </div>
           </CardContent>
         </Card>
-      ) : (
-        <div className="space-y-4">
-          {referrals.map((referral) => (
-            <Card key={referral.id}>
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div>
-                    <CardTitle className="flex items-center gap-2">
-                      <User className="h-5 w-5" />
-                      {referral.studentFirstName} {referral.studentLastInitial}.
-                    </CardTitle>
-                    <CardDescription className="flex items-center gap-4 mt-1">
-                      <span>Grade: {referral.grade}</span>
-                      <span>Teacher: {referral.teacher}</span>
-                      <span className="flex items-center gap-1">
-                        <Calendar className="h-4 w-4" />
-                        {formatDate(referral.createdAt)}
-                      </span>
-                    </CardDescription>
-                  </div>
-                  <div className="text-sm text-gray-500">
-                    ID: {referral.id}
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <h4 className="font-medium text-gray-900 mb-2">Concern Description</h4>
-                  <p className="text-sm text-gray-700 leading-relaxed">
-                    {referral.concernDescription}
-                  </p>
-                </div>
 
-                {referral.additionalInfo && (
-                  <div>
-                    <h4 className="font-medium text-gray-900 mb-2">Additional Information</h4>
-                    <p className="text-sm text-gray-700 leading-relaxed">
-                      {referral.additionalInfo}
-                    </p>
-                  </div>
-                )}
-
-                {referral.aiRecommendations && (
-                  <div>
-                    <h4 className="font-medium text-gray-900 mb-2">AI-Generated Recommendations</h4>
-                    <div className="bg-blue-50 p-4 rounded-lg">
-                      <div className="whitespace-pre-wrap text-sm text-gray-700 leading-relaxed">
-                        {referral.aiRecommendations}
+        {/* Loading State */}
+        {loading ? (
+          <div className="flex items-center justify-center py-16">
+            <div className="text-center space-y-4">
+              <Loader2 className="h-12 w-12 animate-spin text-blue-600 mx-auto" />
+              <p className="text-gray-600 font-medium">Loading referrals...</p>
+            </div>
+          </div>
+        ) : referrals.length === 0 ? (
+          <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
+            <CardContent className="text-center py-16">
+              <div className="space-y-4">
+                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto">
+                  <FileText className="h-8 w-8 text-gray-400" />
+                </div>
+                <p className="text-gray-500 text-lg">
+                  {teacherFilter 
+                    ? `No referrals found for teacher "${teacherFilter}"`
+                    : "No referrals have been submitted yet."
+                  }
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        ) : (
+          /* Referrals List */
+          <div className="space-y-6">
+            {referrals.map((referral) => (
+              <Card key={referral.id} className="shadow-lg border-0 bg-white/90 backdrop-blur-sm hover:shadow-xl transition-all duration-200">
+                <CardHeader className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-t-lg">
+                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                    <div className="space-y-2">
+                      <CardTitle className="flex items-center gap-2 text-lg">
+                        <User className="h-5 w-5" />
+                        {referral.studentFirstName} {referral.studentLastInitial}.
+                      </CardTitle>
+                      <div className="flex flex-wrap items-center gap-3 text-sm text-blue-100">
+                        <div className="flex items-center gap-1">
+                          <GraduationCap className="h-4 w-4" />
+                          <span>Grade: {referral.grade}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <User className="h-4 w-4" />
+                          <span>Teacher: {referral.teacher}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Clock className="h-4 w-4" />
+                          <span>{formatDate(referral.createdAt)}</span>
+                        </div>
                       </div>
                     </div>
-                    
-                    <Alert className="mt-3">
-                      <AlertTriangle className="h-4 w-4" />
-                      <AlertDescription className="text-sm">
-                        ⚠️ IMPORTANT DISCLAIMER: These AI-generated recommendations are for informational purposes only and should not replace professional educational assessment. Please refer this student to your school's student support department for proper evaluation and vetting. All AI-generated suggestions must be reviewed and approved by qualified educational professionals before implementation.
-                      </AlertDescription>
-                    </Alert>
+                    <Badge variant="secondary" className="bg-white/20 text-white border-white/30 self-start">
+                      ID: {referral.id}
+                    </Badge>
                   </div>
-                )}
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
+                </CardHeader>
+                
+                <CardContent className="p-4 sm:p-6 space-y-6">
+                  {/* Concern Description */}
+                  <div className="space-y-3">
+                    <h4 className="font-semibold text-gray-900 flex items-center gap-2">
+                      <AlertTriangle className="h-4 w-4 text-amber-500" />
+                      Concern Description
+                    </h4>
+                    <div className="bg-amber-50 p-4 rounded-lg border border-amber-200">
+                      <p className="text-gray-700 leading-relaxed text-sm">
+                        {referral.concernDescription}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Additional Information */}
+                  {referral.additionalInfo && (
+                    <div className="space-y-3">
+                      <h4 className="font-semibold text-gray-900 flex items-center gap-2">
+                        <FileText className="h-4 w-4 text-blue-500" />
+                        Additional Information
+                      </h4>
+                      <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                        <p className="text-gray-700 leading-relaxed text-sm">
+                          {referral.additionalInfo}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* AI Recommendations */}
+                  {referral.aiRecommendations && (
+                    <div className="space-y-3">
+                      <h4 className="font-semibold text-gray-900 flex items-center gap-2">
+                        <Search className="h-4 w-4 text-emerald-500" />
+                        AI-Generated Recommendations
+                      </h4>
+                      <div className="bg-gradient-to-br from-emerald-50 to-teal-50 p-4 sm:p-6 rounded-lg border border-emerald-200">
+                        <div className="prose max-w-none">
+                          {formatRecommendations(referral.aiRecommendations)}
+                        </div>
+                      </div>
+                      
+                      <Alert className="border-amber-200 bg-amber-50">
+                        <AlertTriangle className="h-4 w-4 text-amber-600" />
+                        <AlertDescription className="text-xs text-amber-800 leading-relaxed">
+                          ⚠️ IMPORTANT DISCLAIMER: These AI-generated recommendations are for informational purposes only and should not replace professional educational assessment. Please refer this student to your school's student support department for proper evaluation and vetting. All AI-generated suggestions must be reviewed and approved by qualified educational professionals before implementation.
+                        </AlertDescription>
+                      </Alert>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

@@ -30,9 +30,18 @@ Student Information:
 - Concern Description: ${req.concernDescription}
 ${req.additionalInfo ? `- Additional Information: ${req.additionalInfo}` : ''}
 
-Please provide specific, actionable Tier 2 intervention recommendations that a teacher could implement in the classroom. Focus on evidence-based strategies that address the described concerns. Keep recommendations practical and classroom-friendly.
+Please provide specific, actionable Tier 2 intervention recommendations that a teacher could implement in the classroom. Focus on evidence-based strategies that address the described concerns.
 
-Format your response as a clear, organized list of recommendations with brief explanations for each strategy.`;
+Format your response as follows:
+1. Start with a brief summary of the student's needs
+2. Provide 4-6 specific intervention strategies
+3. For each strategy, include:
+   - Strategy name/title
+   - Clear implementation steps
+   - Expected outcomes
+   - Timeline for implementation
+
+Use professional educational terminology and ensure recommendations are practical and classroom-friendly. Structure your response with clear headings and bullet points for easy reading.`;
 
     try {
       const response = await fetch('https://api.deepseek.com/chat/completions', {
@@ -46,14 +55,14 @@ Format your response as a clear, organized list of recommendations with brief ex
           messages: [
             {
               role: 'system',
-              content: 'You are an educational specialist AI assistant helping teachers with Tier 2 intervention recommendations for students who may need 504/IEP accommodations. Provide practical, evidence-based classroom strategies.'
+              content: 'You are an educational specialist AI assistant helping teachers with Tier 2 intervention recommendations for students who may need 504/IEP accommodations. Provide practical, evidence-based classroom strategies in a professional, well-structured format with clear headings and implementation details.'
             },
             {
               role: 'user',
               content: prompt
             }
           ],
-          max_tokens: 1000,
+          max_tokens: 1500,
           temperature: 0.7
         })
       });
