@@ -8,8 +8,15 @@ export interface GenerateRecommendationsRequest {
   studentLastInitial: string;
   grade: string;
   teacher: string;
+  teacherPosition: string;
+  incidentDate: string;
+  location: string;
+  concernTypes: string[];
+  otherConcernType?: string;
   concernDescription: string;
-  additionalInfo?: string;
+  severityLevel: string;
+  actionsTaken: string[];
+  otherActionTaken?: string;
 }
 
 export interface GenerateRecommendationsResponse {
@@ -21,25 +28,43 @@ export interface GenerateRecommendationsResponse {
 export const generateRecommendations = api<GenerateRecommendationsRequest, GenerateRecommendationsResponse>(
   { expose: true, method: "POST", path: "/ai/recommendations" },
   async (req) => {
+    const concernTypesText = req.concernTypes.length > 0 
+      ? req.concernTypes.join(', ') + (req.otherConcernType ? `, ${req.otherConcernType}` : '')
+      : 'Not specified';
+    
+    const actionsTakenText = req.actionsTaken.length > 0 
+      ? req.actionsTaken.join(', ') + (req.otherActionTaken ? `, ${req.otherActionTaken}` : '')
+      : 'None documented';
+
     const prompt = `You are an educational specialist AI assistant helping teachers with Tier 2 intervention recommendations for students who may need 504/IEP accommodations.
 
 Student Information:
 - Name: ${req.studentFirstName} ${req.studentLastInitial}.
 - Grade: ${req.grade}
-- Teacher: ${req.teacher}
-- Concern Description: ${req.concernDescription}
-${req.additionalInfo ? `- Additional Information: ${req.additionalInfo}` : ''}
+- Teacher: ${req.teacher} (${req.teacherPosition})
+- Incident Date: ${req.incidentDate}
+- Location: ${req.location}
+- Type of Concern: ${concernTypesText}
+- Severity Level: ${req.severityLevel}
+- Actions Already Taken: ${actionsTakenText}
+- Detailed Description: ${req.concernDescription}
 
-Please provide specific, actionable Tier 2 intervention recommendations that a teacher could implement in the classroom. Focus on evidence-based strategies that address the described concerns.
+Based on the concern type(s) identified (${concernTypesText}) and severity level (${req.severityLevel}), please provide specific, actionable Tier 2 intervention recommendations that a teacher could implement in the classroom. Focus on evidence-based strategies that address the described concerns.
 
 Format your response as follows:
-1. Start with a brief summary of the student's needs
-2. Provide 4-6 specific intervention strategies
-3. For each strategy, include:
-   - Strategy name/title
-   - Clear implementation steps
-   - Expected outcomes
-   - Timeline for implementation
+1. **Assessment Summary** - Brief analysis of the student's needs based on the concern type and severity
+2. **Immediate Interventions** (1-2 weeks) - Quick strategies to implement right away
+3. **Short-term Strategies** (2-6 weeks) - More comprehensive interventions
+4. **Long-term Support** (6+ weeks) - Sustained support strategies
+5. **Progress Monitoring** - How to track effectiveness
+6. **When to Escalate** - Clear indicators for referring to student support team
+
+For each strategy, include:
+- Strategy name/title
+- Clear implementation steps
+- Expected outcomes
+- Timeline for implementation
+- Materials/resources needed
 
 Use professional educational terminology and ensure recommendations are practical and classroom-friendly. Structure your response with clear headings and bullet points for easy reading.`;
 
@@ -55,14 +80,14 @@ Use professional educational terminology and ensure recommendations are practica
           messages: [
             {
               role: 'system',
-              content: 'You are an educational specialist AI assistant helping teachers with Tier 2 intervention recommendations for students who may need 504/IEP accommodations. Provide practical, evidence-based classroom strategies in a professional, well-structured format with clear headings and implementation details.'
+              content: 'You are an educational specialist AI assistant helping teachers with Tier 2 intervention recommendations for students who may need 504/IEP accommodations. Provide practical, evidence-based classroom strategies in a professional, well-structured format with clear headings and implementation details. Tailor recommendations based on the specific concern types and severity level provided.'
             },
             {
               role: 'user',
               content: prompt
             }
           ],
-          max_tokens: 1500,
+          max_tokens: 2000,
           temperature: 0.7
         })
       });

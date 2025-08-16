@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, AlertTriangle, Search, Calendar, User, FileText, Clock, GraduationCap } from 'lucide-react';
+import { Loader2, AlertTriangle, Search, Calendar, User, FileText, Clock, GraduationCap, MapPin, AlertCircle } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import backend from '~backend/client';
 import type { Referral } from '~backend/referrals/list';
@@ -47,6 +47,27 @@ export function ReferralList() {
       hour: '2-digit',
       minute: '2-digit'
     });
+  };
+
+  const formatIncidentDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  };
+
+  const getSeverityBadgeColor = (severity: string) => {
+    switch (severity.toLowerCase()) {
+      case 'mild':
+        return 'bg-green-100 text-green-800 border-green-200';
+      case 'moderate':
+        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      case 'urgent':
+        return 'bg-red-100 text-red-800 border-red-200';
+      default:
+        return 'bg-gray-100 text-gray-800 border-gray-200';
+    }
   };
 
   const formatRecommendations = (text: string) => {
@@ -189,21 +210,68 @@ export function ReferralList() {
                         </div>
                         <div className="flex items-center gap-1">
                           <User className="h-4 w-4" />
-                          <span>Teacher: {referral.teacher}</span>
+                          <span>{referral.teacher} ({referral.teacherPosition})</span>
                         </div>
                         <div className="flex items-center gap-1">
                           <Clock className="h-4 w-4" />
-                          <span>{formatDate(referral.createdAt)}</span>
+                          <span>Submitted: {formatDate(referral.createdAt)}</span>
                         </div>
                       </div>
                     </div>
-                    <Badge variant="secondary" className="bg-white/20 text-white border-white/30 self-start">
-                      ID: {referral.id}
-                    </Badge>
+                    <div className="flex flex-col sm:items-end gap-2">
+                      <Badge variant="secondary" className="bg-white/20 text-white border-white/30 self-start sm:self-end">
+                        ID: {referral.id}
+                      </Badge>
+                      <Badge className={getSeverityBadgeColor(referral.severityLevel)}>
+                        {referral.severityLevel.charAt(0).toUpperCase() + referral.severityLevel.slice(1)}
+                      </Badge>
+                    </div>
                   </div>
                 </CardHeader>
                 
                 <CardContent className="p-4 sm:p-6 space-y-6">
+                  {/* Incident Details */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <h4 className="font-semibold text-gray-900 flex items-center gap-2">
+                        <Calendar className="h-4 w-4 text-blue-500" />
+                        Incident Date
+                      </h4>
+                      <p className="text-sm text-gray-700 bg-blue-50 p-2 rounded">
+                        {formatIncidentDate(referral.incidentDate)}
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      <h4 className="font-semibold text-gray-900 flex items-center gap-2">
+                        <MapPin className="h-4 w-4 text-green-500" />
+                        Location
+                      </h4>
+                      <p className="text-sm text-gray-700 bg-green-50 p-2 rounded">
+                        {referral.location}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Concern Types */}
+                  <div className="space-y-3">
+                    <h4 className="font-semibold text-gray-900 flex items-center gap-2">
+                      <AlertCircle className="h-4 w-4 text-purple-500" />
+                      Concern Types
+                    </h4>
+                    <div className="flex flex-wrap gap-2">
+                      {referral.concernTypes.map((type, index) => (
+                        <Badge key={index} variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">
+                          {type}
+                        </Badge>
+                      ))}
+                      {referral.otherConcernType && (
+                        <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">
+                          {referral.otherConcernType}
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+
                   {/* Concern Description */}
                   <div className="space-y-3">
                     <h4 className="font-semibold text-gray-900 flex items-center gap-2">
@@ -217,17 +285,26 @@ export function ReferralList() {
                     </div>
                   </div>
 
-                  {/* Additional Information */}
-                  {referral.additionalInfo && (
+                  {/* Actions Taken */}
+                  {referral.actionsTaken.length > 0 && (
                     <div className="space-y-3">
                       <h4 className="font-semibold text-gray-900 flex items-center gap-2">
-                        <FileText className="h-4 w-4 text-blue-500" />
-                        Additional Information
+                        <FileText className="h-4 w-4 text-indigo-500" />
+                        Actions Already Taken
                       </h4>
-                      <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-                        <p className="text-gray-700 leading-relaxed text-sm">
-                          {referral.additionalInfo}
-                        </p>
+                      <div className="bg-indigo-50 p-4 rounded-lg border border-indigo-200">
+                        <div className="flex flex-wrap gap-2">
+                          {referral.actionsTaken.map((action, index) => (
+                            <Badge key={index} variant="outline" className="bg-indigo-100 text-indigo-700 border-indigo-300">
+                              {action}
+                            </Badge>
+                          ))}
+                          {referral.otherActionTaken && (
+                            <Badge variant="outline" className="bg-indigo-100 text-indigo-700 border-indigo-300">
+                              {referral.otherActionTaken}
+                            </Badge>
+                          )}
+                        </div>
                       </div>
                     </div>
                   )}

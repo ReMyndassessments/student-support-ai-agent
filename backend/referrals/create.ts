@@ -6,8 +6,15 @@ export interface CreateReferralRequest {
   studentLastInitial: string;
   grade: string;
   teacher: string;
+  teacherPosition: string;
+  incidentDate: string;
+  location: string;
+  concernTypes: string[];
+  otherConcernType?: string;
   concernDescription: string;
-  additionalInfo?: string;
+  severityLevel: string;
+  actionsTaken: string[];
+  otherActionTaken?: string;
   aiRecommendations?: string;
 }
 
@@ -17,8 +24,15 @@ export interface Referral {
   studentLastInitial: string;
   grade: string;
   teacher: string;
+  teacherPosition: string;
+  incidentDate: string;
+  location: string;
+  concernTypes: string[];
+  otherConcernType?: string;
   concernDescription: string;
-  additionalInfo?: string;
+  severityLevel: string;
+  actionsTaken: string[];
+  otherActionTaken?: string;
   aiRecommendations?: string;
   createdAt: Date;
 }
@@ -33,8 +47,15 @@ export const create = api<CreateReferralRequest, Referral>(
       student_last_initial: string;
       grade: string;
       teacher: string;
+      teacher_position: string;
+      incident_date: string;
+      location: string;
+      concern_types: string;
+      other_concern_type: string | null;
       concern_description: string;
-      additional_info: string | null;
+      severity_level: string;
+      actions_taken: string;
+      other_action_taken: string | null;
       ai_recommendations: string | null;
       created_at: Date;
     }>`
@@ -43,16 +64,30 @@ export const create = api<CreateReferralRequest, Referral>(
         student_last_initial,
         grade,
         teacher,
+        teacher_position,
+        incident_date,
+        location,
+        concern_types,
+        other_concern_type,
         concern_description,
-        additional_info,
+        severity_level,
+        actions_taken,
+        other_action_taken,
         ai_recommendations
       ) VALUES (
         ${req.studentFirstName},
         ${req.studentLastInitial},
         ${req.grade},
         ${req.teacher},
+        ${req.teacherPosition},
+        ${req.incidentDate},
+        ${req.location},
+        ${JSON.stringify(req.concernTypes)},
+        ${req.otherConcernType || null},
         ${req.concernDescription},
-        ${req.additionalInfo || null},
+        ${req.severityLevel},
+        ${JSON.stringify(req.actionsTaken)},
+        ${req.otherActionTaken || null},
         ${req.aiRecommendations || null}
       )
       RETURNING *
@@ -68,8 +103,15 @@ export const create = api<CreateReferralRequest, Referral>(
       studentLastInitial: row.student_last_initial,
       grade: row.grade,
       teacher: row.teacher,
+      teacherPosition: row.teacher_position,
+      incidentDate: row.incident_date,
+      location: row.location,
+      concernTypes: JSON.parse(row.concern_types),
+      otherConcernType: row.other_concern_type || undefined,
       concernDescription: row.concern_description,
-      additionalInfo: row.additional_info || undefined,
+      severityLevel: row.severity_level,
+      actionsTaken: JSON.parse(row.actions_taken),
+      otherActionTaken: row.other_action_taken || undefined,
       aiRecommendations: row.ai_recommendations || undefined,
       createdAt: row.created_at
     };

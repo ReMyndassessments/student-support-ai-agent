@@ -5,10 +5,33 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, AlertTriangle, CheckCircle, User, BookOpen, MessageSquare, Sparkles, Save, RotateCcw } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Loader2, AlertTriangle, CheckCircle, User, BookOpen, MessageSquare, Sparkles, Save, RotateCcw, Calendar, MapPin, AlertCircle } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import backend from '~backend/client';
 import type { GenerateRecommendationsRequest } from '~backend/ai/generate-recommendations';
+
+const CONCERN_TYPES = [
+  'Academic',
+  'Attendance', 
+  'Behavior',
+  'Social/Emotional',
+  'Peer Relationships',
+  'Family/Home'
+];
+
+const SEVERITY_LEVELS = [
+  { value: 'mild', label: 'Mild – Needs classroom support' },
+  { value: 'moderate', label: 'Moderate – Needs Tier 2 intervention' },
+  { value: 'urgent', label: 'Urgent – Immediate follow-up needed' }
+];
+
+const ACTIONS_TAKEN = [
+  'Talked with student',
+  'Contacted parent',
+  'Documented only'
+];
 
 export function ReferralForm() {
   const [formData, setFormData] = useState({
@@ -16,8 +39,15 @@ export function ReferralForm() {
     studentLastInitial: '',
     grade: '',
     teacher: '',
+    teacherPosition: '',
+    incidentDate: '',
+    location: '',
+    concernTypes: [] as string[],
+    otherConcernType: '',
     concernDescription: '',
-    additionalInfo: ''
+    severityLevel: '',
+    actionsTaken: [] as string[],
+    otherActionTaken: ''
   });
   
   const [recommendations, setRecommendations] = useState<string>('');
@@ -29,15 +59,31 @@ export function ReferralForm() {
   
   const { toast } = useToast();
 
-  const handleInputChange = (field: string, value: string) => {
+  const handleInputChange = (field: string, value: string | string[]) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     setHasGenerated(false);
     setHasSaved(false);
   };
 
+  const handleConcernTypeChange = (concernType: string, checked: boolean) => {
+    const updatedTypes = checked 
+      ? [...formData.concernTypes, concernType]
+      : formData.concernTypes.filter(type => type !== concernType);
+    handleInputChange('concernTypes', updatedTypes);
+  };
+
+  const handleActionTakenChange = (action: string, checked: boolean) => {
+    const updatedActions = checked 
+      ? [...formData.actionsTaken, action]
+      : formData.actionsTaken.filter(a => a !== action);
+    handleInputChange('actionsTaken', updatedActions);
+  };
+
   const generateRecommendations = async () => {
     if (!formData.studentFirstName || !formData.studentLastInitial || !formData.grade || 
-        !formData.teacher || !formData.concernDescription) {
+        !formData.teacher || !formData.teacherPosition || !formData.incidentDate ||
+        !formData.location || formData.concernTypes.length === 0 || !formData.concernDescription ||
+        !formData.severityLevel) {
       toast({
         title: "Missing Information",
         description: "Please fill in all required fields before generating recommendations.",
@@ -53,8 +99,15 @@ export function ReferralForm() {
         studentLastInitial: formData.studentLastInitial,
         grade: formData.grade,
         teacher: formData.teacher,
+        teacherPosition: formData.teacherPosition,
+        incidentDate: formData.incidentDate,
+        location: formData.location,
+        concernTypes: formData.concernTypes,
+        otherConcernType: formData.otherConcernType || undefined,
         concernDescription: formData.concernDescription,
-        additionalInfo: formData.additionalInfo || undefined
+        severityLevel: formData.severityLevel,
+        actionsTaken: formData.actionsTaken,
+        otherActionTaken: formData.otherActionTaken || undefined
       };
 
       const response = await backend.ai.generateRecommendations(request);
@@ -96,8 +149,15 @@ export function ReferralForm() {
         studentLastInitial: formData.studentLastInitial,
         grade: formData.grade,
         teacher: formData.teacher,
+        teacherPosition: formData.teacherPosition,
+        incidentDate: formData.incidentDate,
+        location: formData.location,
+        concernTypes: formData.concernTypes,
+        otherConcernType: formData.otherConcernType || undefined,
         concernDescription: formData.concernDescription,
-        additionalInfo: formData.additionalInfo || undefined,
+        severityLevel: formData.severityLevel,
+        actionsTaken: formData.actionsTaken,
+        otherActionTaken: formData.otherActionTaken || undefined,
         aiRecommendations: recommendations
       });
 
@@ -124,8 +184,15 @@ export function ReferralForm() {
       studentLastInitial: '',
       grade: '',
       teacher: '',
+      teacherPosition: '',
+      incidentDate: '',
+      location: '',
+      concernTypes: [],
+      otherConcernType: '',
       concernDescription: '',
-      additionalInfo: ''
+      severityLevel: '',
+      actionsTaken: [],
+      otherActionTaken: ''
     });
     setRecommendations('');
     setDisclaimer('');
@@ -199,53 +266,23 @@ export function ReferralForm() {
             <BookOpen className="h-8 w-8 text-white" />
           </div>
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-            Student Support Referral Form
+            Quick Student Concern Form
           </h1>
           <p className="text-gray-600 max-w-2xl mx-auto text-sm sm:text-base">
-            Generate AI-powered Tier 2 intervention recommendations for students who may need 504/IEP accommodations
+            For AI-Generated Tier 2 Interventions
           </p>
         </div>
 
-        {/* Main Form */}
+        {/* Student Information */}
         <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm">
           <CardHeader className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-t-lg">
             <CardTitle className="flex items-center gap-2">
               <User className="h-5 w-5" />
               Student Information
             </CardTitle>
-            <CardDescription className="text-blue-100">
-              Please provide the following information about the student and your concerns.
-            </CardDescription>
           </CardHeader>
-          <CardContent className="p-4 sm:p-6 space-y-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-              <div className="space-y-2">
-                <Label htmlFor="firstName" className="text-sm font-medium text-gray-700">
-                  Student First Name *
-                </Label>
-                <Input
-                  id="firstName"
-                  value={formData.studentFirstName}
-                  onChange={(e) => handleInputChange('studentFirstName', e.target.value)}
-                  placeholder="Enter first name"
-                  className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="lastInitial" className="text-sm font-medium text-gray-700">
-                  Student Last Initial *
-                </Label>
-                <Input
-                  id="lastInitial"
-                  value={formData.studentLastInitial}
-                  onChange={(e) => handleInputChange('studentLastInitial', e.target.value)}
-                  placeholder="Enter last initial"
-                  maxLength={1}
-                  className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                />
-              </div>
-              
+          <CardContent className="p-4 sm:p-6 space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="grade" className="text-sm font-medium text-gray-700">
                   Grade *
@@ -260,8 +297,187 @@ export function ReferralForm() {
               </div>
               
               <div className="space-y-2">
+                <Label htmlFor="firstName" className="text-sm font-medium text-gray-700">
+                  First Name *
+                </Label>
+                <Input
+                  id="firstName"
+                  value={formData.studentFirstName}
+                  onChange={(e) => handleInputChange('studentFirstName', e.target.value)}
+                  placeholder="Enter first name"
+                  className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="lastInitial" className="text-sm font-medium text-gray-700">
+                  Last Initial *
+                </Label>
+                <Input
+                  id="lastInitial"
+                  value={formData.studentLastInitial}
+                  onChange={(e) => handleInputChange('studentLastInitial', e.target.value)}
+                  placeholder="Enter last initial"
+                  maxLength={1}
+                  className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Incident/Concern */}
+        <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm">
+          <CardHeader className="bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-t-lg">
+            <CardTitle className="flex items-center gap-2">
+              <AlertCircle className="h-5 w-5" />
+              Incident/Concern
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-4 sm:p-6 space-y-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="incidentDate" className="text-sm font-medium text-gray-700">
+                  Date *
+                </Label>
+                <Input
+                  id="incidentDate"
+                  type="date"
+                  value={formData.incidentDate}
+                  onChange={(e) => handleInputChange('incidentDate', e.target.value)}
+                  className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="location" className="text-sm font-medium text-gray-700">
+                  Location *
+                </Label>
+                <Input
+                  id="location"
+                  value={formData.location}
+                  onChange={(e) => handleInputChange('location', e.target.value)}
+                  placeholder="e.g., Classroom, Cafeteria, Hallway"
+                  className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <Label className="text-sm font-medium text-gray-700">
+                Type of Concern (check one or more) *
+              </Label>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {CONCERN_TYPES.map((type) => (
+                  <div key={type} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`concern-${type}`}
+                      checked={formData.concernTypes.includes(type)}
+                      onCheckedChange={(checked) => handleConcernTypeChange(type, checked as boolean)}
+                    />
+                    <Label htmlFor={`concern-${type}`} className="text-sm text-gray-700">
+                      {type}
+                    </Label>
+                  </div>
+                ))}
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="otherConcern" className="text-sm font-medium text-gray-700">
+                  Other (specify):
+                </Label>
+                <Input
+                  id="otherConcern"
+                  value={formData.otherConcernType}
+                  onChange={(e) => handleInputChange('otherConcernType', e.target.value)}
+                  placeholder="Specify other concern type"
+                  className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="concernDescription" className="text-sm font-medium text-gray-700">
+                Details of Concern *
+              </Label>
+              <Textarea
+                id="concernDescription"
+                value={formData.concernDescription}
+                onChange={(e) => handleInputChange('concernDescription', e.target.value)}
+                placeholder="Please briefly describe the situation, behavior, or challenge — e.g., 'Student struggles to complete classwork,' 'Shows frequent anxiety before presentations,' 'Argues with peers during group work'"
+                rows={4}
+                className="border-gray-300 focus:border-blue-500 focus:ring-blue-500 resize-none"
+              />
+            </div>
+
+            <div className="space-y-3">
+              <Label className="text-sm font-medium text-gray-700">
+                Severity Level *
+              </Label>
+              <RadioGroup 
+                value={formData.severityLevel} 
+                onValueChange={(value) => handleInputChange('severityLevel', value)}
+                className="space-y-2"
+              >
+                {SEVERITY_LEVELS.map((level) => (
+                  <div key={level.value} className="flex items-center space-x-2">
+                    <RadioGroupItem value={level.value} id={`severity-${level.value}`} />
+                    <Label htmlFor={`severity-${level.value}`} className="text-sm text-gray-700">
+                      {level.label}
+                    </Label>
+                  </div>
+                ))}
+              </RadioGroup>
+            </div>
+
+            <div className="space-y-3">
+              <Label className="text-sm font-medium text-gray-700">
+                Actions Taken Already (optional)
+              </Label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {ACTIONS_TAKEN.map((action) => (
+                  <div key={action} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`action-${action}`}
+                      checked={formData.actionsTaken.includes(action)}
+                      onCheckedChange={(checked) => handleActionTakenChange(action, checked as boolean)}
+                    />
+                    <Label htmlFor={`action-${action}`} className="text-sm text-gray-700">
+                      {action}
+                    </Label>
+                  </div>
+                ))}
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="otherAction" className="text-sm font-medium text-gray-700">
+                  Other (specify):
+                </Label>
+                <Input
+                  id="otherAction"
+                  value={formData.otherActionTaken}
+                  onChange={(e) => handleInputChange('otherActionTaken', e.target.value)}
+                  placeholder="Specify other action taken"
+                  className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Teacher Information */}
+        <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm">
+          <CardHeader className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-t-lg">
+            <CardTitle className="flex items-center gap-2">
+              <User className="h-5 w-5" />
+              Teacher Information
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-4 sm:p-6 space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
                 <Label htmlFor="teacher" className="text-sm font-medium text-gray-700">
-                  Teacher Name *
+                  Name *
                 </Label>
                 <Input
                   id="teacher"
@@ -271,38 +487,27 @@ export function ReferralForm() {
                   className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
                 />
               </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="teacherPosition" className="text-sm font-medium text-gray-700">
+                  Position *
+                </Label>
+                <Input
+                  id="teacherPosition"
+                  value={formData.teacherPosition}
+                  onChange={(e) => handleInputChange('teacherPosition', e.target.value)}
+                  placeholder="e.g., 3rd Grade Teacher, Math Teacher, Special Education"
+                  className="border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                />
+              </div>
             </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="concern" className="text-sm font-medium text-gray-700">
-                Description of Concern *
-              </Label>
-              <Textarea
-                id="concern"
-                value={formData.concernDescription}
-                onChange={(e) => handleInputChange('concernDescription', e.target.value)}
-                placeholder="Describe the specific academic, behavioral, or social concerns you've observed..."
-                rows={4}
-                className="border-gray-300 focus:border-blue-500 focus:ring-blue-500 resize-none"
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="additional" className="text-sm font-medium text-gray-700">
-                Additional Information
-              </Label>
-              <Textarea
-                id="additional"
-                value={formData.additionalInfo}
-                onChange={(e) => handleInputChange('additionalInfo', e.target.value)}
-                placeholder="Any additional context, previous interventions tried, or relevant background information..."
-                rows={3}
-                className="border-gray-300 focus:border-blue-500 focus:ring-blue-500 resize-none"
-              />
-            </div>
-            
-            {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-3 pt-4">
+          </CardContent>
+        </Card>
+
+        {/* Action Buttons */}
+        <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm">
+          <CardContent className="p-4 sm:p-6">
+            <div className="flex flex-col sm:flex-row gap-3">
               <Button 
                 onClick={generateRecommendations}
                 disabled={isGenerating}
@@ -365,12 +570,12 @@ export function ReferralForm() {
         {/* Recommendations Display */}
         {recommendations && (
           <Card className="shadow-xl border-0 bg-white/90 backdrop-blur-sm">
-            <CardHeader className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-t-lg">
+            <CardHeader className="bg-gradient-to-r from-purple-500 to-pink-600 text-white rounded-t-lg">
               <CardTitle className="flex items-center gap-2">
                 <MessageSquare className="h-5 w-5" />
                 AI-Generated Tier 2 Intervention Recommendations
               </CardTitle>
-              <CardDescription className="text-emerald-100">
+              <CardDescription className="text-purple-100">
                 Review these suggestions and consult with your student support department
               </CardDescription>
             </CardHeader>
