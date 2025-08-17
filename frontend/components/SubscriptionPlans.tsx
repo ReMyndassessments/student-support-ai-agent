@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, Check, Star, Users, Building, GraduationCap, ArrowRight, Sparkles } from 'lucide-react';
+import { Loader2, Check, Star, Users, Building, GraduationCap, ArrowRight, Sparkles, Mail } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import backend from '~backend/client';
 
@@ -122,6 +122,19 @@ export function SubscriptionPlans() {
     }
   };
 
+  const handleDemoRequest = () => {
+    const subject = encodeURIComponent('Demo Request for Concern2Care');
+    const body = encodeURIComponent(`Hello,
+
+I would like to request a demo of Concern2Care for my school/district.
+
+Please contact me to schedule a demonstration.
+
+Thank you!`);
+    
+    window.location.href = `mailto:c2c_demo@remynd.online?subject=${subject}&body=${body}`;
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
       <div className="max-w-7xl mx-auto px-6 py-12">
@@ -149,6 +162,28 @@ export function SubscriptionPlans() {
             </p>
           </div>
         </div>
+
+        {/* Demo Request Option */}
+        <Card className="max-w-2xl mx-auto mb-12 border-0 bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 shadow-xl rounded-3xl overflow-hidden">
+          <CardContent className="p-8 text-center">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-amber-500 to-orange-600 rounded-3xl shadow-lg mb-4">
+              <Mail className="h-8 w-8 text-white" />
+            </div>
+            <h3 className="text-2xl font-bold text-gray-900 mb-3">
+              Want to See It in Action?
+            </h3>
+            <p className="text-gray-700 mb-6 leading-relaxed">
+              Schedule a personalized demo to see how Concern2Care can transform your student support process. Perfect for schools and districts evaluating the platform.
+            </p>
+            <Button
+              onClick={handleDemoRequest}
+              className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white shadow-lg rounded-2xl py-3 px-8 text-lg font-semibold transition-all duration-200 transform hover:scale-105"
+            >
+              <Mail className="mr-2 h-5 w-5" />
+              Request Demo
+            </Button>
+          </CardContent>
+        </Card>
 
         {/* Customer Information */}
         <Card className="max-w-md mx-auto mb-12 border-0 bg-white/80 backdrop-blur-sm shadow-xl rounded-3xl overflow-hidden">
@@ -336,6 +371,10 @@ export function SubscriptionPlans() {
               {
                 question: "What if I need to cancel?",
                 answer: "You can cancel your subscription at any time. You'll continue to have access until the end of your current billing period."
+              },
+              {
+                question: "Can I see a demo before subscribing?",
+                answer: "Absolutely! Click the 'Request Demo' button to schedule a personalized demonstration of Concern2Care for your school or district."
               }
             ].map((faq, index) => (
               <Card key={index} className="border-0 bg-white/80 backdrop-blur-sm shadow-lg rounded-2xl text-left">
@@ -356,6 +395,11 @@ export function SubscriptionPlans() {
               <br />
               <a href="mailto:sales@remynd.com" className="text-blue-600 hover:text-blue-700 font-medium">
                 sales@remynd.com
+              </a>
+              <br />
+              <strong>Want a demo?</strong> Email us at{' '}
+              <a href="mailto:c2c_demo@remynd.online" className="text-blue-600 hover:text-blue-700 font-medium">
+                c2c_demo@remynd.online
               </a>
             </AlertDescription>
           </Alert>

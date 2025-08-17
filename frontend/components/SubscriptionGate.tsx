@@ -2,7 +2,7 @@ import { ReactNode } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Lock, Crown, CreditCard, Sparkles } from 'lucide-react';
+import { Lock, Crown, CreditCard, Sparkles, Mail } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useSubscription } from '../hooks/useSubscription';
 
@@ -14,6 +14,19 @@ interface SubscriptionGateProps {
 
 export function SubscriptionGate({ userEmail, children, feature = "this feature" }: SubscriptionGateProps) {
   const { hasActiveSubscription, loading } = useSubscription(userEmail);
+
+  const handleDemoRequest = () => {
+    const subject = encodeURIComponent('Demo Request for Concern2Care');
+    const body = encodeURIComponent(`Hello,
+
+I would like to request a demo of Concern2Care for my school/district.
+
+Please contact me to schedule a demonstration.
+
+Thank you!`);
+    
+    window.location.href = `mailto:c2c_demo@remynd.online?subject=${subject}&body=${body}`;
+  };
 
   if (loading) {
     return (
@@ -146,6 +159,15 @@ export function SubscriptionGate({ userEmail, children, feature = "this feature"
                         Subscribe Now
                       </Button>
                     </Link>
+                    
+                    <Button
+                      onClick={handleDemoRequest}
+                      variant="outline"
+                      className="w-full border-amber-300 text-amber-700 hover:bg-amber-50 rounded-2xl py-3"
+                    >
+                      <Mail className="mr-2 h-4 w-4" />
+                      Request Demo
+                    </Button>
                     
                     <Link to="/">
                       <Button variant="outline" className="w-full border-gray-300 text-gray-700 hover:bg-white/80 rounded-2xl py-3">

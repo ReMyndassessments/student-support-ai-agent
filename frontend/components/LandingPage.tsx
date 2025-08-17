@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Sparkles, Users, Brain, Shield, CreditCard } from 'lucide-react';
+import { ArrowRight, Sparkles, Users, Brain, Shield, CreditCard, Mail } from 'lucide-react';
 
 interface LandingPageProps {
   userEmail?: string;
@@ -31,6 +31,19 @@ export function LandingPage({ userEmail = "teacher@school.edu" }: LandingPagePro
       bgGradient: 'from-green-50 to-emerald-50'
     }
   ];
+
+  const handleDemoRequest = () => {
+    const subject = encodeURIComponent('Demo Request for Concern2Care');
+    const body = encodeURIComponent(`Hello,
+
+I would like to request a demo of Concern2Care for my school/district.
+
+Please contact me to schedule a demonstration.
+
+Thank you!`);
+    
+    window.location.href = `mailto:c2c_demo@remynd.online?subject=${subject}&body=${body}`;
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
@@ -77,6 +90,14 @@ export function LandingPage({ userEmail = "teacher@school.edu" }: LandingPagePro
                     Subscribe Now
                   </Button>
                 </Link>
+                <Button 
+                  onClick={handleDemoRequest}
+                  variant="outline" 
+                  className="border-gray-300 text-gray-700 hover:bg-white/80 rounded-2xl py-6 px-8 text-lg font-semibold"
+                >
+                  <Mail className="mr-2 h-5 w-5" />
+                  Request Demo
+                </Button>
                 <Link to="/subscription/plans">
                   <Button variant="outline" className="border-gray-300 text-gray-700 hover:bg-white/80 rounded-2xl py-6 px-8 text-lg font-semibold">
                     View Plans & Pricing
@@ -232,6 +253,14 @@ export function LandingPage({ userEmail = "teacher@school.edu" }: LandingPagePro
                     Subscribe Now
                   </Button>
                 </Link>
+                <Button 
+                  onClick={handleDemoRequest}
+                  variant="outline" 
+                  className="border-gray-300 text-gray-700 hover:bg-white/80 rounded-2xl py-6 px-8 text-lg font-semibold"
+                >
+                  <Mail className="mr-2 h-5 w-5" />
+                  Request Demo
+                </Button>
                 <Link to="/subscription/plans">
                   <Button variant="outline" className="border-gray-300 text-gray-700 hover:bg-white/80 rounded-2xl py-6 px-8 text-lg font-semibold">
                     View Plans
