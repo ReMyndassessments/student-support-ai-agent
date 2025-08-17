@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, Check, Users, Building, GraduationCap, ArrowRight, Sparkles, Mail } from 'lucide-react';
+import { Loader2, Check, Users, Building, GraduationCap, ArrowRight, Sparkles, Mail, AlertTriangle } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import backend from '~backend/client';
 
@@ -82,6 +82,7 @@ export function SubscriptionPlans() {
     name: ''
   });
   const [isCreatingCheckout, setIsCreatingCheckout] = useState(false);
+  const [configurationError, setConfigurationError] = useState(false);
   const { toast } = useToast();
 
   const handleSubscribe = async (planType: 'teacher' | 'school' | 'district') => {
@@ -95,6 +96,8 @@ export function SubscriptionPlans() {
     }
 
     setIsCreatingCheckout(true);
+    setConfigurationError(false);
+    
     try {
       const response = await backend.polar.createCheckout({
         customerEmail: customerInfo.email,
@@ -110,35 +113,21 @@ export function SubscriptionPlans() {
       console.error('Error creating checkout:', error);
       
       // Check if it's a configuration error
-      if (error instanceof Error && error.message.includes('Product ID not configured')) {
+      if (error instanceof Error && (
+        error.message.includes('not configured') ||
+        error.message.includes('Product ID not configured') ||
+        error.message.includes('API key not configured')
+      )) {
+        setConfigurationError(true);
         toast({
-          title: "Configuration Error",
-          description: "Payment system is still being configured. Please contact us directly for subscription setup.",
+          title: "Payment System Setup",
+          description: "Payment processing is being configured. Please use the contact options below.",
           variant: "destructive"
         });
-        
-        // Fallback to email contact
-        setTimeout(() => {
-          const subject = encodeURIComponent(`Subscription Request - ${planType.charAt(0).toUpperCase() + planType.slice(1)} Plan`);
-          const body = encodeURIComponent(`Hello,
-
-I would like to subscribe to the ${planType.charAt(0).toUpperCase() + planType.slice(1)} Plan for Concern2Care.
-
-Customer Information:
-- Email: ${customerInfo.email}
-- Name: ${customerInfo.name || 'Not provided'}
-- Plan: ${planType.charAt(0).toUpperCase() + planType.slice(1)} Plan (${plans.find(p => p.id === planType)?.price})
-
-Please contact me to complete the subscription setup.
-
-Thank you!`);
-          
-          window.location.href = `mailto:sales@remynd.com?subject=${subject}&body=${body}`;
-        }, 2000);
       } else {
         toast({
           title: "Error",
-          description: "Failed to create checkout session. Please try again.",
+          description: "Failed to create checkout session. Please try again or contact support.",
           variant: "destructive"
         });
       }
@@ -158,6 +147,25 @@ Please contact me to schedule a demonstration.
 Thank you!`);
     
     window.location.href = `mailto:c2c_demo@remynd.online?subject=${subject}&body=${body}`;
+  };
+
+  const handleDirectContact = (planType: 'teacher' | 'school' | 'district') => {
+    const plan = plans.find(p => p.id === planType);
+    const subject = encodeURIComponent(`Subscription Request - ${plan?.name}`);
+    const body = encodeURIComponent(`Hello,
+
+I would like to subscribe to the ${plan?.name} for Concern2Care.
+
+Customer Information:
+- Email: ${customerInfo.email}
+- Name: ${customerInfo.name || 'Not provided'}
+- Plan: ${plan?.name} (${plan?.price})
+
+Please contact me to complete the subscription setup.
+
+Thank you!`);
+    
+    window.location.href = `mailto:sales@remynd.com?subject=${subject}&body=${body}`;
   };
 
   return (
@@ -187,6 +195,19 @@ Thank you!`);
             </p>
           </div>
         </div>
+
+        {/* Configuration Error Alert */}
+        {configurationError && (
+          <Alert className="max-w-4xl mx-auto mb-12 border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl">
+            <AlertTriangle className="h-5 w-5 text-amber-600" />
+            <AlertDescription className="text-amber-800">
+              <strong>Payment System Configuration</strong>
+              <br />
+              Our payment system is currently being set up. In the meantime, please contact us directly to set up your subscription. 
+              We'll have automated payments available soon!
+            </AlertDescription>
+          </Alert>
+        )}
 
         {/* Demo Request Option */}
         <Card className="max-w-2xl mx-auto mb-12 border-0 bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 shadow-xl rounded-3xl overflow-hidden">
@@ -281,23 +302,37 @@ Thank you!`);
                     ))}
                   </ul>
                   
-                  <Button
-                    onClick={() => handleSubscribe(plan.id)}
-                    disabled={isCreatingCheckout || !customerInfo.email}
-                    className={`w-full bg-gradient-to-r ${plan.gradient} hover:opacity-90 text-white shadow-lg rounded-2xl py-6 text-lg font-semibold transition-all duration-200 transform hover:scale-105`}
-                  >
-                    {isCreatingCheckout ? (
-                      <>
-                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                        Creating Checkout...
-                      </>
-                    ) : (
-                      <>
-                        Subscribe Now
-                        <ArrowRight className="ml-2 h-5 w-5" />
-                      </>
+                  <div className="space-y-3">
+                    <Button
+                      onClick={() => handleSubscribe(plan.id)}
+                      disabled={isCreatingCheckout || !customerInfo.email}
+                      className={`w-full bg-gradient-to-r ${plan.gradient} hover:opacity-90 text-white shadow-lg rounded-2xl py-6 text-lg font-semibold transition-all duration-200 transform hover:scale-105`}
+                    >
+                      {isCreatingCheckout ? (
+                        <>
+                          <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                          Creating Checkout...
+                        </>
+                      ) : (
+                        <>
+                          Subscribe Now
+                          <ArrowRight className="ml-2 h-5 w-5" />
+                        </>
+                      )}
+                    </Button>
+                    
+                    {configurationError && (
+                      <Button
+                        onClick={() => handleDirectContact(plan.id)}
+                        disabled={!customerInfo.email}
+                        variant="outline"
+                        className="w-full border-gray-300 text-gray-700 hover:bg-gray-50 rounded-2xl py-3"
+                      >
+                        <Mail className="mr-2 h-4 w-4" />
+                        Contact for Subscription
+                      </Button>
                     )}
-                  </Button>
+                  </div>
                 </CardContent>
               </Card>
             );
@@ -370,7 +405,7 @@ Thank you!`);
             {[
               {
                 question: "How does billing work?",
-                answer: "All plans are billed monthly. You can upgrade, downgrade, or cancel your subscription at any time through your account dashboard."
+                answer: "All plans are billed monthly through Polar. You can upgrade, downgrade, or cancel your subscription at any time through your account dashboard."
               },
               {
                 question: "Can I change plans later?",
@@ -386,11 +421,15 @@ Thank you!`);
               },
               {
                 question: "What if I need to cancel?",
-                answer: "You can cancel your subscription at any time. You'll continue to have access until the end of your current billing period."
+                answer: "You can cancel your subscription at any time through the Polar customer portal. You'll continue to have access until the end of your current billing period."
               },
               {
                 question: "Can I see a demo before subscribing?",
                 answer: "Absolutely! Click the 'Request Demo' button to schedule a personalized demonstration of Concern2Care for your school or district."
+              },
+              {
+                question: "What payment methods do you accept?",
+                answer: "We accept all major credit cards and ACH payments through our secure payment processor, Polar."
               }
             ].map((faq, index) => (
               <Card key={index} className="border-0 bg-white/80 backdrop-blur-sm shadow-lg rounded-2xl text-left">

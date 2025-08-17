@@ -2,7 +2,10 @@ import { api } from "encore.dev/api";
 import { subscriptionDB } from "./db";
 import { APIError } from "encore.dev/api";
 import { Header } from "encore.dev/api";
+import { secret } from "encore.dev/config";
 import crypto from "crypto";
+
+const polarWebhookSecret = secret("PolarWebhookSecret");
 
 export interface PolarWebhookRequest {
   type: string;
@@ -22,8 +25,20 @@ export const webhook = api<PolarWebhookRequest & WebhookHeaders, PolarWebhookRes
   { expose: true, method: "POST", path: "/polar/webhook" },
   async (req) => {
     try {
-      // For demo purposes, we'll accept webhooks without signature verification
-      // In production, you would verify the webhook signature
+      const webhookSecret = polarWebhookSecret();
+      
+      // Verify webhook signature if secret is configured
+      if (webhookSecret && req.signature) {
+        const isValid = verifyWebhookSignature(
+          JSON.stringify(req),
+          req.signature,
+          webhookSecret
+        );
+        
+        if (!isValid) {
+          throw APIError.unauthenticated("Invalid webhook signature");
+        }
+      }
       
       console.log(`Processing Polar webhook: ${req.type}`);
 
@@ -61,11 +76,33 @@ export const webhook = api<PolarWebhookRequest & WebhookHeaders, PolarWebhookRes
   }
 );
 
+function verifyWebhookSignature(payload: string, signature: string, secret: string): boolean {
+  try {
+    const expectedSignature = crypto
+      .createHmac('sha256', secret)
+      .update(payload, 'utf8')
+      .digest('hex');
+    
+    return crypto.timingSafeEqual(
+      Buffer.from(signature, 'hex'),
+      Buffer.from(expectedSignature, 'hex')
+    );
+  } catch (error) {
+    console.error('Error verifying webhook signature:', error);
+    return false;
+  }
+}
+
 async function handleSubscriptionCreated(data: any) {
   const subscription = data.subscription;
   const customer = data.customer;
   
   console.log('Creating subscription:', subscription.id);
+  
+  // Extract plan type from metadata or product name
+  const planType = subscription.metadata?.plan_type || 
+                   subscription.product?.name?.toLowerCase() || 
+                   'unknown';
   
   await subscriptionDB.exec`
     INSERT INTO subscriptions (
@@ -82,7 +119,7 @@ async function handleSubscriptionCreated(data: any) {
       ${subscription.id},
       ${customer.email},
       ${customer.name || ''},
-      ${subscription.product?.name || 'unknown'},
+      ${planType},
       ${subscription.status},
       ${subscription.current_period_start ? new Date(subscription.current_period_start) : null},
       ${subscription.current_period_end ? new Date(subscription.current_period_end) : null},
