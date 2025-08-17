@@ -1,9 +1,6 @@
 import { api } from "encore.dev/api";
-import { secret } from "encore.dev/config";
 import { users } from "~encore/clients";
 import { APIError } from "encore.dev/api";
-
-const deepseekApiKey = secret("DeepSeekAPIKey");
 
 export interface GenerateRecommendationsRequest {
   userEmail: string;
@@ -43,6 +40,17 @@ export const generateRecommendations = api<GenerateRecommendationsRequest, Gener
       }
     } catch (error) {
       throw APIError.invalidArgument("No DeepSeek API key available. Please add your API key in your profile settings.");
+    }
+
+    // For demo purposes, if using demo admin key, return mock recommendations
+    if (apiKey === 'demo-admin-key-placeholder') {
+      const mockRecommendations = generateMockRecommendations(req);
+      const disclaimer = "⚠️ IMPORTANT DISCLAIMER: These AI-generated recommendations are for informational purposes only and should not replace professional educational assessment. Please refer this student to your school's student support department for proper evaluation and vetting. All AI-generated suggestions must be reviewed and approved by qualified educational professionals before implementation.";
+      
+      return {
+        recommendations: mockRecommendations,
+        disclaimer
+      };
     }
 
     if (!apiKey) {
@@ -142,3 +150,71 @@ Use professional educational terminology and ensure recommendations are practica
     }
   }
 );
+
+function generateMockRecommendations(req: GenerateRecommendationsRequest): string {
+  const concernTypes = req.concernTypes.join(', ');
+  
+  return `# Assessment Summary
+
+Based on the ${req.severityLevel} level concerns related to ${concernTypes} for ${req.studentFirstName} ${req.studentLastInitial}. (Grade ${req.grade}), the following Tier 2 interventions are recommended to address the observed challenges in ${req.location}.
+
+## Immediate Interventions (1-2 weeks)
+
+**1. Structured Check-In System**
+- Implementation: Daily 2-minute check-ins at the beginning of class
+- Expected outcomes: Improved communication and early identification of issues
+- Timeline: Start immediately, continue for 2 weeks minimum
+- Materials needed: Simple check-in form or digital tool
+
+**2. Clear Expectations and Visual Supports**
+- Implementation: Create visual schedule and behavior expectations chart
+- Expected outcomes: Increased understanding of classroom routines
+- Timeline: Implement within 3 days
+- Materials needed: Poster board, markers, laminator
+
+## Short-term Strategies (2-6 weeks)
+
+**3. Targeted Skill Building**
+- Implementation: 15-minute focused sessions 3x per week
+- Expected outcomes: Improvement in specific skill areas
+- Timeline: 4-6 week intervention cycle
+- Materials needed: Skill-specific worksheets and manipulatives
+
+**4. Peer Support System**
+- Implementation: Pair student with trained peer mentor
+- Expected outcomes: Improved social skills and academic support
+- Timeline: 4 weeks with weekly check-ins
+- Materials needed: Peer mentor training materials
+
+## Long-term Support (6+ weeks)
+
+**5. Comprehensive Behavior Plan**
+- Implementation: Develop individualized behavior intervention plan
+- Expected outcomes: Sustained positive behavior changes
+- Timeline: Ongoing with monthly reviews
+- Materials needed: Data collection sheets, reward system
+
+**6. Family Collaboration**
+- Implementation: Regular communication with family about strategies
+- Expected outcomes: Consistent support across environments
+- Timeline: Ongoing partnership
+- Materials needed: Communication log, home-school collaboration forms
+
+## Progress Monitoring
+
+- Weekly data collection on target behaviors/skills
+- Bi-weekly review of intervention effectiveness
+- Monthly team meetings to assess progress
+- Use of standardized assessment tools as appropriate
+
+## When to Escalate
+
+Consider referring to the student support team if:
+- No improvement after 4-6 weeks of consistent intervention
+- Behaviors escalate in frequency or intensity
+- Student expresses safety concerns
+- Additional assessment needs are identified
+- Family requests formal evaluation
+
+**Note:** This is a demonstration of AI-generated recommendations. In a real implementation, these would be more detailed and specifically tailored to the exact concerns described.`;
+}

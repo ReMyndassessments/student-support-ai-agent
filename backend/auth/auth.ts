@@ -1,8 +1,5 @@
 import { Header, Cookie, APIError, Gateway } from "encore.dev/api";
 import { authHandler } from "encore.dev/auth";
-import { secret } from "encore.dev/config";
-
-const adminPassword = secret("AdminDemoPassword");
 
 interface AuthParams {
   authorization?: Header<"Authorization">;
@@ -39,8 +36,8 @@ const auth = authHandler<AuthParams, AuthData>(
     if (data.authorization) {
       const token = data.authorization.replace("Bearer ", "");
       
-      // Check if it's the admin demo password
-      if (token === adminPassword()) {
+      // For demo purposes, accept a simple demo token
+      if (token === 'demo-admin-token') {
         return {
           userID: 'admin',
           email: 'admin@concern2care.demo',

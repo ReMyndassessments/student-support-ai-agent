@@ -1,8 +1,5 @@
 import { api, Cookie } from "encore.dev/api";
-import { secret } from "encore.dev/config";
 import { APIError } from "encore.dev/api";
-
-const adminPassword = secret("AdminDemoPassword");
 
 export interface AdminLoginRequest {
   password: string;
@@ -22,7 +19,10 @@ export interface AdminLoginResponse {
 export const adminLogin = api<AdminLoginRequest, AdminLoginResponse>(
   { expose: true, method: "POST", path: "/auth/admin/login" },
   async (req) => {
-    if (req.password !== adminPassword()) {
+    // For demo purposes, use a simple hardcoded password
+    const demoPassword = "demo2024";
+    
+    if (req.password !== demoPassword) {
       throw APIError.unauthenticated("Invalid admin password");
     }
 

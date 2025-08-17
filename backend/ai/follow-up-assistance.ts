@@ -1,9 +1,6 @@
 import { api } from "encore.dev/api";
-import { secret } from "encore.dev/config";
 import { users } from "~encore/clients";
 import { APIError } from "encore.dev/api";
-
-const deepseekApiKey = secret("DeepSeekAPIKey");
 
 export interface FollowUpAssistanceRequest {
   userEmail: string;
@@ -37,6 +34,17 @@ export const followUpAssistance = api<FollowUpAssistanceRequest, FollowUpAssista
       }
     } catch (error) {
       throw APIError.invalidArgument("No DeepSeek API key available. Please add your API key in your profile settings.");
+    }
+
+    // For demo purposes, if using demo admin key, return mock assistance
+    if (apiKey === 'demo-admin-key-placeholder') {
+      const mockAssistance = generateMockFollowUpAssistance(req);
+      const disclaimer = "⚠️ IMPORTANT DISCLAIMER: This AI-generated assistance is for informational purposes only and should not replace professional educational consultation. Please work with your school's student support department, special education team, or educational specialists for comprehensive guidance. All suggestions should be reviewed and approved by qualified educational professionals before implementation.";
+      
+      return {
+        assistance: mockAssistance,
+        disclaimer
+      };
     }
 
     if (!apiKey) {
@@ -127,3 +135,96 @@ Focus on actionable advice that a classroom teacher can realistically implement.
     }
   }
 );
+
+function generateMockFollowUpAssistance(req: FollowUpAssistanceRequest): string {
+  return `## Direct Answer
+
+Thank you for your question: "${req.specificQuestion}"
+
+Based on your specific implementation question and the original recommendations for ${req.studentFirstName} ${req.studentLastInitial}., here's detailed guidance to help you move forward effectively.
+
+## Implementation Steps
+
+**Step 1: Preparation (Days 1-2)**
+- Gather necessary materials and resources
+- Set up physical space if needed
+- Prepare any visual aids or tools
+- Brief any support staff involved
+
+**Step 2: Introduction (Days 3-5)**
+- Introduce the intervention to the student
+- Explain expectations clearly
+- Model the desired behavior or skill
+- Practice together initially
+
+**Step 3: Implementation (Week 2+)**
+- Begin consistent daily implementation
+- Monitor student response closely
+- Adjust approach based on student needs
+- Document progress regularly
+
+## Practical Tips
+
+- **Start Small**: Begin with shorter sessions and gradually increase
+- **Be Consistent**: Same time, same approach daily
+- **Stay Positive**: Focus on effort and improvement, not perfection
+- **Involve the Student**: Ask for their input and feedback
+- **Communicate**: Keep parents and support team informed
+
+## Resources Needed
+
+- Timer for structured activities
+- Data collection sheet or app
+- Visual supports (charts, pictures)
+- Reinforcement items or activities
+- Communication log for home-school connection
+
+## Timeline Considerations
+
+- **Week 1**: Setup and introduction
+- **Weeks 2-4**: Full implementation with daily monitoring
+- **Week 4**: Mid-point review and adjustments
+- **Weeks 5-6**: Continue with any modifications
+- **Week 6**: Comprehensive review and next steps
+
+## Troubleshooting
+
+**If the student resists:**
+- Check if expectations are too high
+- Increase reinforcement frequency
+- Involve student in goal-setting
+
+**If no progress is seen:**
+- Review implementation fidelity
+- Consider environmental factors
+- Consult with support team
+
+**If behaviors worsen:**
+- Ensure safety first
+- Document incidents
+- Seek immediate support team consultation
+
+## Progress Monitoring
+
+- Daily: Quick check on target behavior/skill
+- Weekly: Review data trends and patterns
+- Bi-weekly: Assess overall effectiveness
+- Monthly: Comprehensive review with team
+
+**Data to Collect:**
+- Frequency of target behavior
+- Duration of interventions
+- Student engagement level
+- Academic performance indicators
+
+## When to Seek Additional Support
+
+Contact your student support team if:
+- No improvement after 3-4 weeks of consistent implementation
+- Student safety concerns arise
+- Behaviors escalate beyond classroom management
+- You need additional resources or training
+- Family has concerns or questions
+
+**Note:** This is demonstration assistance. In a real implementation, the guidance would be more specifically tailored to your exact question and situation.`;
+}
