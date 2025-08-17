@@ -7,8 +7,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Checkbox } from '@/components/ui/checkbox';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Loader2, AlertTriangle, CheckCircle, User, BookOpen, MessageSquare, Sparkles, Save, RotateCcw, Calendar, MapPin, AlertCircle } from 'lucide-react';
+import { Loader2, AlertTriangle, CheckCircle, User, BookOpen, MessageSquare, Sparkles, Save, RotateCcw, Calendar, MapPin, AlertCircle, ArrowLeft } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
+import { Link } from 'react-router-dom';
 import backend from '~backend/client';
 import type { GenerateRecommendationsRequest } from '~backend/ai/generate-recommendations';
 
@@ -260,6 +261,17 @@ export function ReferralForm() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
       <div className="max-w-4xl mx-auto px-4 py-6 sm:py-8 space-y-6">
+        {/* Back Button */}
+        <div className="flex items-center">
+          <Link 
+            to="/" 
+            className="inline-flex items-center text-blue-600 hover:text-blue-700 font-medium transition-colors"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Home
+          </Link>
+        </div>
+
         {/* Header */}
         <div className="text-center space-y-3">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl shadow-lg mb-4">

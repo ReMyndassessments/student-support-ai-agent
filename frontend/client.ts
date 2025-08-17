@@ -84,6 +84,7 @@ export interface ClientOptions {
 /**
  * Import the endpoint handlers to derive the types for the client.
  */
+import { followUpAssistance as api_ai_follow_up_assistance_followUpAssistance } from "~backend/ai/follow-up-assistance";
 import { generateRecommendations as api_ai_generate_recommendations_generateRecommendations } from "~backend/ai/generate-recommendations";
 
 export namespace ai {
@@ -93,7 +94,17 @@ export namespace ai {
 
         constructor(baseClient: BaseClient) {
             this.baseClient = baseClient
+            this.followUpAssistance = this.followUpAssistance.bind(this)
             this.generateRecommendations = this.generateRecommendations.bind(this)
+        }
+
+        /**
+         * Provides follow-up assistance for implementing Tier 2 interventions.
+         */
+        public async followUpAssistance(params: RequestType<typeof api_ai_follow_up_assistance_followUpAssistance>): Promise<ResponseType<typeof api_ai_follow_up_assistance_followUpAssistance>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/ai/follow-up-assistance`, {method: "POST", body: JSON.stringify(params)})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_ai_follow_up_assistance_followUpAssistance>
         }
 
         /**
@@ -111,7 +122,9 @@ export namespace ai {
  * Import the endpoint handlers to derive the types for the client.
  */
 import { create as api_referrals_create_create } from "~backend/referrals/create";
+import { generatePDF as api_referrals_generate_pdf_generatePDF } from "~backend/referrals/generate-pdf";
 import { list as api_referrals_list_list } from "~backend/referrals/list";
+import { shareEmail as api_referrals_share_email_shareEmail } from "~backend/referrals/share-email";
 
 export namespace referrals {
 
@@ -121,7 +134,9 @@ export namespace referrals {
         constructor(baseClient: BaseClient) {
             this.baseClient = baseClient
             this.create = this.create.bind(this)
+            this.generatePDF = this.generatePDF.bind(this)
             this.list = this.list.bind(this)
+            this.shareEmail = this.shareEmail.bind(this)
         }
 
         /**
@@ -131,6 +146,15 @@ export namespace referrals {
             // Now make the actual call to the API
             const resp = await this.baseClient.callTypedAPI(`/referrals`, {method: "POST", body: JSON.stringify(params)})
             return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_referrals_create_create>
+        }
+
+        /**
+         * Generates a PDF report for a referral suitable for student support meetings.
+         */
+        public async generatePDF(params: { referralId: number }): Promise<ResponseType<typeof api_referrals_generate_pdf_generatePDF>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/referrals/${encodeURIComponent(params.referralId)}/pdf`, {method: "POST", body: undefined})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_referrals_generate_pdf_generatePDF>
         }
 
         /**
@@ -146,6 +170,22 @@ export namespace referrals {
             // Now make the actual call to the API
             const resp = await this.baseClient.callTypedAPI(`/referrals`, {query, method: "GET", body: undefined})
             return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_referrals_list_list>
+        }
+
+        /**
+         * Shares a referral via email for student support meetings.
+         */
+        public async shareEmail(params: RequestType<typeof api_referrals_share_email_shareEmail>): Promise<ResponseType<typeof api_referrals_share_email_shareEmail>> {
+            // Construct the body with only the fields which we want encoded within the body (excluding query string or header fields)
+            const body: Record<string, any> = {
+                message:        params.message,
+                recipientEmail: params.recipientEmail,
+                senderName:     params.senderName,
+            }
+
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/referrals/${encodeURIComponent(params.referralId)}/share`, {method: "POST", body: JSON.stringify(body)})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_referrals_share_email_shareEmail>
         }
     }
 }

@@ -4,8 +4,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, AlertTriangle, Search, Calendar, User, FileText, Clock, GraduationCap, MapPin, AlertCircle } from 'lucide-react';
+import { Loader2, AlertTriangle, Search, Calendar, User, FileText, Clock, GraduationCap, MapPin, AlertCircle, ArrowLeft } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
+import { Link } from 'react-router-dom';
 import backend from '~backend/client';
 import type { Referral } from '~backend/referrals/list';
 
@@ -130,6 +131,17 @@ export function ReferralList() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
       <div className="max-w-6xl mx-auto px-4 py-6 sm:py-8 space-y-6">
+        {/* Back Button */}
+        <div className="flex items-center">
+          <Link 
+            to="/" 
+            className="inline-flex items-center text-blue-600 hover:text-blue-700 font-medium transition-colors"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Home
+          </Link>
+        </div>
+
         {/* Header */}
         <div className="text-center space-y-3">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl shadow-lg mb-4">

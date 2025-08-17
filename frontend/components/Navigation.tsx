@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { FileText, List, GraduationCap, Menu, X } from 'lucide-react';
+import { FileText, List, GraduationCap, Menu, X, Home } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 
@@ -10,6 +10,11 @@ export function Navigation() {
   const navItems = [
     {
       to: '/',
+      icon: Home,
+      label: 'Home'
+    },
+    {
+      to: '/new-referral',
       icon: FileText,
       label: 'New Referral'
     },
@@ -21,12 +26,12 @@ export function Navigation() {
   ];
 
   return (
-    <nav className="bg-white shadow-lg border-b border-gray-200">
+    <nav className="bg-white/90 backdrop-blur-md shadow-lg border-b border-gray-200 sticky top-0 z-50">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo and Title */}
-          <div className="flex items-center space-x-3">
-            <div className="bg-gradient-to-br from-blue-600 to-indigo-700 p-2 rounded-lg">
+          <Link to="/" className="flex items-center space-x-3 hover:opacity-80 transition-opacity">
+            <div className="bg-gradient-to-br from-blue-600 to-indigo-700 p-2 rounded-xl shadow-lg">
               <GraduationCap className="h-6 w-6 text-white" />
             </div>
             <div>
@@ -40,7 +45,7 @@ export function Navigation() {
                 from Remynd
               </p>
             </div>
-          </div>
+          </Link>
           
           {/* Desktop Navigation */}
           <div className="hidden md:flex space-x-2">
@@ -50,9 +55,9 @@ export function Navigation() {
                 <Link
                   key={item.to}
                   to={item.to}
-                  className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
                     location.pathname === item.to
-                      ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-md'
+                      ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg'
                       : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                   }`}
                 >
@@ -91,9 +96,9 @@ export function Navigation() {
                     key={item.to}
                     to={item.to}
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className={`flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${
+                    className={`flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
                       location.pathname === item.to
-                        ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-md'
+                        ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg'
                         : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                     }`}
                   >
