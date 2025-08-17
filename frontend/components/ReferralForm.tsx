@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Checkbox } from '@/components/ui/checkbox';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Loader2, AlertTriangle, CheckCircle, ArrowLeft, Sparkles, HelpCircle, User, Calendar, MapPin, AlertCircle } from 'lucide-react';
+import { Loader2, AlertTriangle, CheckCircle, ArrowLeft, Sparkles, HelpCircle, User, Calendar, MapPin, AlertCircle, Key } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { Link, useNavigate } from 'react-router-dom';
 import backend from '~backend/client';
@@ -37,6 +37,7 @@ const ACTIONS_TAKEN = [
 
 export function ReferralForm() {
   const navigate = useNavigate();
+  const [userEmail, setUserEmail] = useState('');
   const [formData, setFormData] = useState({
     studentFirstName: '',
     studentLastInitial: '',
@@ -92,6 +93,15 @@ export function ReferralForm() {
   };
 
   const generateRecommendations = async () => {
+    if (!userEmail) {
+      toast({
+        title: "Email Required",
+        description: "Please enter your email address to generate recommendations.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     if (!formData.studentFirstName || !formData.studentLastInitial || !formData.grade || 
         !formData.teacher || !formData.teacherPosition || !formData.incidentDate ||
         !formData.location || formData.concernTypes.length === 0 || !formData.concernDescription ||
@@ -107,6 +117,7 @@ export function ReferralForm() {
     setIsGenerating(true);
     try {
       const request: GenerateRecommendationsRequest = {
+        userEmail,
         studentFirstName: formData.studentFirstName,
         studentLastInitial: formData.studentLastInitial,
         grade: formData.grade,
@@ -137,17 +148,41 @@ export function ReferralForm() {
       });
     } catch (error) {
       console.error('Error generating recommendations:', error);
-      toast({
-        title: "Error",
-        description: "Failed to generate recommendations. Please try again.",
-        variant: "destructive"
-      });
+      const errorMessage = error instanceof Error ? error.message : "Failed to generate recommendations. Please try again.";
+      
+      if (errorMessage.includes("DeepSeek API key")) {
+        toast({
+          title: "API Key Required",
+          description: "Please add your DeepSeek API key in your profile to use AI features.",
+          variant: "destructive",
+          action: (
+            <Button variant="outline" size="sm" onClick={() => navigate('/profile')}>
+              Go to Profile
+            </Button>
+          )
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: errorMessage,
+          variant: "destructive"
+        });
+      }
     } finally {
       setIsGenerating(false);
     }
   };
 
   const generateFollowUpAssistance = async () => {
+    if (!userEmail) {
+      toast({
+        title: "Email Required",
+        description: "Please enter your email address.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     if (!followUpQuestion.trim()) {
       toast({
         title: "Missing Question",
@@ -160,6 +195,7 @@ export function ReferralForm() {
     setIsGeneratingFollowUp(true);
     try {
       const request: FollowUpAssistanceRequest = {
+        userEmail,
         originalRecommendations: recommendations,
         specificQuestion: followUpQuestion,
         studentFirstName: formData.studentFirstName,
@@ -180,11 +216,26 @@ export function ReferralForm() {
       });
     } catch (error) {
       console.error('Error generating follow-up assistance:', error);
-      toast({
-        title: "Error",
-        description: "Failed to generate follow-up assistance. Please try again.",
-        variant: "destructive"
-      });
+      const errorMessage = error instanceof Error ? error.message : "Failed to generate follow-up assistance. Please try again.";
+      
+      if (errorMessage.includes("DeepSeek API key")) {
+        toast({
+          title: "API Key Required",
+          description: "Please add your DeepSeek API key in your profile to use AI features.",
+          variant: "destructive",
+          action: (
+            <Button variant="outline" size="sm" onClick={() => navigate('/profile')}>
+              Go to Profile
+            </Button>
+          )
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: errorMessage,
+          variant: "destructive"
+        });
+      }
     } finally {
       setIsGeneratingFollowUp(false);
     }
@@ -378,6 +429,39 @@ export function ReferralForm() {
             </p>
           </div>
         </div>
+
+        {/* User Email */}
+        <Card className="border-0 bg-white/80 backdrop-blur-sm shadow-xl rounded-3xl overflow-hidden">
+          <CardHeader className="bg-gradient-to-r from-gray-600 via-slate-600 to-gray-700 text-white rounded-t-3xl">
+            <CardTitle className="flex items-center gap-3 text-xl">
+              <div className="w-10 h-10 bg-white/20 rounded-2xl flex items-center justify-center">
+                <Key className="h-6 w-6" />
+              </div>
+              Your Information
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-6">
+            <div className="space-y-2">
+              <Label htmlFor="userEmail" className="text-sm font-medium text-gray-700">
+                Your Email Address *
+              </Label>
+              <Input
+                id="userEmail"
+                type="email"
+                value={userEmail}
+                onChange={(e) => setUserEmail(e.target.value)}
+                placeholder="your.email@school.edu"
+                className="border-gray-200 rounded-xl focus:border-gray-500 focus:ring-gray-500"
+              />
+              <p className="text-xs text-gray-500">
+                Required to access AI features and save your referrals. 
+                <Link to="/profile" className="text-blue-600 hover:text-blue-700 ml-1">
+                  Configure your DeepSeek API key →
+                </Link>
+              </p>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Student Information */}
         <Card className="border-0 bg-white/80 backdrop-blur-sm shadow-xl rounded-3xl overflow-hidden">
@@ -624,7 +708,7 @@ export function ReferralForm() {
         <div className="flex flex-col sm:flex-row gap-4">
           <Button 
             onClick={generateRecommendations}
-            disabled={isGenerating}
+            disabled={isGenerating || !userEmail}
             className="flex-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 text-white shadow-xl rounded-2xl py-6 text-lg font-semibold transition-all duration-200 transform hover:scale-105"
           >
             {isGenerating ? (
@@ -775,7 +859,7 @@ export function ReferralForm() {
               
               <Button 
                 onClick={generateFollowUpAssistance}
-                disabled={isGeneratingFollowUp || !followUpQuestion.trim()}
+                disabled={isGeneratingFollowUp || !followUpQuestion.trim() || !userEmail}
                 className="bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 text-white shadow-lg rounded-2xl py-3 px-6 transform hover:scale-105 transition-all duration-200"
               >
                 {isGeneratingFollowUp ? (

@@ -1,9 +1,12 @@
 import { api } from "encore.dev/api";
 import { secret } from "encore.dev/config";
+import { users } from "~encore/clients";
+import { APIError } from "encore.dev/api";
 
 const deepseekApiKey = secret("DeepSeekAPIKey");
 
 export interface FollowUpAssistanceRequest {
+  userEmail: string;
   originalRecommendations: string;
   specificQuestion: string;
   studentFirstName: string;
@@ -22,6 +25,25 @@ export interface FollowUpAssistanceResponse {
 export const followUpAssistance = api<FollowUpAssistanceRequest, FollowUpAssistanceResponse>(
   { expose: true, method: "POST", path: "/ai/follow-up-assistance" },
   async (req) => {
+    // Get user's DeepSeek API key
+    let apiKey: string;
+    try {
+      const userKeyResponse = await users.getDeepSeekKey({ email: req.userEmail });
+      if (userKeyResponse.hasKey && userKeyResponse.key) {
+        apiKey = userKeyResponse.key;
+      } else {
+        // Fall back to system key if user doesn't have one
+        apiKey = deepseekApiKey();
+      }
+    } catch (error) {
+      // Fall back to system key if user lookup fails
+      apiKey = deepseekApiKey();
+    }
+
+    if (!apiKey) {
+      throw APIError.invalidArgument("No DeepSeek API key available. Please add your API key in your profile settings.");
+    }
+
     const concernTypesText = req.concernTypes.length > 0 
       ? req.concernTypes.join(', ')
       : 'Not specified';
@@ -58,7 +80,7 @@ Focus on actionable advice that a classroom teacher can realistically implement.
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${deepseekApiKey()}`
+          'Authorization': `Bearer ${apiKey}`
         },
         body: JSON.stringify({
           model: 'deepseek-chat',
@@ -78,6 +100,8 @@ Focus on actionable advice that a classroom teacher can realistically implement.
       });
 
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`DeepSeek API error: ${response.status} - ${errorText}`);
         throw new Error(`DeepSeek API error: ${response.status}`);
       }
 
@@ -92,6 +116,10 @@ Focus on actionable advice that a classroom teacher can realistically implement.
       };
     } catch (error) {
       console.error('Error calling DeepSeek API for follow-up assistance:', error);
+      
+      if (error instanceof Error && error.message.includes('401')) {
+        throw APIError.invalidArgument("Invalid DeepSeek API key. Please check your API key in your profile settings.");
+      }
       
       return {
         assistance: 'Unable to generate follow-up assistance at this time due to a technical error. Please try again later or contact your student support department directly for implementation guidance.',
