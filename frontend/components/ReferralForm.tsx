@@ -9,7 +9,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Loader2, AlertTriangle, CheckCircle, ArrowLeft, Sparkles, HelpCircle, User, Calendar, MapPin, AlertCircle } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import backend from '~backend/client';
 import type { GenerateRecommendationsRequest } from '~backend/ai/generate-recommendations';
 import type { FollowUpAssistanceRequest } from '~backend/ai/follow-up-assistance';
@@ -36,6 +36,7 @@ const ACTIONS_TAKEN = [
 ];
 
 export function ReferralForm() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     studentFirstName: '',
     studentLastInitial: '',
@@ -58,6 +59,7 @@ export function ReferralForm() {
   const [isSaving, setIsSaving] = useState(false);
   const [hasGenerated, setHasGenerated] = useState(false);
   const [hasSaved, setHasSaved] = useState(false);
+  const [savedReferralId, setSavedReferralId] = useState<number | null>(null);
   
   // Follow-up assistance state
   const [followUpQuestion, setFollowUpQuestion] = useState('');
@@ -204,7 +206,7 @@ export function ReferralForm() {
         ? `${recommendations}\n\n--- FOLLOW-UP ASSISTANCE ---\n\nTeacher's Question: ${followUpQuestion}\n\nAdditional Guidance:\n${followUpAssistance}`
         : recommendations;
 
-      await backend.referrals.create({
+      const response = await backend.referrals.create({
         studentFirstName: formData.studentFirstName,
         studentLastInitial: formData.studentLastInitial,
         grade: formData.grade,
@@ -222,6 +224,7 @@ export function ReferralForm() {
       });
 
       setHasSaved(true);
+      setSavedReferralId(response.id);
       toast({
         title: "Referral Saved",
         description: "The referral form has been saved successfully."
@@ -258,6 +261,7 @@ export function ReferralForm() {
     setDisclaimer('');
     setHasGenerated(false);
     setHasSaved(false);
+    setSavedReferralId(null);
     setFollowUpQuestion('');
     setFollowUpAssistance('');
     setFollowUpDisclaimer('');
@@ -670,6 +674,44 @@ export function ReferralForm() {
             Reset Form
           </Button>
         </div>
+
+        {/* Success Actions */}
+        {hasSaved && savedReferralId && (
+          <Card className="border-0 bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 shadow-xl rounded-3xl overflow-hidden">
+            <CardHeader className="bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500 text-white rounded-t-3xl">
+              <CardTitle className="flex items-center gap-3 text-xl">
+                <div className="w-10 h-10 bg-white/20 rounded-2xl flex items-center justify-center">
+                  <CheckCircle className="h-6 w-6" />
+                </div>
+                Referral Saved Successfully!
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-6">
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Button
+                  onClick={() => navigate('/referrals')}
+                  className="bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 text-white shadow-lg rounded-2xl px-6 py-3"
+                >
+                  View All Referrals
+                </Button>
+                <Button
+                  onClick={() => navigate(`/meeting/${savedReferralId}`)}
+                  variant="outline"
+                  className="border-green-500 text-green-700 hover:bg-green-50 rounded-2xl px-6 py-3"
+                >
+                  Prepare for Meeting
+                </Button>
+                <Button
+                  onClick={resetForm}
+                  variant="outline"
+                  className="border-gray-300 text-gray-700 hover:bg-white/80 rounded-2xl px-6 py-3"
+                >
+                  Create Another Referral
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Recommendations Display */}
         {recommendations && (

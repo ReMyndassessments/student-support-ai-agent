@@ -7,7 +7,7 @@ import { Loader2, AlertTriangle, Users, Calendar, MapPin, FileText, Download, Pr
 import { useToast } from '@/components/ui/use-toast';
 import { useParams, Link } from 'react-router-dom';
 import backend from '~backend/client';
-import type { Referral } from '~backend/referrals/list';
+import type { Referral } from '~backend/referrals/get';
 
 export function MeetingPreparation() {
   const { referralId } = useParams<{ referralId: string }>();
@@ -25,10 +25,8 @@ export function MeetingPreparation() {
   const loadReferral = async () => {
     try {
       setLoading(true);
-      // In a real implementation, you would have a get single referral endpoint
-      const response = await backend.referrals.list({ limit: 1 });
-      const foundReferral = response.referrals.find(r => r.id === parseInt(referralId!));
-      setReferral(foundReferral || null);
+      const response = await backend.referrals.get({ id: parseInt(referralId!) });
+      setReferral(response);
     } catch (error) {
       console.error('Error loading referral:', error);
       toast({
