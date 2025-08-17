@@ -11,9 +11,9 @@ import { UserProfile } from './components/UserProfile';
 import { SubscriptionGate } from './components/SubscriptionGate';
 
 export default function App() {
-  // For demo purposes, using a placeholder email
   // In a real app, this would come from authentication
-  const userEmail = "demo@school.edu";
+  // For now, using a placeholder that will require subscription
+  const userEmail = "teacher@school.edu";
 
   return (
     <Router>

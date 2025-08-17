@@ -31,26 +31,18 @@ export interface GenerateRecommendationsResponse {
 export const generateRecommendations = api<GenerateRecommendationsRequest, GenerateRecommendationsResponse>(
   { expose: true, method: "POST", path: "/ai/recommendations" },
   async (req) => {
-    // Check if this is a demo user
-    const isDemoUser = req.userEmail === "demo@school.edu";
-    
+    // Get user's personal DeepSeek API key
     let apiKey: string;
     
-    if (isDemoUser) {
-      // Use admin key for demo users
-      apiKey = deepseekApiKey();
-    } else {
-      // Get user's personal DeepSeek API key for real users
-      try {
-        const userKeyResponse = await users.getDeepSeekKey({ email: req.userEmail });
-        if (userKeyResponse.hasKey && userKeyResponse.key) {
-          apiKey = userKeyResponse.key;
-        } else {
-          throw APIError.invalidArgument("No DeepSeek API key found. Please add your API key in your profile settings to use AI features.");
-        }
-      } catch (error) {
-        throw APIError.invalidArgument("No DeepSeek API key available. Please add your API key in your profile settings.");
+    try {
+      const userKeyResponse = await users.getDeepSeekKey({ email: req.userEmail });
+      if (userKeyResponse.hasKey && userKeyResponse.key) {
+        apiKey = userKeyResponse.key;
+      } else {
+        throw APIError.invalidArgument("No DeepSeek API key found. Please add your API key in your profile settings to use AI features.");
       }
+    } catch (error) {
+      throw APIError.invalidArgument("No DeepSeek API key available. Please add your API key in your profile settings.");
     }
 
     if (!apiKey) {
@@ -140,11 +132,7 @@ Use professional educational terminology and ensure recommendations are practica
       console.error('Error calling DeepSeek API:', error);
       
       if (error instanceof Error && error.message.includes('401')) {
-        if (isDemoUser) {
-          throw APIError.internal("Demo API key configuration error. Please contact support.");
-        } else {
-          throw APIError.invalidArgument("Invalid DeepSeek API key. Please check your API key in your profile settings.");
-        }
+        throw APIError.invalidArgument("Invalid DeepSeek API key. Please check your API key in your profile settings.");
       }
       
       return {

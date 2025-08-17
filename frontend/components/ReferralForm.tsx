@@ -37,7 +37,7 @@ const ACTIONS_TAKEN = [
 
 export function ReferralForm() {
   const navigate = useNavigate();
-  const [userEmail, setUserEmail] = useState('demo@school.edu');
+  const [userEmail, setUserEmail] = useState('teacher@school.edu');
   const [formData, setFormData] = useState({
     studentFirstName: '',
     studentLastInitial: '',
@@ -150,7 +150,7 @@ export function ReferralForm() {
       console.error('Error generating recommendations:', error);
       const errorMessage = error instanceof Error ? error.message : "Failed to generate recommendations. Please try again.";
       
-      if (errorMessage.includes("DeepSeek API key") && userEmail !== "demo@school.edu") {
+      if (errorMessage.includes("DeepSeek API key")) {
         toast({
           title: "API Key Required",
           description: "Please add your DeepSeek API key in your profile to use AI features.",
@@ -218,7 +218,7 @@ export function ReferralForm() {
       console.error('Error generating follow-up assistance:', error);
       const errorMessage = error instanceof Error ? error.message : "Failed to generate follow-up assistance. Please try again.";
       
-      if (errorMessage.includes("DeepSeek API key") && userEmail !== "demo@school.edu") {
+      if (errorMessage.includes("DeepSeek API key")) {
         toast({
           title: "API Key Required",
           description: "Please add your DeepSeek API key in your profile to use AI features.",
@@ -397,8 +397,6 @@ export function ReferralForm() {
     return formattedLines;
   };
 
-  const isDemoUser = userEmail === "demo@school.edu";
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
       <div className="max-w-4xl mx-auto px-6 py-8 space-y-8">
@@ -456,19 +454,10 @@ export function ReferralForm() {
                 className="border-gray-200 rounded-xl focus:border-gray-500 focus:ring-gray-500"
               />
               <div className="text-xs text-gray-500">
-                {isDemoUser ? (
-                  <div className="flex items-center gap-2 text-blue-600">
-                    <CheckCircle className="h-3 w-3" />
-                    Demo mode - AI features enabled with admin key
-                  </div>
-                ) : (
-                  <>
-                    Required to access AI features and save your referrals. 
-                    <Link to="/profile" className="text-blue-600 hover:text-blue-700 ml-1">
-                      Configure your DeepSeek API key →
-                    </Link>
-                  </>
-                )}
+                Required to access AI features and save your referrals. 
+                <Link to="/profile" className="text-blue-600 hover:text-blue-700 ml-1">
+                  Configure your DeepSeek API key →
+                </Link>
               </div>
             </div>
           </CardContent>

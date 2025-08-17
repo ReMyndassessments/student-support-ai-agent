@@ -15,11 +15,6 @@ interface SubscriptionGateProps {
 export function SubscriptionGate({ userEmail, children, feature = "this feature" }: SubscriptionGateProps) {
   const { hasActiveSubscription, loading } = useSubscription(userEmail);
 
-  // Allow demo user to access all features
-  if (userEmail === "demo@school.edu") {
-    return <>{children}</>;
-  }
-
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex items-center justify-center">
