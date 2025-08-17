@@ -15,14 +15,14 @@ export function Navigation({ userEmail = "teacher@school.edu", isAdmin = false, 
 
   const adminNavItems = [
     {
+      to: '/',
+      icon: Home,
+      label: 'Landing Page'
+    },
+    {
       to: '/admin',
       icon: Shield,
       label: 'Admin Dashboard'
-    },
-    {
-      to: '/landing',
-      icon: Home,
-      label: 'Landing Page'
     },
     {
       to: '/new-referral',
@@ -66,7 +66,7 @@ export function Navigation({ userEmail = "teacher@school.edu", isAdmin = false, 
       <div className="max-w-6xl mx-auto px-6">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to={isAdmin ? "/admin" : "/"} className="flex items-center space-x-3 hover:opacity-80 transition-opacity">
+          <Link to="/" className="flex items-center space-x-3 hover:opacity-80 transition-opacity">
             <div className="w-10 h-10 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 rounded-2xl flex items-center justify-center shadow-lg">
               <GraduationCap className="h-6 w-6 text-white" />
             </div>
@@ -86,8 +86,7 @@ export function Navigation({ userEmail = "teacher@school.edu", isAdmin = false, 
           <div className="hidden md:flex items-center space-x-2">
             {navItems.map((item) => {
               const Icon = item.icon;
-              const isActive = location.pathname === item.to || 
-                (item.to === '/admin' && location.pathname === '/');
+              const isActive = location.pathname === item.to;
               
               return (
                 <Link
@@ -141,8 +140,7 @@ export function Navigation({ userEmail = "teacher@school.edu", isAdmin = false, 
             <div className="space-y-2">
               {navItems.map((item) => {
                 const Icon = item.icon;
-                const isActive = location.pathname === item.to ||
-                  (item.to === '/admin' && location.pathname === '/');
+                const isActive = location.pathname === item.to;
                 
                 return (
                   <Link

@@ -2,12 +2,14 @@ import { Link } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Sparkles, Users, Brain, Shield, CreditCard, Mail } from 'lucide-react';
+import { AdminLoginFooter } from './AdminLoginFooter';
 
 interface LandingPageProps {
   userEmail?: string;
+  onAdminLogin?: (user: { email: string; name: string; isAdmin: boolean }) => void;
 }
 
-export function LandingPage({ userEmail = "teacher@school.edu" }: LandingPageProps) {
+export function LandingPage({ userEmail = "teacher@school.edu", onAdminLogin }: LandingPageProps) {
   const features = [
     {
       icon: Brain,
@@ -271,6 +273,9 @@ Thank you!`);
           </Card>
         </div>
       </div>
+
+      {/* Admin Login Footer */}
+      {onAdminLogin && <AdminLoginFooter onAdminLogin={onAdminLogin} />}
     </div>
   );
 }

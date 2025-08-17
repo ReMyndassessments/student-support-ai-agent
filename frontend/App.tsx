@@ -73,91 +73,69 @@ export default function App() {
     );
   }
 
-  // If no user is logged in, show admin login
-  if (!user) {
-    return (
-      <>
-        <AdminLogin onLoginSuccess={handleLoginSuccess} />
-        <Toaster />
-      </>
-    );
-  }
-
-  // If admin is logged in, show admin dashboard or full app
-  if (user.isAdmin) {
-    return (
-      <Router>
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
-          <Navigation userEmail={user.email} isAdmin={true} onLogout={handleLogout} />
-          <main>
-            <Routes>
-              <Route path="/" element={<AdminDashboard user={user} onLogout={handleLogout} />} />
-              <Route path="/admin" element={<AdminDashboard user={user} onLogout={handleLogout} />} />
-              <Route path="/landing" element={<LandingPage userEmail={user.email} />} />
-              <Route path="/new-referral" element={<ReferralForm />} />
-              <Route path="/referrals" element={<ReferralList />} />
-              <Route path="/meeting/:referralId" element={<MeetingPreparation />} />
-              <Route path="/profile" element={
-                <div className="max-w-4xl mx-auto px-6 py-8">
-                  <div className="text-center mb-8">
-                    <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
-                      Admin Profile
-                    </h1>
-                    <p className="text-gray-600">
-                      Demo administrator account settings
-                    </p>
-                  </div>
-                  <UserProfile userEmail={user.email} />
-                </div>
-              } />
-              <Route path="/subscription/plans" element={<SubscriptionPlans />} />
-              <Route path="/subscription/success" element={<SubscriptionSuccess />} />
-            </Routes>
-          </main>
-          <Toaster />
-        </div>
-      </Router>
-    );
-  }
-
-  // Regular user flow (this won't be reached in demo mode, but keeping for completeness)
   return (
     <Router>
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
-        <Navigation userEmail={user.email} />
+        <Navigation userEmail={user?.email || "teacher@school.edu"} isAdmin={user?.isAdmin} onLogout={handleLogout} />
         <main>
           <Routes>
-            <Route path="/" element={<LandingPage userEmail={user.email} />} />
-            <Route path="/new-referral" element={
-              <SubscriptionGate userEmail={user.email} feature="referral creation">
-                <ReferralForm />
-              </SubscriptionGate>
-            } />
-            <Route path="/referrals" element={
-              <SubscriptionGate userEmail={user.email} feature="referral management">
-                <ReferralList />
-              </SubscriptionGate>
-            } />
-            <Route path="/meeting/:referralId" element={
-              <SubscriptionGate userEmail={user.email} feature="meeting preparation">
-                <MeetingPreparation />
-              </SubscriptionGate>
-            } />
-            <Route path="/profile" element={
-              <SubscriptionGate userEmail={user.email} feature="profile management">
-                <div className="max-w-4xl mx-auto px-6 py-8">
-                  <div className="text-center mb-8">
-                    <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
-                      User Profile
-                    </h1>
-                    <p className="text-gray-600">
-                      Manage your account settings and API configuration
-                    </p>
+            <Route path="/" element={<LandingPage userEmail={user?.email || "teacher@school.edu"} onAdminLogin={handleLoginSuccess} />} />
+            <Route path="/admin-login" element={<AdminLogin onLoginSuccess={handleLoginSuccess} />} />
+            {user?.isAdmin ? (
+              <>
+                <Route path="/admin" element={<AdminDashboard user={user} onLogout={handleLogout} />} />
+                <Route path="/new-referral" element={<ReferralForm />} />
+                <Route path="/referrals" element={<ReferralList />} />
+                <Route path="/meeting/:referralId" element={<MeetingPreparation />} />
+                <Route path="/profile" element={
+                  <div className="max-w-4xl mx-auto px-6 py-8">
+                    <div className="text-center mb-8">
+                      <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
+                        Admin Profile
+                      </h1>
+                      <p className="text-gray-600">
+                        Demo administrator account settings
+                      </p>
+                    </div>
+                    <UserProfile userEmail={user.email} />
                   </div>
-                  <UserProfile userEmail={user.email} />
-                </div>
-              </SubscriptionGate>
-            } />
+                } />
+              </>
+            ) : (
+              <>
+                <Route path="/admin" element={<LandingPage userEmail={user?.email || "teacher@school.edu"} onAdminLogin={handleLoginSuccess} />} />
+                <Route path="/new-referral" element={
+                  <SubscriptionGate userEmail={user?.email || "teacher@school.edu"} feature="referral creation">
+                    <ReferralForm />
+                  </SubscriptionGate>
+                } />
+                <Route path="/referrals" element={
+                  <SubscriptionGate userEmail={user?.email || "teacher@school.edu"} feature="referral management">
+                    <ReferralList />
+                  </SubscriptionGate>
+                } />
+                <Route path="/meeting/:referralId" element={
+                  <SubscriptionGate userEmail={user?.email || "teacher@school.edu"} feature="meeting preparation">
+                    <MeetingPreparation />
+                  </SubscriptionGate>
+                } />
+                <Route path="/profile" element={
+                  <SubscriptionGate userEmail={user?.email || "teacher@school.edu"} feature="profile management">
+                    <div className="max-w-4xl mx-auto px-6 py-8">
+                      <div className="text-center mb-8">
+                        <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
+                          User Profile
+                        </h1>
+                        <p className="text-gray-600">
+                          Manage your account settings and API configuration
+                        </p>
+                      </div>
+                      <UserProfile userEmail={user?.email || "teacher@school.edu"} />
+                    </div>
+                  </SubscriptionGate>
+                } />
+              </>
+            )}
             <Route path="/subscription/plans" element={<SubscriptionPlans />} />
             <Route path="/subscription/success" element={<SubscriptionSuccess />} />
           </Routes>
