@@ -34,6 +34,7 @@ const BROWSER = typeof globalThis === "object" && ("window" in globalThis);
  */
 export class Client {
     public readonly ai: ai.ServiceClient
+    public readonly polar: polar.ServiceClient
     public readonly referrals: referrals.ServiceClient
     private readonly options: ClientOptions
     private readonly target: string
@@ -50,6 +51,7 @@ export class Client {
         this.options = options ?? {}
         const base = new BaseClient(this.target, this.options)
         this.ai = new ai.ServiceClient(base)
+        this.polar = new polar.ServiceClient(base)
         this.referrals = new referrals.ServiceClient(base)
     }
 
@@ -114,6 +116,76 @@ export namespace ai {
             // Now make the actual call to the API
             const resp = await this.baseClient.callTypedAPI(`/ai/recommendations`, {method: "POST", body: JSON.stringify(params)})
             return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_ai_generate_recommendations_generateRecommendations>
+        }
+    }
+}
+
+/**
+ * Import the endpoint handlers to derive the types for the client.
+ */
+import { checkSubscription as api_polar_check_subscription_checkSubscription } from "~backend/polar/check-subscription";
+import { createCheckout as api_polar_create_checkout_createCheckout } from "~backend/polar/create-checkout";
+import { listSubscriptions as api_polar_list_subscriptions_listSubscriptions } from "~backend/polar/list-subscriptions";
+import { webhook as api_polar_webhook_webhook } from "~backend/polar/webhook";
+
+export namespace polar {
+
+    export class ServiceClient {
+        private baseClient: BaseClient
+
+        constructor(baseClient: BaseClient) {
+            this.baseClient = baseClient
+            this.checkSubscription = this.checkSubscription.bind(this)
+            this.createCheckout = this.createCheckout.bind(this)
+            this.listSubscriptions = this.listSubscriptions.bind(this)
+            this.webhook = this.webhook.bind(this)
+        }
+
+        /**
+         * Checks if a user has an active subscription.
+         */
+        public async checkSubscription(params: RequestType<typeof api_polar_check_subscription_checkSubscription>): Promise<ResponseType<typeof api_polar_check_subscription_checkSubscription>> {
+            // Convert our params into the objects we need for the request
+            const query = makeRecord<string, string | string[]>({
+                email: params.email,
+            })
+
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/polar/subscription/check`, {query, method: "GET", body: undefined})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_polar_check_subscription_checkSubscription>
+        }
+
+        /**
+         * Creates a Polar checkout session for subscription purchase.
+         */
+        public async createCheckout(params: RequestType<typeof api_polar_create_checkout_createCheckout>): Promise<ResponseType<typeof api_polar_create_checkout_createCheckout>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/polar/checkout`, {method: "POST", body: JSON.stringify(params)})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_polar_create_checkout_createCheckout>
+        }
+
+        /**
+         * Lists all subscriptions with optional filtering.
+         */
+        public async listSubscriptions(params: RequestType<typeof api_polar_list_subscriptions_listSubscriptions>): Promise<ResponseType<typeof api_polar_list_subscriptions_listSubscriptions>> {
+            // Convert our params into the objects we need for the request
+            const query = makeRecord<string, string | string[]>({
+                limit:  params.limit === undefined ? undefined : String(params.limit),
+                status: params.status,
+            })
+
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/polar/subscriptions`, {query, method: "GET", body: undefined})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_polar_list_subscriptions_listSubscriptions>
+        }
+
+        /**
+         * Handles Polar webhook events for subscription management.
+         */
+        public async webhook(params: RequestType<typeof api_polar_webhook_webhook>): Promise<ResponseType<typeof api_polar_webhook_webhook>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/polar/webhook`, {method: "POST", body: JSON.stringify(params)})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_polar_webhook_webhook>
         }
     }
 }

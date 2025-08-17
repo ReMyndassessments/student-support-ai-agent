@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { FileText, List, ArrowRight, Plus, Eye, Sparkles, Users, Brain, Shield } from 'lucide-react';
+import { FileText, List, ArrowRight, Plus, Eye, Sparkles, Users, Brain, Shield, CreditCard } from 'lucide-react';
 
 export function LandingPage() {
   const quickActions = [
@@ -20,6 +20,14 @@ export function LandingPage() {
       description: 'Review submitted referrals',
       gradient: 'from-emerald-500 via-teal-500 to-cyan-600',
       bgGradient: 'from-emerald-50 to-cyan-50'
+    },
+    {
+      to: '/subscription/plans',
+      icon: CreditCard,
+      title: 'Subscribe',
+      description: 'Unlock premium features',
+      gradient: 'from-purple-500 via-pink-500 to-rose-600',
+      bgGradient: 'from-purple-50 to-rose-50'
     }
   ];
 
@@ -76,7 +84,7 @@ export function LandingPage() {
         </div>
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
           {quickActions.map((action) => {
             const Icon = action.icon;
             return (
@@ -188,6 +196,33 @@ export function LandingPage() {
               </div>
             ))}
           </div>
+        </div>
+
+        {/* CTA Section */}
+        <div className="text-center mt-16">
+          <Card className="border-0 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 shadow-2xl rounded-3xl overflow-hidden">
+            <CardContent className="p-12">
+              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+                Ready to Transform Student Support?
+              </h2>
+              <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
+                Join thousands of educators using AI-powered tools to better support their students.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Link to="/subscription/plans">
+                  <Button className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 text-white shadow-xl rounded-2xl py-6 px-8 text-lg font-semibold transition-all duration-200 transform hover:scale-105">
+                    <CreditCard className="mr-2 h-5 w-5" />
+                    Start Free Trial
+                  </Button>
+                </Link>
+                <Link to="/new-referral">
+                  <Button variant="outline" className="border-gray-300 text-gray-700 hover:bg-white/80 rounded-2xl py-6 px-8 text-lg font-semibold">
+                    Try Demo
+                  </Button>
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>

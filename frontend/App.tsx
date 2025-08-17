@@ -5,6 +5,8 @@ import { LandingPage } from './components/LandingPage';
 import { ReferralForm } from './components/ReferralForm';
 import { ReferralList } from './components/ReferralList';
 import { MeetingPreparation } from './components/MeetingPreparation';
+import { SubscriptionPlans } from './components/SubscriptionPlans';
+import { SubscriptionSuccess } from './components/SubscriptionSuccess';
 
 export default function App() {
   return (
@@ -17,6 +19,8 @@ export default function App() {
             <Route path="/new-referral" element={<ReferralForm />} />
             <Route path="/referrals" element={<ReferralList />} />
             <Route path="/meeting/:referralId" element={<MeetingPreparation />} />
+            <Route path="/subscription/plans" element={<SubscriptionPlans />} />
+            <Route path="/subscription/success" element={<SubscriptionSuccess />} />
           </Routes>
         </main>
         <Toaster />
