@@ -75,7 +75,7 @@ export function LandingPage() {
               </span>
             </h1>
             <p className="text-xl sm:text-2xl text-gray-700 mb-2 font-medium">
-              AI-Powered Student Support System
+              AI-Powered Tier 2 Student Support System for Teachers
             </p>
             <p className="text-sm text-gray-500 font-medium">
               from Remynd
