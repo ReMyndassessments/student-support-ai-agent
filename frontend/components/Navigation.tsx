@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Home, Menu, X, GraduationCap, FileText, Users, LogOut } from 'lucide-react';
+import { Home, Menu, X, GraduationCap, FileText, Users, LogOut, CreditCard } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 
@@ -36,6 +36,11 @@ export function Navigation({ userEmail = "teacher@school.edu", isAdmin = false, 
       to: '/',
       icon: Home,
       label: 'Home'
+    },
+    {
+      to: '/subscription/plans',
+      icon: CreditCard,
+      label: 'Subscribe'
     }
   ];
 
