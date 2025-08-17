@@ -74,7 +74,7 @@ _________________________________
 - **3 days:** ________________________________
 - **5 days:** ________________________________
 
-### If I Don''t Meet My Goals:
+### If I Do Not Meet My Goals:
 - **First time:** ________________________________
 - **Second time:** ________________________________
 - **Third time:** ________________________________
@@ -297,7 +297,7 @@ Sensory breaks help students regulate their sensory systems and improve focus an
 ### Proprioceptive Input
 - Jumping jacks
 - Marching in place
-- Yoga poses (child''s pose, downward dog)
+- Yoga poses (child pose, downward dog)
 - Stretching exercises
 - Heavy work tasks (moving desks, organizing supplies)
 
@@ -336,7 +336,7 @@ Sensory breaks help students regulate their sensory systems and improve focus an
 ### Creating a Sensory Break Schedule
 1. **Identify triggers** - When does the student need breaks?
 2. **Set regular intervals** - Every 20-30 minutes or as needed
-3. **Choose appropriate activities** - Match to student''s needs
+3. **Choose appropriate activities** - Match to student needs
 4. **Monitor effectiveness** - Track what works best
 
 ### Sensory Break Card System
@@ -597,7 +597,7 @@ Students will learn and practice appropriate ways to initiate friendships.
    - Use a friendly voice
 
 3. **Start a conversation**
-   - "Hi, I''m [name]. What''s your name?"
+   - "Hi, I am [name]. What is your name?"
    - "What are you doing? Can I join?"
    - "I like your [item]. Where did you get it?"
 
@@ -665,7 +665,7 @@ Students will learn peaceful ways to resolve conflicts with peers.
 
 3. **Listen to the Other Person**
    - Make eye contact
-   - Don''t interrupt
+   - Do not interrupt
    - Try to understand their perspective
 
 4. **Find a Solution Together**
@@ -709,7 +709,7 @@ Students will recognize emotions in others and respond with empathy.
 ### Lesson Structure (30 minutes)
 
 #### Introduction (5 minutes)
-- Define empathy as understanding others'' feelings
+- Define empathy as understanding others feelings
 - Discuss why empathy is important
 - Share examples of empathetic responses
 
@@ -722,18 +722,18 @@ Students will recognize emotions in others and respond with empathy.
 
 2. **Listen Carefully**
    - Pay attention to words
-   - Notice what''s not being said
+   - Notice what is not being said
    - Ask clarifying questions
 
 3. **Reflect Their Feelings**
-   - "It sounds like you''re feeling..."
+   - "It sounds like you are feeling..."
    - "That must have been..."
-   - "I can see why you''d feel..."
+   - "I can see why you would feel..."
 
 4. **Offer Support**
    - "Is there anything I can do to help?"
    - "Would you like to talk about it?"
-   - "I''m here for you"
+   - "I am here for you"
 
 #### Guided Practice (10 minutes)
 - Practice reading facial expressions
@@ -743,7 +743,7 @@ Students will recognize emotions in others and respond with empathy.
 #### Independent Practice (5 minutes)
 - Partner practice with emotion cards
 - Create empathy response cards
-- Plan to notice others'' feelings today
+- Plan to notice others feelings today
 
 ### Assessment
 - Observe emotion recognition accuracy
@@ -988,7 +988,7 @@ Rating: 😊 😐 😞
 ## Teaching Executive Function Skills
 
 ### Explicit Instruction
-1. **Explain** the skill and why it''s important
+1. **Explain** the skill and why it is important
 2. **Model** the skill in action
 3. **Practice** together with guidance
 4. **Apply** independently with support
