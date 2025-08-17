@@ -1,12 +1,11 @@
 import { api } from "encore.dev/api";
 import { APIError } from "encore.dev/api";
 import { secret } from "encore.dev/config";
+import { getAuthData } from "~encore/auth";
 
 const polarApiKey = secret("PolarApiKey");
 
 export interface CreateCheckoutRequest {
-  customerEmail: string;
-  customerName?: string;
   planType: 'teacher' | 'school' | 'district';
   successUrl: string;
   cancelUrl?: string;
@@ -26,8 +25,9 @@ const PRODUCT_IDS = {
 
 // Creates a Polar checkout session for subscription purchase.
 export const createCheckout = api<CreateCheckoutRequest, CreateCheckoutResponse>(
-  { expose: true, method: "POST", path: "/polar/checkout" },
+  { expose: true, method: "POST", path: "/polar/checkout", auth: true },
   async (req) => {
+    const auth = getAuthData()!;
     const apiKey = polarApiKey();
     const productId = PRODUCT_IDS[req.planType]();
     
@@ -41,15 +41,17 @@ export const createCheckout = api<CreateCheckoutRequest, CreateCheckoutResponse>
 
     try {
       // Create checkout session with Polar API
+      // IMPORTANT: Use the authenticated user's email, not a provided email
       const checkoutData = {
         product_id: productId,
-        customer_email: req.customerEmail,
-        customer_name: req.customerName,
+        customer_email: auth.email,
+        customer_name: auth.name,
         success_url: req.successUrl,
         cancel_url: req.cancelUrl || req.successUrl,
         metadata: {
           plan_type: req.planType,
-          customer_email: req.customerEmail
+          customer_email: auth.email,
+          user_id: auth.userID
         }
       };
 
@@ -70,7 +72,7 @@ export const createCheckout = api<CreateCheckoutRequest, CreateCheckoutResponse>
 
       const checkout = await response.json();
       
-      console.log(`Checkout created for ${req.customerEmail} - ${req.planType} plan: ${checkout.id}`);
+      console.log(`Checkout created for ${auth.email} - ${req.planType} plan: ${checkout.id}`);
       
       return {
         checkoutUrl: checkout.url,

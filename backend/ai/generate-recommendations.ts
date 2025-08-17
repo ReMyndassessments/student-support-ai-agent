@@ -1,9 +1,9 @@
 import { api } from "encore.dev/api";
 import { users } from "~encore/clients";
 import { APIError } from "encore.dev/api";
+import { getAuthData } from "~encore/auth";
 
 export interface GenerateRecommendationsRequest {
-  userEmail: string;
   studentFirstName: string;
   studentLastInitial: string;
   grade: string;
@@ -26,13 +26,25 @@ export interface GenerateRecommendationsResponse {
 
 // Generates Tier 2 intervention recommendations based on student information and concerns.
 export const generateRecommendations = api<GenerateRecommendationsRequest, GenerateRecommendationsResponse>(
-  { expose: true, method: "POST", path: "/ai/recommendations" },
+  { expose: true, method: "POST", path: "/ai/recommendations", auth: true },
   async (req) => {
+    const auth = getAuthData()!;
+    
+    // Check user access to AI recommendations feature
+    const accessCheck = await users.checkAccess({ 
+      email: auth.email, 
+      feature: 'ai_recommendations' 
+    });
+    
+    if (!accessCheck.hasAccess) {
+      throw APIError.permissionDenied(`Access denied: ${accessCheck.reason}. Please upgrade to ${accessCheck.suggestedPlan} plan.`);
+    }
+
     // Get user's personal DeepSeek API key
     let apiKey: string;
     
     try {
-      const userKeyResponse = await users.getDeepSeekKey({ email: req.userEmail });
+      const userKeyResponse = await users.getDeepSeekKey({ email: auth.email });
       if (userKeyResponse.hasKey && userKeyResponse.key) {
         apiKey = userKeyResponse.key;
       } else {

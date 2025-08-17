@@ -1,11 +1,10 @@
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, Check, Users, Building, GraduationCap, ArrowRight, Sparkles, Mail, AlertTriangle } from 'lucide-react';
+import { Loader2, Check, Users, Building, GraduationCap, ArrowRight, Sparkles, Mail, AlertTriangle, Shield } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
+import { useAuth } from '@clerk/clerk-react';
 import backend from '~backend/client';
 
 interface Plan {
@@ -31,6 +30,7 @@ const plans: Plan[] = [
       'PDF report generation',
       'Email sharing',
       'Follow-up assistance',
+      'Personal API key integration',
       'Basic analytics'
     ],
     icon: GraduationCap,
@@ -41,7 +41,7 @@ const plans: Plan[] = [
     id: 'school',
     name: 'School Plan',
     price: '$125/month',
-    description: 'For entire schools and departments',
+    description: 'For schools with collaboration features',
     features: [
       'Everything in Teacher Plan',
       'Multi-teacher collaboration',
@@ -49,7 +49,8 @@ const plans: Plan[] = [
       'Admin dashboard',
       'Priority support',
       'Custom branding',
-      'Data export tools'
+      'Data export tools',
+      'Bulk user management'
     ],
     icon: Building,
     gradient: 'from-purple-500 to-pink-600',
@@ -68,7 +69,8 @@ const plans: Plan[] = [
       'Dedicated account manager',
       'Training & onboarding',
       'SLA guarantee',
-      'White-label options'
+      'White-label options',
+      'Enterprise security'
     ],
     icon: Users,
     gradient: 'from-emerald-500 to-teal-600',
@@ -77,19 +79,16 @@ const plans: Plan[] = [
 ];
 
 export function SubscriptionPlans() {
-  const [customerInfo, setCustomerInfo] = useState({
-    email: '',
-    name: ''
-  });
   const [isCreatingCheckout, setIsCreatingCheckout] = useState(false);
   const [configurationError, setConfigurationError] = useState(false);
   const { toast } = useToast();
+  const { isSignedIn, getToken } = useAuth();
 
   const handleSubscribe = async (planType: 'teacher' | 'school' | 'district') => {
-    if (!customerInfo.email) {
+    if (!isSignedIn) {
       toast({
-        title: "Email Required",
-        description: "Please enter your email address to continue.",
+        title: "Sign In Required",
+        description: "Please sign in to subscribe to a plan.",
         variant: "destructive"
       });
       return;
@@ -99,9 +98,12 @@ export function SubscriptionPlans() {
     setConfigurationError(false);
     
     try {
-      const response = await backend.polar.createCheckout({
-        customerEmail: customerInfo.email,
-        customerName: customerInfo.name || undefined,
+      // Get the authentication token
+      const token = await getToken();
+      
+      const response = await backend.with({ 
+        auth: async () => ({ authorization: `Bearer ${token}` })
+      }).polar.createCheckout({
         planType,
         successUrl: `${window.location.origin}/subscription/success`,
         cancelUrl: `${window.location.origin}/subscription/plans`
@@ -122,6 +124,12 @@ export function SubscriptionPlans() {
         toast({
           title: "Payment System Setup",
           description: "Payment processing is being configured. Please use the contact options below.",
+          variant: "destructive"
+        });
+      } else if (error instanceof Error && error.message.includes('unauthenticated')) {
+        toast({
+          title: "Authentication Required",
+          description: "Please sign in to subscribe to a plan.",
           variant: "destructive"
         });
       } else {
@@ -156,10 +164,7 @@ Thank you!`);
 
 I would like to subscribe to the ${plan?.name} for Concern2Care.
 
-Customer Information:
-- Email: ${customerInfo.email}
-- Name: ${customerInfo.name || 'Not provided'}
-- Plan: ${plan?.name} (${plan?.price})
+Plan: ${plan?.name} (${plan?.price})
 
 Please contact me to complete the subscription setup.
 
@@ -196,6 +201,17 @@ Thank you!`);
           </div>
         </div>
 
+        {/* Individual Account Notice */}
+        <Alert className="max-w-4xl mx-auto mb-12 border-blue-200 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-2xl">
+          <Shield className="h-5 w-5 text-blue-600" />
+          <AlertDescription className="text-blue-800">
+            <strong>Individual Account Required</strong>
+            <br />
+            Each teacher needs their own personal subscription to ensure secure access, data privacy compliance, 
+            and personalized AI recommendations. This prevents account sharing and protects student data.
+          </AlertDescription>
+        </Alert>
+
         {/* Configuration Error Alert */}
         {configurationError && (
           <Alert className="max-w-4xl mx-auto mb-12 border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl">
@@ -231,39 +247,17 @@ Thank you!`);
           </CardContent>
         </Card>
 
-        {/* Customer Information */}
-        <Card className="max-w-md mx-auto mb-12 border-0 bg-white/80 backdrop-blur-sm shadow-xl rounded-3xl overflow-hidden">
-          <CardHeader className="bg-gradient-to-r from-gray-600 via-slate-600 to-gray-700 text-white rounded-t-3xl">
-            <CardTitle className="text-center text-xl">Get Started</CardTitle>
-          </CardHeader>
-          <CardContent className="p-6 space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email" className="text-sm font-medium text-gray-700">
-                Email Address *
-              </Label>
-              <Input
-                id="email"
-                type="email"
-                value={customerInfo.email}
-                onChange={(e) => setCustomerInfo(prev => ({ ...prev, email: e.target.value }))}
-                placeholder="your.email@school.edu"
-                className="border-gray-200 rounded-xl focus:border-blue-500 focus:ring-blue-500"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="name" className="text-sm font-medium text-gray-700">
-                Full Name (optional)
-              </Label>
-              <Input
-                id="name"
-                value={customerInfo.name}
-                onChange={(e) => setCustomerInfo(prev => ({ ...prev, name: e.target.value }))}
-                placeholder="Your full name"
-                className="border-gray-200 rounded-xl focus:border-gray-500 focus:ring-gray-500"
-              />
-            </div>
-          </CardContent>
-        </Card>
+        {/* Authentication Notice */}
+        {!isSignedIn && (
+          <Alert className="max-w-4xl mx-auto mb-12 border-purple-200 bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl">
+            <Shield className="h-5 w-5 text-purple-600" />
+            <AlertDescription className="text-purple-800">
+              <strong>Sign In Required</strong>
+              <br />
+              Please sign in to subscribe to a plan. This ensures your subscription is tied to your personal account for security and data privacy.
+            </AlertDescription>
+          </Alert>
+        )}
 
         {/* Pricing Plans */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
@@ -285,7 +279,7 @@ Thank you!`);
                     </div>
                     <div className="text-center">
                       <div className="text-4xl font-bold">{plan.price}</div>
-                      <p className="text-white/80 text-sm">Billed monthly</p>
+                      <p className="text-white/80 text-sm">Per individual teacher</p>
                     </div>
                   </div>
                 </CardHeader>
@@ -305,13 +299,18 @@ Thank you!`);
                   <div className="space-y-3">
                     <Button
                       onClick={() => handleSubscribe(plan.id)}
-                      disabled={isCreatingCheckout || !customerInfo.email}
+                      disabled={isCreatingCheckout || !isSignedIn}
                       className={`w-full bg-gradient-to-r ${plan.gradient} hover:opacity-90 text-white shadow-lg rounded-2xl py-6 text-lg font-semibold transition-all duration-200 transform hover:scale-105`}
                     >
                       {isCreatingCheckout ? (
                         <>
                           <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                           Creating Checkout...
+                        </>
+                      ) : !isSignedIn ? (
+                        <>
+                          Sign In to Subscribe
+                          <ArrowRight className="ml-2 h-5 w-5" />
                         </>
                       ) : (
                         <>
@@ -324,7 +323,6 @@ Thank you!`);
                     {configurationError && (
                       <Button
                         onClick={() => handleDirectContact(plan.id)}
-                        disabled={!customerInfo.email}
                         variant="outline"
                         className="w-full border-gray-300 text-gray-700 hover:bg-gray-50 rounded-2xl py-3"
                       >
@@ -359,16 +357,16 @@ Thank you!`);
               bgGradient: 'from-purple-50 to-pink-50'
             },
             {
-              icon: Users,
-              title: 'Collaborative',
-              description: 'Share referrals with your support team and prepare comprehensive meeting documentation.',
+              icon: Shield,
+              title: 'Secure & Private',
+              description: 'Individual accounts ensure data privacy compliance and prevent unauthorized access to student information.',
               gradient: 'from-blue-500 to-cyan-500',
               bgGradient: 'from-blue-50 to-cyan-50'
             },
             {
               icon: Building,
               title: 'Scalable',
-              description: 'From individual teachers to entire districts, our platform grows with your organization.',
+              description: 'From individual teachers to entire districts, our platform grows with your organization while maintaining security.',
               gradient: 'from-emerald-500 to-teal-500',
               bgGradient: 'from-emerald-50 to-teal-50'
             }
@@ -404,16 +402,20 @@ Thank you!`);
           <div className="max-w-3xl mx-auto space-y-6">
             {[
               {
+                question: "Why does each teacher need their own subscription?",
+                answer: "Individual subscriptions ensure data privacy compliance, prevent unauthorized access to student information, and provide personalized AI recommendations based on each teacher's specific needs and teaching style."
+              },
+              {
+                question: "Can schools purchase subscriptions for their teachers?",
+                answer: "Yes! Schools can purchase individual subscriptions for their teachers. School and District plans include bulk management features and administrative controls while maintaining individual account security."
+              },
+              {
                 question: "How does billing work?",
                 answer: "All plans are billed monthly through Polar. You can upgrade, downgrade, or cancel your subscription at any time through your account dashboard."
               },
               {
-                question: "Can I change plans later?",
-                answer: "Yes, you can upgrade or downgrade your plan at any time. Changes take effect at your next billing cycle."
-              },
-              {
                 question: "Is my student data secure?",
-                answer: "Absolutely. We follow FERPA guidelines and use enterprise-grade security to protect all student information."
+                answer: "Absolutely. We follow FERPA guidelines and use enterprise-grade security to protect all student information. Individual accounts prevent data sharing between unauthorized users."
               },
               {
                 question: "Do you offer training and support?",
@@ -426,10 +428,6 @@ Thank you!`);
               {
                 question: "Can I see a demo before subscribing?",
                 answer: "Absolutely! Click the 'Request Demo' button to schedule a personalized demonstration of Concern2Care for your school or district."
-              },
-              {
-                question: "What payment methods do you accept?",
-                answer: "We accept all major credit cards and ACH payments through our secure payment processor, Polar."
               }
             ].map((faq, index) => (
               <Card key={index} className="border-0 bg-white/80 backdrop-blur-sm shadow-lg rounded-2xl text-left">

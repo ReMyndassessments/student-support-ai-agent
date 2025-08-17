@@ -1,10 +1,6 @@
 import { api } from "encore.dev/api";
-import { Query } from "encore.dev/api";
 import { userDB } from "./db";
-
-export interface GetProfileRequest {
-  email: Query<string>;
-}
+import { getAuthData } from "~encore/auth";
 
 export interface UserProfile {
   id: number;
@@ -15,10 +11,12 @@ export interface UserProfile {
   updatedAt: Date;
 }
 
-// Retrieves user profile information.
-export const getProfile = api<GetProfileRequest, UserProfile>(
-  { expose: true, method: "GET", path: "/users/profile" },
-  async (req) => {
+// Retrieves the authenticated user's profile information.
+export const getProfile = api<void, UserProfile>(
+  { expose: true, method: "GET", path: "/users/profile", auth: true },
+  async () => {
+    const auth = getAuthData()!;
+    
     let user = await userDB.queryRow<{
       id: number;
       email: string;
@@ -29,7 +27,7 @@ export const getProfile = api<GetProfileRequest, UserProfile>(
     }>`
       SELECT id, email, name, deepseek_api_key, created_at, updated_at
       FROM users 
-      WHERE email = ${req.email}
+      WHERE email = ${auth.email}
     `;
 
     // Create user if doesn't exist
@@ -42,8 +40,8 @@ export const getProfile = api<GetProfileRequest, UserProfile>(
         created_at: Date;
         updated_at: Date;
       }>`
-        INSERT INTO users (email, created_at, updated_at)
-        VALUES (${req.email}, NOW(), NOW())
+        INSERT INTO users (email, name, created_at, updated_at)
+        VALUES (${auth.email}, ${auth.name}, NOW(), NOW())
         RETURNING id, email, name, deepseek_api_key, created_at, updated_at
       `;
     }

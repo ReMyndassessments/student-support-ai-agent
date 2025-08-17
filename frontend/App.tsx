@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { ClerkProvider, SignedIn, SignedOut, useAuth } from '@clerk/clerk-react';
 import { Toaster } from '@/components/ui/toaster';
 import { Navigation } from './components/Navigation';
 import { LandingPage } from './components/LandingPage';
@@ -12,6 +13,8 @@ import { UserProfile } from './components/UserProfile';
 import { SubscriptionGate } from './components/SubscriptionGate';
 import { AdminLogin } from './components/AdminLogin';
 import { AdminDashboard } from './components/AdminDashboard';
+import { AuthenticatedApp } from './components/AuthenticatedApp';
+import { clerkPublishableKey } from './config';
 
 interface User {
   email: string;
@@ -19,12 +22,13 @@ interface User {
   isAdmin: boolean;
 }
 
-export default function App() {
-  const [user, setUser] = useState<User | null>(null);
+function AppContent() {
+  const [adminUser, setAdminUser] = useState<User | null>(null);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+  const { isSignedIn, user } = useAuth();
 
   useEffect(() => {
-    // Check if user is already logged in (check for admin session cookie)
+    // Check if user is already logged in as admin (check for admin session cookie)
     const checkAuth = () => {
       const cookies = document.cookie.split(';');
       const adminSession = cookies.find(cookie => cookie.trim().startsWith('admin_session='));
@@ -34,7 +38,7 @@ export default function App() {
           const sessionValue = adminSession.split('=')[1];
           const sessionData = JSON.parse(atob(sessionValue));
           if (sessionData.isAdmin && sessionData.email === 'admin@concern2care.demo') {
-            setUser({
+            setAdminUser({
               email: 'admin@concern2care.demo',
               name: 'Demo Administrator',
               isAdmin: true
@@ -50,12 +54,12 @@ export default function App() {
     checkAuth();
   }, []);
 
-  const handleLoginSuccess = (userData: User) => {
-    setUser(userData);
+  const handleAdminLogin = (userData: User) => {
+    setAdminUser(userData);
   };
 
-  const handleLogout = () => {
-    setUser(null);
+  const handleAdminLogout = () => {
+    setAdminUser(null);
     // Clear the admin session cookie
     document.cookie = 'admin_session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
   };
@@ -73,62 +77,78 @@ export default function App() {
     );
   }
 
-  return (
-    <Router>
+  // If admin is logged in, show admin interface
+  if (adminUser?.isAdmin) {
+    return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
-        <Navigation userEmail={user?.email || "teacher@school.edu"} isAdmin={user?.isAdmin} onLogout={handleLogout} />
+        <Navigation 
+          userEmail={adminUser.email} 
+          userName={adminUser.name}
+          isAdmin={adminUser.isAdmin} 
+          onLogout={handleAdminLogout} 
+        />
         <main>
           <Routes>
-            <Route path="/" element={<LandingPage userEmail={user?.email || "teacher@school.edu"} onAdminLogin={handleLoginSuccess} />} />
-            <Route path="/admin-login" element={<AdminLogin onLoginSuccess={handleLoginSuccess} />} />
-            {user?.isAdmin ? (
-              <>
-                <Route path="/admin" element={<AdminDashboard user={user} onLogout={handleLogout} />} />
-                <Route path="/new-referral" element={<ReferralForm />} />
-                <Route path="/referrals" element={<ReferralList />} />
-                <Route path="/meeting/:referralId" element={<MeetingPreparation />} />
-              </>
-            ) : (
-              <>
-                <Route path="/admin" element={<LandingPage userEmail={user?.email || "teacher@school.edu"} onAdminLogin={handleLoginSuccess} />} />
-                <Route path="/new-referral" element={
-                  <SubscriptionGate userEmail={user?.email || "teacher@school.edu"} feature="referral creation">
-                    <ReferralForm />
-                  </SubscriptionGate>
-                } />
-                <Route path="/referrals" element={
-                  <SubscriptionGate userEmail={user?.email || "teacher@school.edu"} feature="referral management">
-                    <ReferralList />
-                  </SubscriptionGate>
-                } />
-                <Route path="/meeting/:referralId" element={
-                  <SubscriptionGate userEmail={user?.email || "teacher@school.edu"} feature="meeting preparation">
-                    <MeetingPreparation />
-                  </SubscriptionGate>
-                } />
-                <Route path="/profile" element={
-                  <SubscriptionGate userEmail={user?.email || "teacher@school.edu"} feature="profile management">
-                    <div className="max-w-4xl mx-auto px-6 py-8">
-                      <div className="text-center mb-8">
-                        <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
-                          User Profile
-                        </h1>
-                        <p className="text-gray-600">
-                          Manage your account settings and API configuration
-                        </p>
-                      </div>
-                      <UserProfile userEmail={user?.email || "teacher@school.edu"} />
-                    </div>
-                  </SubscriptionGate>
-                } />
-              </>
-            )}
+            <Route path="/" element={<LandingPage userEmail={adminUser.email} onAdminLogin={handleAdminLogin} />} />
+            <Route path="/admin" element={<AdminDashboard user={adminUser} onLogout={handleAdminLogout} />} />
+            <Route path="/new-referral" element={<ReferralForm />} />
+            <Route path="/referrals" element={<ReferralList />} />
+            <Route path="/meeting/:referralId" element={<MeetingPreparation />} />
             <Route path="/subscription/plans" element={<SubscriptionPlans />} />
             <Route path="/subscription/success" element={<SubscriptionSuccess />} />
           </Routes>
         </main>
         <Toaster />
       </div>
-    </Router>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
+      <SignedOut>
+        <Navigation onAdminLogin={handleAdminLogin} />
+        <main>
+          <Routes>
+            <Route path="/" element={<LandingPage onAdminLogin={handleAdminLogin} />} />
+            <Route path="/admin-login" element={<AdminLogin onLoginSuccess={handleAdminLogin} />} />
+            <Route path="/subscription/plans" element={<SubscriptionPlans />} />
+            <Route path="/subscription/success" element={<SubscriptionSuccess />} />
+            <Route path="*" element={<LandingPage onAdminLogin={handleAdminLogin} />} />
+          </Routes>
+        </main>
+      </SignedOut>
+
+      <SignedIn>
+        <AuthenticatedApp user={user} />
+      </SignedIn>
+      
+      <Toaster />
+    </div>
+  );
+}
+
+export default function App() {
+  if (!clerkPublishableKey) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex items-center justify-center">
+        <div className="text-center max-w-md mx-auto p-6">
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">Configuration Required</h1>
+          <p className="text-gray-600 mb-4">
+            Please configure your Clerk publishable key in the frontend configuration to enable user authentication.
+          </p>
+          <p className="text-sm text-gray-500">
+            Check the <code>frontend/config.ts</code> file and add your Clerk publishable key.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <ClerkProvider publishableKey={clerkPublishableKey}>
+      <Router>
+        <AppContent />
+      </Router>
+    </ClerkProvider>
   );
 }

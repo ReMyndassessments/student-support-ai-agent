@@ -60,10 +60,21 @@ Thank you!`);
                 Subscription Required
               </h1>
               <p className="text-gray-600 text-lg">
-                Unlock {feature} with a Concern2Care subscription
+                Unlock {feature} with a personal Concern2Care subscription
               </p>
             </div>
           </div>
+
+          {/* Individual Account Required */}
+          <Alert className="max-w-4xl mx-auto mb-8 border-blue-200 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-2xl">
+            <Crown className="h-5 w-5 text-blue-600" />
+            <AlertDescription className="text-blue-800">
+              <strong>Individual Account Required</strong>
+              <br />
+              Each teacher needs their own personal subscription to ensure secure access and personalized AI recommendations. 
+              This prevents account sharing and ensures compliance with educational data privacy requirements.
+            </AlertDescription>
+          </Alert>
 
           {/* Subscription Required Card */}
           <Card className="border-0 bg-white/90 backdrop-blur-sm shadow-2xl rounded-3xl overflow-hidden mb-8">
@@ -111,15 +122,27 @@ Thank you!`);
                         </div>
                         <span className="text-gray-700">Follow-up implementation assistance</span>
                       </li>
+                      <li className="flex items-start gap-3">
+                        <div className="w-6 h-6 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <Sparkles className="h-4 w-4 text-white" />
+                        </div>
+                        <span className="text-gray-700">Personal DeepSeek API key integration</span>
+                      </li>
                     </ul>
                   </div>
 
-                  <Alert className="border-blue-200 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-2xl">
-                    <Crown className="h-4 w-4 text-blue-600" />
-                    <AlertDescription className="text-blue-800 text-sm">
-                      <strong>Professional AI-Powered Support</strong>
+                  <Alert className="border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl">
+                    <Lock className="h-4 w-4 text-amber-600" />
+                    <AlertDescription className="text-amber-800 text-sm">
+                      <strong>Why Individual Subscriptions?</strong>
                       <br />
-                      Get instant access to evidence-based intervention recommendations tailored to your students' needs.
+                      • Ensures data privacy and security compliance
+                      <br />
+                      • Personalized AI recommendations based on your teaching style
+                      <br />
+                      • Individual API key management for better performance
+                      <br />
+                      • Prevents unauthorized access to student data
                     </AlertDescription>
                   </Alert>
                 </div>
@@ -128,26 +151,26 @@ Thank you!`);
                   <div className="bg-gradient-to-br from-purple-50 via-pink-50 to-rose-50 p-6 rounded-2xl border border-purple-200">
                     <h4 className="font-semibold text-purple-900 mb-3">Choose Your Plan</h4>
                     <div className="space-y-3">
-                      <div className="bg-white/60 p-3 rounded-xl">
+                      <div className="bg-white/60 p-3 rounded-xl border-2 border-blue-300">
                         <div className="flex justify-between items-center">
                           <span className="font-medium text-gray-900">Teacher Plan</span>
                           <span className="text-blue-600 font-bold">$15/month</span>
                         </div>
-                        <p className="text-gray-600 text-sm">Perfect for individual teachers</p>
+                        <p className="text-gray-600 text-sm">Perfect for individual teachers • Most Popular</p>
                       </div>
-                      <div className="bg-white/60 p-3 rounded-xl border-2 border-purple-300">
+                      <div className="bg-white/60 p-3 rounded-xl">
                         <div className="flex justify-between items-center">
                           <span className="font-medium text-gray-900">School Plan</span>
                           <span className="text-purple-600 font-bold">$125/month</span>
                         </div>
-                        <p className="text-gray-600 text-sm">For entire schools • Most Popular</p>
+                        <p className="text-gray-600 text-sm">For schools with collaboration features</p>
                       </div>
                       <div className="bg-white/60 p-3 rounded-xl">
                         <div className="flex justify-between items-center">
                           <span className="font-medium text-gray-900">District Plan</span>
                           <span className="text-emerald-600 font-bold">$1,250/month</span>
                         </div>
-                        <p className="text-gray-600 text-sm">For school districts</p>
+                        <p className="text-gray-600 text-sm">For school districts with advanced features</p>
                       </div>
                     </div>
                   </div>
@@ -156,7 +179,7 @@ Thank you!`);
                     <Link to="/subscription/plans">
                       <Button className="w-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 text-white shadow-xl rounded-2xl py-6 text-lg font-semibold transition-all duration-200 transform hover:scale-105">
                         <CreditCard className="mr-2 h-5 w-5" />
-                        Subscribe Now
+                        Get Your Personal Subscription
                       </Button>
                     </Link>
                     
@@ -168,14 +191,29 @@ Thank you!`);
                       <Mail className="mr-2 h-4 w-4" />
                       Request Demo
                     </Button>
-                    
-                    <Link to="/">
-                      <Button variant="outline" className="w-full border-gray-300 text-gray-700 hover:bg-white/80 rounded-2xl py-3">
-                        Back to Home
-                      </Button>
-                    </Link>
                   </div>
                 </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* School/District Information */}
+          <Card className="border-0 bg-gradient-to-br from-emerald-50 to-teal-50 shadow-xl rounded-3xl overflow-hidden">
+            <CardContent className="p-8">
+              <h3 className="text-xl font-bold text-emerald-900 mb-4">
+                For Schools & Districts
+              </h3>
+              <p className="text-emerald-800 mb-4">
+                While each teacher needs their own subscription for security and personalization, 
+                School and District plans offer additional collaboration features and bulk pricing options.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Button variant="outline" className="border-emerald-300 text-emerald-700 hover:bg-emerald-100 rounded-xl">
+                  Learn About School Plans
+                </Button>
+                <Button variant="outline" className="border-emerald-300 text-emerald-700 hover:bg-emerald-100 rounded-xl">
+                  Contact for District Pricing
+                </Button>
               </div>
             </CardContent>
           </Card>

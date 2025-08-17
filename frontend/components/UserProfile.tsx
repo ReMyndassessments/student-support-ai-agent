@@ -7,14 +7,11 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Loader2, User, Key, Save, Eye, EyeOff, ExternalLink, CheckCircle, AlertTriangle } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
+import { useAuth } from '@clerk/clerk-react';
 import backend from '~backend/client';
 import type { UserProfile as Profile } from '~backend/users/get-profile';
 
-interface UserProfileProps {
-  userEmail: string;
-}
-
-export function UserProfile({ userEmail }: UserProfileProps) {
+export function UserProfile() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -24,17 +21,20 @@ export function UserProfile({ userEmail }: UserProfileProps) {
     deepSeekApiKey: ''
   });
   const { toast } = useToast();
+  const { getToken, user } = useAuth();
 
   useEffect(() => {
-    if (userEmail) {
-      loadProfile();
-    }
-  }, [userEmail]);
+    loadProfile();
+  }, []);
 
   const loadProfile = async () => {
     try {
       setLoading(true);
-      const response = await backend.users.getProfile({ email: userEmail });
+      const token = await getToken();
+      const response = await backend.with({ 
+        auth: async () => ({ authorization: `Bearer ${token}` })
+      }).users.getProfile();
+      
       setProfile(response);
       setFormData({
         name: response.name || '',
@@ -55,8 +55,10 @@ export function UserProfile({ userEmail }: UserProfileProps) {
   const handleSave = async () => {
     setSaving(true);
     try {
-      const response = await backend.users.updateProfile({
-        email: userEmail,
+      const token = await getToken();
+      const response = await backend.with({ 
+        auth: async () => ({ authorization: `Bearer ${token}` })
+      }).users.updateProfile({
         name: formData.name || undefined,
         deepSeekApiKey: formData.deepSeekApiKey || undefined
       });
@@ -122,7 +124,7 @@ export function UserProfile({ userEmail }: UserProfileProps) {
                 </Label>
                 <Input
                   id="email"
-                  value={userEmail}
+                  value={user?.emailAddresses?.[0]?.emailAddress || ''}
                   disabled
                   className="border-gray-200 rounded-xl bg-gray-50"
                 />
@@ -198,10 +200,10 @@ export function UserProfile({ userEmail }: UserProfileProps) {
           <Alert className="border-blue-200 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-2xl">
             <AlertTriangle className="h-4 w-4 text-blue-600" />
             <AlertDescription className="text-blue-800 text-sm">
-              <strong>Why do I need a DeepSeek API key?</strong>
+              <strong>Why do I need a personal DeepSeek API key?</strong>
               <br />
-              Your personal API key ensures you have direct access to AI recommendations and helps us keep costs sustainable. 
-              You can get a free API key from DeepSeek that includes generous usage limits.
+              Your personal API key ensures you have direct access to AI recommendations, maintains data privacy, 
+              and helps us keep costs sustainable. You can get a free API key from DeepSeek that includes generous usage limits.
             </AlertDescription>
           </Alert>
 

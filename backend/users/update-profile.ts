@@ -1,9 +1,9 @@
 import { api } from "encore.dev/api";
 import { userDB } from "./db";
 import { APIError } from "encore.dev/api";
+import { getAuthData } from "~encore/auth";
 
 export interface UpdateProfileRequest {
-  email: string;
   name?: string;
   deepSeekApiKey?: string;
 }
@@ -17,10 +17,12 @@ export interface UserProfile {
   updatedAt: Date;
 }
 
-// Updates user profile information.
+// Updates the authenticated user's profile information.
 export const updateProfile = api<UpdateProfileRequest, UserProfile>(
-  { expose: true, method: "PUT", path: "/users/profile" },
+  { expose: true, method: "PUT", path: "/users/profile", auth: true },
   async (req) => {
+    const auth = getAuthData()!;
+    
     // First ensure user exists
     let user = await userDB.queryRow<{
       id: number;
@@ -32,7 +34,7 @@ export const updateProfile = api<UpdateProfileRequest, UserProfile>(
     }>`
       SELECT id, email, name, deepseek_api_key, created_at, updated_at
       FROM users 
-      WHERE email = ${req.email}
+      WHERE email = ${auth.email}
     `;
 
     if (!user) {
@@ -46,7 +48,7 @@ export const updateProfile = api<UpdateProfileRequest, UserProfile>(
         updated_at: Date;
       }>`
         INSERT INTO users (email, name, deepseek_api_key, created_at, updated_at)
-        VALUES (${req.email}, ${req.name || null}, ${req.deepSeekApiKey || null}, NOW(), NOW())
+        VALUES (${auth.email}, ${req.name || auth.name}, ${req.deepSeekApiKey || null}, NOW(), NOW())
         RETURNING id, email, name, deepseek_api_key, created_at, updated_at
       `;
     } else {
@@ -64,7 +66,7 @@ export const updateProfile = api<UpdateProfileRequest, UserProfile>(
           name = COALESCE(${req.name || null}, name),
           deepseek_api_key = COALESCE(${req.deepSeekApiKey || null}, deepseek_api_key),
           updated_at = NOW()
-        WHERE email = ${req.email}
+        WHERE email = ${auth.email}
         RETURNING id, email, name, deepseek_api_key, created_at, updated_at
       `;
     }

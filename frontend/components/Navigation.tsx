@@ -1,17 +1,21 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Home, Menu, X, GraduationCap, FileText, Users, LogOut, CreditCard } from 'lucide-react';
+import { Home, Menu, X, GraduationCap, FileText, Users, LogOut, CreditCard, User } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { SignInButton, UserButton, useAuth } from '@clerk/clerk-react';
 
 interface NavigationProps {
   userEmail?: string;
+  userName?: string;
   isAdmin?: boolean;
   onLogout?: () => void;
+  onAdminLogin?: (user: { email: string; name: string; isAdmin: boolean }) => void;
 }
 
-export function Navigation({ userEmail = "teacher@school.edu", isAdmin = false, onLogout }: NavigationProps) {
+export function Navigation({ userEmail, userName, isAdmin = false, onLogout, onAdminLogin }: NavigationProps) {
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { isSignedIn } = useAuth();
 
   const adminNavItems = [
     {
@@ -31,7 +35,30 @@ export function Navigation({ userEmail = "teacher@school.edu", isAdmin = false, 
     }
   ];
 
-  const regularNavItems = [
+  const authenticatedNavItems = [
+    {
+      to: '/',
+      icon: Home,
+      label: 'Home'
+    },
+    {
+      to: '/new-referral',
+      icon: FileText,
+      label: 'New Referral'
+    },
+    {
+      to: '/referrals',
+      icon: Users,
+      label: 'My Referrals'
+    },
+    {
+      to: '/profile',
+      icon: User,
+      label: 'Profile'
+    }
+  ];
+
+  const publicNavItems = [
     {
       to: '/',
       icon: Home,
@@ -44,7 +71,7 @@ export function Navigation({ userEmail = "teacher@school.edu", isAdmin = false, 
     }
   ];
 
-  const navItems = isAdmin ? adminNavItems : regularNavItems;
+  const navItems = isAdmin ? adminNavItems : (isSignedIn ? authenticatedNavItems : publicNavItems);
 
   return (
     <nav className="bg-white/90 backdrop-blur-md shadow-lg border-b border-white/20">
@@ -89,17 +116,38 @@ export function Navigation({ userEmail = "teacher@school.edu", isAdmin = false, 
               );
             })}
             
-            {isAdmin && onLogout && (
-              <Button
-                onClick={onLogout}
-                variant="outline"
-                size="sm"
-                className="border-gray-300 text-gray-700 hover:bg-gray-50 rounded-xl ml-2"
-              >
-                <LogOut className="h-4 w-4 mr-2" />
-                Logout
-              </Button>
-            )}
+            {/* Authentication */}
+            <div className="ml-4 flex items-center space-x-2">
+              {isAdmin && onLogout ? (
+                <Button
+                  onClick={onLogout}
+                  variant="outline"
+                  size="sm"
+                  className="border-gray-300 text-gray-700 hover:bg-gray-50 rounded-xl"
+                >
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Logout
+                </Button>
+              ) : isSignedIn ? (
+                <UserButton 
+                  appearance={{
+                    elements: {
+                      avatarBox: "w-8 h-8"
+                    }
+                  }}
+                />
+              ) : (
+                <SignInButton mode="modal">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    className="border-blue-300 text-blue-700 hover:bg-blue-50 rounded-xl"
+                  >
+                    Sign In
+                  </Button>
+                </SignInButton>
+              )}
+            </div>
           </div>
 
           {/* Mobile Menu Button */}
@@ -144,19 +192,32 @@ export function Navigation({ userEmail = "teacher@school.edu", isAdmin = false, 
                 );
               })}
               
-              {isAdmin && onLogout && (
-                <Button
-                  onClick={() => {
-                    setIsMobileMenuOpen(false);
-                    onLogout();
-                  }}
-                  variant="outline"
-                  className="w-full justify-start border-gray-300 text-gray-700 hover:bg-gray-50 rounded-xl mt-2"
-                >
-                  <LogOut className="h-4 w-4 mr-2" />
-                  Logout
-                </Button>
-              )}
+              {/* Mobile Authentication */}
+              <div className="pt-2 border-t border-white/20 mt-2">
+                {isAdmin && onLogout ? (
+                  <Button
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      onLogout();
+                    }}
+                    variant="outline"
+                    className="w-full justify-start border-gray-300 text-gray-700 hover:bg-gray-50 rounded-xl"
+                  >
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Logout
+                  </Button>
+                ) : !isSignedIn ? (
+                  <SignInButton mode="modal">
+                    <Button 
+                      variant="outline" 
+                      className="w-full justify-start border-blue-300 text-blue-700 hover:bg-blue-50 rounded-xl"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      Sign In
+                    </Button>
+                  </SignInButton>
+                ) : null}
+              </div>
             </div>
           </div>
         )}

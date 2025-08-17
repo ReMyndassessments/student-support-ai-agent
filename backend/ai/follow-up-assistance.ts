@@ -1,9 +1,9 @@
 import { api } from "encore.dev/api";
 import { users } from "~encore/clients";
 import { APIError } from "encore.dev/api";
+import { getAuthData } from "~encore/auth";
 
 export interface FollowUpAssistanceRequest {
-  userEmail: string;
   originalRecommendations: string;
   specificQuestion: string;
   studentFirstName: string;
@@ -20,13 +20,25 @@ export interface FollowUpAssistanceResponse {
 
 // Provides follow-up assistance for implementing Tier 2 interventions.
 export const followUpAssistance = api<FollowUpAssistanceRequest, FollowUpAssistanceResponse>(
-  { expose: true, method: "POST", path: "/ai/follow-up-assistance" },
+  { expose: true, method: "POST", path: "/ai/follow-up-assistance", auth: true },
   async (req) => {
+    const auth = getAuthData()!;
+    
+    // Check user access to follow-up assistance feature
+    const accessCheck = await users.checkAccess({ 
+      email: auth.email, 
+      feature: 'follow_up_assistance' 
+    });
+    
+    if (!accessCheck.hasAccess) {
+      throw APIError.permissionDenied(`Access denied: ${accessCheck.reason}. Please upgrade to ${accessCheck.suggestedPlan} plan.`);
+    }
+
     // Get user's personal DeepSeek API key
     let apiKey: string;
     
     try {
-      const userKeyResponse = await users.getDeepSeekKey({ email: req.userEmail });
+      const userKeyResponse = await users.getDeepSeekKey({ email: auth.email });
       if (userKeyResponse.hasKey && userKeyResponse.key) {
         apiKey = userKeyResponse.key;
       } else {
