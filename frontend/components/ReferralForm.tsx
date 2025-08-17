@@ -7,11 +7,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Checkbox } from '@/components/ui/checkbox';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Loader2, AlertTriangle, CheckCircle, ArrowLeft, Sparkles } from 'lucide-react';
+import { Loader2, AlertTriangle, CheckCircle, ArrowLeft, Sparkles, HelpCircle } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { Link } from 'react-router-dom';
 import backend from '~backend/client';
 import type { GenerateRecommendationsRequest } from '~backend/ai/generate-recommendations';
+import type { FollowUpAssistanceRequest } from '~backend/ai/follow-up-assistance';
 
 const CONCERN_TYPES = [
   'Academic',
@@ -58,12 +59,20 @@ export function ReferralForm() {
   const [hasGenerated, setHasGenerated] = useState(false);
   const [hasSaved, setHasSaved] = useState(false);
   
+  // Follow-up assistance state
+  const [followUpQuestion, setFollowUpQuestion] = useState('');
+  const [followUpAssistance, setFollowUpAssistance] = useState<string>('');
+  const [followUpDisclaimer, setFollowUpDisclaimer] = useState<string>('');
+  const [isGeneratingFollowUp, setIsGeneratingFollowUp] = useState(false);
+  const [hasFollowUpAssistance, setHasFollowUpAssistance] = useState(false);
+  
   const { toast } = useToast();
 
   const handleInputChange = (field: string, value: string | string[]) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     setHasGenerated(false);
     setHasSaved(false);
+    setHasFollowUpAssistance(false);
   };
 
   const handleConcernTypeChange = (concernType: string, checked: boolean) => {
@@ -116,6 +125,9 @@ export function ReferralForm() {
       setDisclaimer(response.disclaimer);
       setHasGenerated(true);
       setHasSaved(false);
+      setHasFollowUpAssistance(false);
+      setFollowUpQuestion('');
+      setFollowUpAssistance('');
       
       toast({
         title: "Recommendations Generated",
@@ -133,6 +145,49 @@ export function ReferralForm() {
     }
   };
 
+  const generateFollowUpAssistance = async () => {
+    if (!followUpQuestion.trim()) {
+      toast({
+        title: "Missing Question",
+        description: "Please enter a specific question about implementing the interventions.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsGeneratingFollowUp(true);
+    try {
+      const request: FollowUpAssistanceRequest = {
+        originalRecommendations: recommendations,
+        specificQuestion: followUpQuestion,
+        studentFirstName: formData.studentFirstName,
+        studentLastInitial: formData.studentLastInitial,
+        grade: formData.grade,
+        concernTypes: formData.concernTypes,
+        severityLevel: formData.severityLevel
+      };
+
+      const response = await backend.ai.followUpAssistance(request);
+      setFollowUpAssistance(response.assistance);
+      setFollowUpDisclaimer(response.disclaimer);
+      setHasFollowUpAssistance(true);
+      
+      toast({
+        title: "Follow-up Assistance Generated",
+        description: "Additional implementation guidance has been generated."
+      });
+    } catch (error) {
+      console.error('Error generating follow-up assistance:', error);
+      toast({
+        title: "Error",
+        description: "Failed to generate follow-up assistance. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsGeneratingFollowUp(false);
+    }
+  };
+
   const saveReferral = async () => {
     if (!hasGenerated) {
       toast({
@@ -145,6 +200,10 @@ export function ReferralForm() {
 
     setIsSaving(true);
     try {
+      const finalRecommendations = hasFollowUpAssistance 
+        ? `${recommendations}\n\n--- FOLLOW-UP ASSISTANCE ---\n\nTeacher's Question: ${followUpQuestion}\n\nAdditional Guidance:\n${followUpAssistance}`
+        : recommendations;
+
       await backend.referrals.create({
         studentFirstName: formData.studentFirstName,
         studentLastInitial: formData.studentLastInitial,
@@ -159,7 +218,7 @@ export function ReferralForm() {
         severityLevel: formData.severityLevel,
         actionsTaken: formData.actionsTaken,
         otherActionTaken: formData.otherActionTaken || undefined,
-        aiRecommendations: recommendations
+        aiRecommendations: finalRecommendations
       });
 
       setHasSaved(true);
@@ -199,6 +258,10 @@ export function ReferralForm() {
     setDisclaimer('');
     setHasGenerated(false);
     setHasSaved(false);
+    setFollowUpQuestion('');
+    setFollowUpAssistance('');
+    setFollowUpDisclaimer('');
+    setHasFollowUpAssistance(false);
   };
 
   const formatRecommendations = (text: string) => {
@@ -207,6 +270,34 @@ export function ReferralForm() {
       const trimmedLine = line.trim();
       
       if (!trimmedLine) return null;
+      
+      // Check for follow-up assistance section
+      if (trimmedLine === '--- FOLLOW-UP ASSISTANCE ---') {
+        return (
+          <div key={index} className="border-t border-gray-300 mt-6 pt-6">
+            <h3 className="text-lg font-semibold text-blue-700 mb-3">
+              Follow-up Implementation Assistance
+            </h3>
+          </div>
+        );
+      }
+      
+      if (trimmedLine.startsWith('Teacher\'s Question:')) {
+        return (
+          <div key={index} className="bg-blue-50 p-3 rounded-lg mb-3">
+            <h4 className="text-sm font-medium text-blue-800 mb-1">Teacher's Question:</h4>
+            <p className="text-sm text-blue-700">{trimmedLine.replace('Teacher\'s Question:', '').trim()}</p>
+          </div>
+        );
+      }
+      
+      if (trimmedLine === 'Additional Guidance:') {
+        return (
+          <h4 key={index} className="text-base font-medium text-gray-800 mt-3 mb-2">
+            Additional Guidance:
+          </h4>
+        );
+      }
       
       if (trimmedLine.startsWith('##') || trimmedLine.startsWith('# ')) {
         return (
@@ -566,7 +657,7 @@ export function ReferralForm() {
             <CardContent className="space-y-4">
               <div className="bg-gray-50 p-6 rounded-lg">
                 <div className="prose max-w-none">
-                  {formatRecommendations(recommendations)}
+                  {formatRecommendations(recommendations + (hasFollowUpAssistance ? `\n\n--- FOLLOW-UP ASSISTANCE ---\n\nTeacher's Question: ${followUpQuestion}\n\nAdditional Guidance:\n${followUpAssistance}` : ''))}
                 </div>
               </div>
               
@@ -575,6 +666,64 @@ export function ReferralForm() {
                   <AlertTriangle className="h-4 w-4 text-amber-600" />
                   <AlertDescription className="text-sm text-amber-800">
                     {disclaimer}
+                  </AlertDescription>
+                </Alert>
+              )}
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Follow-up Assistance Section */}
+        {hasGenerated && (
+          <Card className="border border-blue-200 bg-blue-50/50">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-lg font-medium text-blue-900 flex items-center gap-2">
+                <HelpCircle className="h-5 w-5" />
+                Need Help Implementing These Interventions?
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-sm text-blue-800">
+                Ask a specific question about implementing any of the recommended interventions and get detailed guidance.
+              </p>
+              
+              <div className="space-y-2">
+                <Label htmlFor="followUpQuestion" className="text-sm font-medium text-blue-900">
+                  Your Implementation Question
+                </Label>
+                <Textarea
+                  id="followUpQuestion"
+                  value={followUpQuestion}
+                  onChange={(e) => setFollowUpQuestion(e.target.value)}
+                  placeholder="e.g., How do I set up a behavior chart for this student? What materials do I need for the sensory break area? How often should I check in with the student?"
+                  rows={3}
+                  className="border-blue-300 focus:border-blue-500 focus:ring-blue-500 resize-none"
+                />
+              </div>
+              
+              <Button 
+                onClick={generateFollowUpAssistance}
+                disabled={isGeneratingFollowUp || !followUpQuestion.trim()}
+                className="bg-blue-600 hover:bg-blue-700 text-white"
+              >
+                {isGeneratingFollowUp ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Getting Assistance...
+                  </>
+                ) : (
+                  <>
+                    <HelpCircle className="mr-2 h-4 w-4" />
+                    Get Implementation Assistance
+                  </>
+                )}
+              </Button>
+              
+              {hasFollowUpAssistance && followUpDisclaimer && (
+                <Alert className="border-amber-200 bg-amber-50 mt-4">
+                  <AlertTriangle className="h-4 w-4 text-amber-600" />
+                  <AlertDescription className="text-sm text-amber-800">
+                    {followUpDisclaimer}
                   </AlertDescription>
                 </Alert>
               )}

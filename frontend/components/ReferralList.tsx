@@ -78,6 +78,34 @@ export function ReferralList() {
       
       if (!trimmedLine) return null;
       
+      // Check for follow-up assistance section
+      if (trimmedLine === '--- FOLLOW-UP ASSISTANCE ---') {
+        return (
+          <div key={index} className="border-t border-blue-300 mt-6 pt-6">
+            <h4 className="text-base font-semibold text-blue-700 mb-3">
+              Follow-up Implementation Assistance
+            </h4>
+          </div>
+        );
+      }
+      
+      if (trimmedLine.startsWith('Teacher\'s Question:')) {
+        return (
+          <div key={index} className="bg-blue-100 p-3 rounded-lg mb-3">
+            <h5 className="text-sm font-medium text-blue-800 mb-1">Teacher's Question:</h5>
+            <p className="text-sm text-blue-700">{trimmedLine.replace('Teacher\'s Question:', '').trim()}</p>
+          </div>
+        );
+      }
+      
+      if (trimmedLine === 'Additional Guidance:') {
+        return (
+          <h5 key={index} className="text-sm font-medium text-blue-800 mt-3 mb-2">
+            Additional Guidance:
+          </h5>
+        );
+      }
+      
       if (trimmedLine.startsWith('##') || trimmedLine.startsWith('# ')) {
         return (
           <h4 key={index} className="text-base font-semibold text-gray-900 mt-4 mb-2 first:mt-0">
