@@ -37,7 +37,8 @@ const ACTIONS_TAKEN = [
 
 export function ReferralForm() {
   const navigate = useNavigate();
-  const [userEmail, setUserEmail] = useState('teacher@school.edu');
+  // For demo purposes, use admin email
+  const [userEmail, setUserEmail] = useState('admin@concern2care.demo');
   const [formData, setFormData] = useState({
     studentFirstName: '',
     studentLastInitial: '',
@@ -150,24 +151,11 @@ export function ReferralForm() {
       console.error('Error generating recommendations:', error);
       const errorMessage = error instanceof Error ? error.message : "Failed to generate recommendations. Please try again.";
       
-      if (errorMessage.includes("DeepSeek API key")) {
-        toast({
-          title: "API Key Required",
-          description: "Please add your DeepSeek API key in your profile to use AI features.",
-          variant: "destructive",
-          action: (
-            <Button variant="outline" size="sm" onClick={() => navigate('/profile')}>
-              Go to Profile
-            </Button>
-          )
-        });
-      } else {
-        toast({
-          title: "Error",
-          description: errorMessage,
-          variant: "destructive"
-        });
-      }
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive"
+      });
     } finally {
       setIsGenerating(false);
     }
@@ -218,24 +206,11 @@ export function ReferralForm() {
       console.error('Error generating follow-up assistance:', error);
       const errorMessage = error instanceof Error ? error.message : "Failed to generate follow-up assistance. Please try again.";
       
-      if (errorMessage.includes("DeepSeek API key")) {
-        toast({
-          title: "API Key Required",
-          description: "Please add your DeepSeek API key in your profile to use AI features.",
-          variant: "destructive",
-          action: (
-            <Button variant="outline" size="sm" onClick={() => navigate('/profile')}>
-              Go to Profile
-            </Button>
-          )
-        });
-      } else {
-        toast({
-          title: "Error",
-          description: errorMessage,
-          variant: "destructive"
-        });
-      }
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive"
+      });
     } finally {
       setIsGeneratingFollowUp(false);
     }
@@ -403,11 +378,11 @@ export function ReferralForm() {
         {/* Back Button */}
         <div className="flex items-center">
           <Link 
-            to="/" 
+            to="/admin" 
             className="inline-flex items-center text-gray-600 hover:text-gray-900 font-medium transition-colors hover:bg-white/60 px-3 py-2 rounded-xl"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Home
+            Back to Admin Dashboard
           </Link>
         </div>
 
@@ -430,38 +405,15 @@ export function ReferralForm() {
           </div>
         </div>
 
-        {/* User Email */}
-        <Card className="border-0 bg-white/80 backdrop-blur-sm shadow-xl rounded-3xl overflow-hidden">
-          <CardHeader className="bg-gradient-to-r from-gray-600 via-slate-600 to-gray-700 text-white rounded-t-3xl">
-            <CardTitle className="flex items-center gap-3 text-xl">
-              <div className="w-10 h-10 bg-white/20 rounded-2xl flex items-center justify-center">
-                <Key className="h-6 w-6" />
-              </div>
-              Your Information
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-6">
-            <div className="space-y-2">
-              <Label htmlFor="userEmail" className="text-sm font-medium text-gray-700">
-                Your Email Address *
-              </Label>
-              <Input
-                id="userEmail"
-                type="email"
-                value={userEmail}
-                onChange={(e) => setUserEmail(e.target.value)}
-                placeholder="your.email@school.edu"
-                className="border-gray-200 rounded-xl focus:border-gray-500 focus:ring-gray-500"
-              />
-              <div className="text-xs text-gray-500">
-                Required to access AI features and save your referrals. 
-                <Link to="/profile" className="text-blue-600 hover:text-blue-700 ml-1">
-                  Configure your DeepSeek API key →
-                </Link>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Demo Notice */}
+        <Alert className="border-emerald-200 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-2xl">
+          <Key className="h-4 w-4 text-emerald-600" />
+          <AlertDescription className="text-emerald-800">
+            <strong>Demo Mode Active</strong>
+            <br />
+            You are logged in as the demo administrator. All AI features are fully functional using the admin DeepSeek API key.
+          </AlertDescription>
+        </Alert>
 
         {/* Student Information */}
         <Card className="border-0 bg-white/80 backdrop-blur-sm shadow-xl rounded-3xl overflow-hidden">
