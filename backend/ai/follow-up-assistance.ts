@@ -25,19 +25,26 @@ export interface FollowUpAssistanceResponse {
 export const followUpAssistance = api<FollowUpAssistanceRequest, FollowUpAssistanceResponse>(
   { expose: true, method: "POST", path: "/ai/follow-up-assistance" },
   async (req) => {
-    // Get user's DeepSeek API key
+    // Check if this is a demo user
+    const isDemoUser = req.userEmail === "demo@school.edu";
+    
     let apiKey: string;
-    try {
-      const userKeyResponse = await users.getDeepSeekKey({ email: req.userEmail });
-      if (userKeyResponse.hasKey && userKeyResponse.key) {
-        apiKey = userKeyResponse.key;
-      } else {
-        // Fall back to system key if user doesn't have one
-        apiKey = deepseekApiKey();
-      }
-    } catch (error) {
-      // Fall back to system key if user lookup fails
+    
+    if (isDemoUser) {
+      // Use admin key for demo users
       apiKey = deepseekApiKey();
+    } else {
+      // Get user's personal DeepSeek API key for real users
+      try {
+        const userKeyResponse = await users.getDeepSeekKey({ email: req.userEmail });
+        if (userKeyResponse.hasKey && userKeyResponse.key) {
+          apiKey = userKeyResponse.key;
+        } else {
+          throw APIError.invalidArgument("No DeepSeek API key found. Please add your API key in your profile settings to use AI features.");
+        }
+      } catch (error) {
+        throw APIError.invalidArgument("No DeepSeek API key available. Please add your API key in your profile settings.");
+      }
     }
 
     if (!apiKey) {
@@ -118,7 +125,11 @@ Focus on actionable advice that a classroom teacher can realistically implement.
       console.error('Error calling DeepSeek API for follow-up assistance:', error);
       
       if (error instanceof Error && error.message.includes('401')) {
-        throw APIError.invalidArgument("Invalid DeepSeek API key. Please check your API key in your profile settings.");
+        if (isDemoUser) {
+          throw APIError.internal("Demo API key configuration error. Please contact support.");
+        } else {
+          throw APIError.invalidArgument("Invalid DeepSeek API key. Please check your API key in your profile settings.");
+        }
       }
       
       return {
