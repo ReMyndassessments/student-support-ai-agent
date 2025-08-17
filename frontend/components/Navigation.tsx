@@ -3,6 +3,7 @@ import { Home, Menu, X, GraduationCap, FileText, Users, LogOut, CreditCard, User
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { SignInButton, UserButton, useAuth } from '@clerk/clerk-react';
+import { clerkPublishableKey } from '../config';
 
 interface NavigationProps {
   userEmail?: string;
@@ -15,7 +16,10 @@ interface NavigationProps {
 export function Navigation({ userEmail, userName, isAdmin = false, onLogout, onAdminLogin }: NavigationProps) {
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { isSignedIn } = useAuth();
+  
+  // Only use Clerk hooks if Clerk is available
+  const authHooks = clerkPublishableKey ? useAuth() : { isSignedIn: false };
+  const { isSignedIn } = authHooks;
 
   const adminNavItems = [
     {
@@ -71,7 +75,31 @@ export function Navigation({ userEmail, userName, isAdmin = false, onLogout, onA
     }
   ];
 
-  const navItems = isAdmin ? adminNavItems : (isSignedIn ? authenticatedNavItems : publicNavItems);
+  // In demo mode (no Clerk), show demo navigation
+  const demoNavItems = [
+    {
+      to: '/',
+      icon: Home,
+      label: 'Home'
+    },
+    {
+      to: '/new-referral',
+      icon: FileText,
+      label: 'Demo Referral'
+    },
+    {
+      to: '/referrals',
+      icon: Users,
+      label: 'Demo Referrals'
+    },
+    {
+      to: '/subscription/plans',
+      icon: CreditCard,
+      label: 'Subscribe'
+    }
+  ];
+
+  const navItems = isAdmin ? adminNavItems : (clerkPublishableKey ? (isSignedIn ? authenticatedNavItems : publicNavItems) : demoNavItems);
 
   return (
     <nav className="bg-white/90 backdrop-blur-md shadow-lg border-b border-white/20">
@@ -88,6 +116,11 @@ export function Navigation({ userEmail, userName, isAdmin = false, onLogout, onA
               </div>
               {isAdmin && (
                 <div className="px-2 py-1 bg-gradient-to-r from-emerald-100 to-teal-100 text-emerald-800 text-xs font-medium rounded-lg">
+                  DEMO
+                </div>
+              )}
+              {!clerkPublishableKey && !isAdmin && (
+                <div className="px-2 py-1 bg-gradient-to-r from-blue-100 to-cyan-100 text-blue-800 text-xs font-medium rounded-lg">
                   DEMO
                 </div>
               )}
@@ -128,25 +161,27 @@ export function Navigation({ userEmail, userName, isAdmin = false, onLogout, onA
                   <LogOut className="h-4 w-4 mr-2" />
                   Logout
                 </Button>
-              ) : isSignedIn ? (
-                <UserButton 
-                  appearance={{
-                    elements: {
-                      avatarBox: "w-8 h-8"
-                    }
-                  }}
-                />
-              ) : (
-                <SignInButton mode="modal">
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    className="border-blue-300 text-blue-700 hover:bg-blue-50 rounded-xl"
-                  >
-                    Sign In
-                  </Button>
-                </SignInButton>
-              )}
+              ) : clerkPublishableKey ? (
+                isSignedIn ? (
+                  <UserButton 
+                    appearance={{
+                      elements: {
+                        avatarBox: "w-8 h-8"
+                      }
+                    }}
+                  />
+                ) : (
+                  <SignInButton mode="modal">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      className="border-blue-300 text-blue-700 hover:bg-blue-50 rounded-xl"
+                    >
+                      Sign In
+                    </Button>
+                  </SignInButton>
+                )
+              ) : null}
             </div>
           </div>
 
@@ -206,7 +241,7 @@ export function Navigation({ userEmail, userName, isAdmin = false, onLogout, onA
                     <LogOut className="h-4 w-4 mr-2" />
                     Logout
                   </Button>
-                ) : !isSignedIn ? (
+                ) : clerkPublishableKey && !isSignedIn ? (
                   <SignInButton mode="modal">
                     <Button 
                       variant="outline" 
