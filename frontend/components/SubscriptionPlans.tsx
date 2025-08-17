@@ -3,11 +3,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, Check, Users, Building, GraduationCap, ArrowRight, Sparkles, Mail } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
-import backend from '~backend/client';
 
 interface Plan {
   id: 'teacher' | 'school' | 'district';
@@ -78,7 +76,6 @@ const plans: Plan[] = [
 ];
 
 export function SubscriptionPlans() {
-  const [selectedPlan, setSelectedPlan] = useState<'teacher' | 'school' | 'district' | null>(null);
   const [customerInfo, setCustomerInfo] = useState({
     email: '',
     name: ''
