@@ -52,7 +52,7 @@ export function LandingPage({ userEmail = "teacher@school.edu" }: LandingPagePro
               </span>
             </h1>
             <p className="text-xl sm:text-2xl text-gray-700 mb-2 font-medium">
-              AI-Powered Tier 2 Student Support System for Teachers
+              Stronger Tools for Teachers. Smarter Support for Students.
             </p>
             <p className="text-sm text-gray-500 font-medium">
               from Remynd
@@ -65,10 +65,10 @@ export function LandingPage({ userEmail = "teacher@school.edu" }: LandingPagePro
           <Card className="border-0 bg-white/90 backdrop-blur-sm shadow-2xl rounded-3xl overflow-hidden max-w-4xl mx-auto">
             <CardContent className="p-12">
               <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">
-                Transform Your Student Support Process
+                Get instant AI-powered strategies for academic, behavioral, and social-emotional needs
               </h2>
               <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto leading-relaxed">
-                Get AI-powered Tier 2 intervention recommendations, generate professional reports, and streamline your student support meetings with our comprehensive platform designed specifically for educators.
+                Plus professional reports and streamlined communication with your school's support team. With Concern2Care, you can quickly capture a concern and receive research-based, ready-to-use interventions that help your students succeed.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link to="/subscription/plans">
@@ -132,8 +132,8 @@ export function LandingPage({ userEmail = "teacher@school.edu" }: LandingPagePro
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             {[
               {
-                title: 'AI-Powered Recommendations',
-                description: 'Get intelligent Tier 2 intervention suggestions tailored to each student\'s specific needs and concerns.',
+                title: 'Research-Based Interventions',
+                description: 'Get evidence-based strategies tailored to each student\'s specific academic, behavioral, and social-emotional needs.',
                 gradient: 'from-blue-500 to-purple-500'
               },
               {
@@ -142,13 +142,13 @@ export function LandingPage({ userEmail = "teacher@school.edu" }: LandingPagePro
                 gradient: 'from-purple-500 to-pink-500'
               },
               {
-                title: 'Streamlined Workflow',
-                description: 'Simple referral forms, organized case management, and follow-up assistance all in one platform.',
+                title: 'Streamlined Communication',
+                description: 'Simple referral forms, organized case management, and seamless collaboration with your school\'s support team.',
                 gradient: 'from-pink-500 to-rose-500'
               },
               {
-                title: 'Implementation Support',
-                description: 'Get detailed guidance on how to implement recommended interventions in your classroom.',
+                title: 'Ready-to-Use Strategies',
+                description: 'Get detailed guidance on how to implement recommended interventions in your classroom immediately.',
                 gradient: 'from-emerald-500 to-teal-500'
               }
             ].map((item, index) => (
@@ -178,20 +178,20 @@ export function LandingPage({ userEmail = "teacher@school.edu" }: LandingPagePro
             {[
               {
                 step: '1',
-                title: 'Subscribe',
-                description: 'Choose your plan and get instant access',
+                title: 'Capture',
+                description: 'Quickly document student concerns',
                 gradient: 'from-blue-500 to-purple-500'
               },
               {
                 step: '2',
-                title: 'Submit',
-                description: 'Fill out student concern forms',
+                title: 'Analyze',
+                description: 'AI generates research-based strategies',
                 gradient: 'from-purple-500 to-pink-500'
               },
               {
                 step: '3',
                 title: 'Implement',
-                description: 'Apply AI-powered recommendations',
+                description: 'Apply ready-to-use interventions',
                 gradient: 'from-pink-500 to-rose-500'
               }
             ].map((item, index) => (
