@@ -195,16 +195,11 @@ export namespace polar {
         }
 
         /**
-         * Checks if a user has an active subscription.
+         * Checks if the authenticated user has an active subscription.
          */
-        public async checkSubscription(params: RequestType<typeof api_polar_check_subscription_checkSubscription>): Promise<ResponseType<typeof api_polar_check_subscription_checkSubscription>> {
-            // Convert our params into the objects we need for the request
-            const query = makeRecord<string, string | string[]>({
-                email: params.email,
-            })
-
+        public async checkSubscription(): Promise<ResponseType<typeof api_polar_check_subscription_checkSubscription>> {
             // Now make the actual call to the API
-            const resp = await this.baseClient.callTypedAPI(`/polar/subscription/check`, {query, method: "GET", body: undefined})
+            const resp = await this.baseClient.callTypedAPI(`/polar/subscription/check`, {method: "GET", body: undefined})
             return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_polar_check_subscription_checkSubscription>
         }
 
@@ -340,6 +335,7 @@ export namespace referrals {
 /**
  * Import the endpoint handlers to derive the types for the client.
  */
+import { checkAccess as api_users_check_access_checkAccess } from "~backend/users/check-access";
 import { getProfile as api_users_get_profile_getProfile } from "~backend/users/get-profile";
 import { updateProfile as api_users_update_profile_updateProfile } from "~backend/users/update-profile";
 
@@ -350,26 +346,37 @@ export namespace users {
 
         constructor(baseClient: BaseClient) {
             this.baseClient = baseClient
+            this.checkAccess = this.checkAccess.bind(this)
             this.getProfile = this.getProfile.bind(this)
             this.updateProfile = this.updateProfile.bind(this)
         }
 
         /**
-         * Retrieves user profile information.
+         * Checks if a user has access to a specific feature based on their subscription.
          */
-        public async getProfile(params: RequestType<typeof api_users_get_profile_getProfile>): Promise<ResponseType<typeof api_users_get_profile_getProfile>> {
+        public async checkAccess(params: RequestType<typeof api_users_check_access_checkAccess>): Promise<ResponseType<typeof api_users_check_access_checkAccess>> {
             // Convert our params into the objects we need for the request
             const query = makeRecord<string, string | string[]>({
-                email: params.email,
+                email:   params.email,
+                feature: params.feature,
             })
 
             // Now make the actual call to the API
-            const resp = await this.baseClient.callTypedAPI(`/users/profile`, {query, method: "GET", body: undefined})
+            const resp = await this.baseClient.callTypedAPI(`/users/check-access`, {query, method: "GET", body: undefined})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_users_check_access_checkAccess>
+        }
+
+        /**
+         * Retrieves the authenticated user's profile information.
+         */
+        public async getProfile(): Promise<ResponseType<typeof api_users_get_profile_getProfile>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/users/profile`, {method: "GET", body: undefined})
             return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_users_get_profile_getProfile>
         }
 
         /**
-         * Updates user profile information.
+         * Updates the authenticated user's profile information.
          */
         public async updateProfile(params: RequestType<typeof api_users_update_profile_updateProfile>): Promise<ResponseType<typeof api_users_update_profile_updateProfile>> {
             // Now make the actual call to the API
