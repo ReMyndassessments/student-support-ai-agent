@@ -226,18 +226,18 @@ Thank you!`);
             return (
               <Card 
                 key={plan.id} 
-                className={`relative border-0 bg-gradient-to-br ${plan.bgGradient} hover:shadow-2xl transition-all duration-300 hover:scale-105 transform rounded-3xl overflow-hidden ${plan.popular ? 'ring-4 ring-purple-200' : ''}`}
+                className={`relative border-0 bg-gradient-to-br ${plan.bgGradient} hover:shadow-2xl transition-all duration-300 hover:scale-105 transform rounded-3xl overflow-hidden ${plan.popular ? 'ring-4 ring-purple-300 ring-opacity-50' : ''}`}
               >
                 {plan.popular && (
-                  <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                    <Badge className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-1 rounded-full shadow-lg">
-                      <Star className="h-3 w-3 mr-1" />
+                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 z-10">
+                    <Badge className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-2 rounded-full shadow-xl border-2 border-white text-sm font-bold">
+                      <Star className="h-4 w-4 mr-2 fill-current" />
                       Most Popular
                     </Badge>
                   </div>
                 )}
                 
-                <CardHeader className={`bg-gradient-to-r ${plan.gradient} text-white rounded-t-3xl ${plan.popular ? 'pt-8' : 'pt-6'}`}>
+                <CardHeader className={`bg-gradient-to-r ${plan.gradient} text-white rounded-t-3xl ${plan.popular ? 'pt-10' : 'pt-6'}`}>
                   <div className="text-center space-y-4">
                     <div className={`inline-flex items-center justify-center w-16 h-16 bg-white/20 rounded-2xl shadow-lg`}>
                       <Icon className="h-8 w-8" />

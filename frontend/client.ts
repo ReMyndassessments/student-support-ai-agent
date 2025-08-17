@@ -34,6 +34,7 @@ const BROWSER = typeof globalThis === "object" && ("window" in globalThis);
  */
 export class Client {
     public readonly ai: ai.ServiceClient
+    public readonly auth: auth.ServiceClient
     public readonly polar: polar.ServiceClient
     public readonly referrals: referrals.ServiceClient
     public readonly users: users.ServiceClient
@@ -52,6 +53,7 @@ export class Client {
         this.options = options ?? {}
         const base = new BaseClient(this.target, this.options)
         this.ai = new ai.ServiceClient(base)
+        this.auth = new auth.ServiceClient(base)
         this.polar = new polar.ServiceClient(base)
         this.referrals = new referrals.ServiceClient(base)
         this.users = new users.ServiceClient(base)
@@ -71,6 +73,11 @@ export class Client {
 }
 
 /**
+ * Import the auth handler to be able to derive the auth type
+ */
+import type { auth as auth_auth } from "~backend/auth/auth";
+
+/**
  * ClientOptions allows you to override any default behaviour within the generated Encore client.
  */
 export interface ClientOptions {
@@ -83,6 +90,13 @@ export interface ClientOptions {
 
     /** Default RequestInit to be used for the client */
     requestInit?: Omit<RequestInit, "headers"> & { headers?: Record<string, string> }
+
+    /**
+     * Allows you to set the authentication data to be used for each
+     * request either by passing in a static object or by passing in
+     * a function which returns a new object for each request.
+     */
+    auth?: RequestType<typeof auth_auth> | AuthDataGenerator
 }
 
 /**
@@ -118,6 +132,43 @@ export namespace ai {
             // Now make the actual call to the API
             const resp = await this.baseClient.callTypedAPI(`/ai/recommendations`, {method: "POST", body: JSON.stringify(params)})
             return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_ai_generate_recommendations_generateRecommendations>
+        }
+    }
+}
+
+/**
+ * Import the endpoint handlers to derive the types for the client.
+ */
+import { adminLogin as api_auth_admin_login_adminLogin } from "~backend/auth/admin-login";
+import { adminLogout as api_auth_admin_logout_adminLogout } from "~backend/auth/admin-logout";
+
+export namespace auth {
+
+    export class ServiceClient {
+        private baseClient: BaseClient
+
+        constructor(baseClient: BaseClient) {
+            this.baseClient = baseClient
+            this.adminLogin = this.adminLogin.bind(this)
+            this.adminLogout = this.adminLogout.bind(this)
+        }
+
+        /**
+         * Admin login for demo purposes.
+         */
+        public async adminLogin(params: RequestType<typeof api_auth_admin_login_adminLogin>): Promise<ResponseType<typeof api_auth_admin_login_adminLogin>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/auth/admin/login`, {method: "POST", body: JSON.stringify(params)})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_auth_admin_login_adminLogin>
+        }
+
+        /**
+         * Admin logout for demo purposes.
+         */
+        public async adminLogout(): Promise<ResponseType<typeof api_auth_admin_logout_adminLogout>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/auth/admin/logout`, {method: "POST", body: undefined})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_auth_admin_logout_adminLogout>
         }
     }
 }
@@ -185,8 +236,19 @@ export namespace polar {
          * Handles Polar webhook events for subscription management.
          */
         public async webhook(params: RequestType<typeof api_polar_webhook_webhook>): Promise<ResponseType<typeof api_polar_webhook_webhook>> {
+            // Convert our params into the objects we need for the request
+            const headers = makeRecord<string, string>({
+                "polar-signature": params.signature,
+            })
+
+            // Construct the body with only the fields which we want encoded within the body (excluding query string or header fields)
+            const body: Record<string, any> = {
+                data: params.data,
+                type: params.type,
+            }
+
             // Now make the actual call to the API
-            const resp = await this.baseClient.callTypedAPI(`/polar/webhook`, {method: "POST", body: JSON.stringify(params)})
+            const resp = await this.baseClient.callTypedAPI(`/polar/webhook`, {headers, method: "POST", body: JSON.stringify(body)})
             return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_polar_webhook_webhook>
         }
     }
@@ -571,6 +633,11 @@ type CallParameters = Omit<RequestInit, "headers"> & {
     query?: Record<string, string | string[]>
 }
 
+// AuthDataGenerator is a function that returns a new instance of the authentication data required by this API
+export type AuthDataGenerator = () =>
+  | RequestType<typeof auth_auth>
+  | Promise<RequestType<typeof auth_auth> | undefined>
+  | undefined;
 
 // A fetcher is the prototype for the inbuilt Fetch function
 export type Fetcher = typeof fetch;
@@ -582,6 +649,7 @@ class BaseClient {
     readonly fetcher: Fetcher
     readonly headers: Record<string, string>
     readonly requestInit: Omit<RequestInit, "headers"> & { headers?: Record<string, string> }
+    readonly authGenerator?: AuthDataGenerator
 
     constructor(baseURL: string, options: ClientOptions) {
         this.baseURL = baseURL
@@ -601,9 +669,41 @@ class BaseClient {
         } else {
             this.fetcher = boundFetch
         }
+
+        // Setup an authentication data generator using the auth data token option
+        if (options.auth !== undefined) {
+            const auth = options.auth
+            if (typeof auth === "function") {
+                this.authGenerator = auth
+            } else {
+                this.authGenerator = () => auth
+            }
+        }
     }
 
     async getAuthData(): Promise<CallParameters | undefined> {
+        let authData: RequestType<typeof auth_auth> | undefined;
+
+        // If authorization data generator is present, call it and add the returned data to the request
+        if (this.authGenerator) {
+            const mayBePromise = this.authGenerator();
+            if (mayBePromise instanceof Promise) {
+                authData = await mayBePromise;
+            } else {
+                authData = mayBePromise;
+            }
+        }
+
+        if (authData) {
+            const data: CallParameters = {};
+
+            data.headers = makeRecord<string, string>({
+                authorization: authData.authorization,
+            });
+
+            return data;
+        }
+
         return undefined;
     }
 
