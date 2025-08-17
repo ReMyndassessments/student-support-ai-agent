@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, AlertTriangle, Users, Calendar, MapPin, FileText, Download, Printer, Mail, CheckCircle, Clock, Target } from 'lucide-react';
+import { Loader2, AlertTriangle, Users, Calendar, MapPin, FileText, Download, Printer, Mail, CheckCircle, Clock, Target, User } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { useParams, Link } from 'react-router-dom';
 import backend from '~backend/client';
@@ -98,22 +98,24 @@ export function MeetingPreparation() {
   const getSeverityColor = (severity: string) => {
     switch (severity.toLowerCase()) {
       case 'mild':
-        return 'text-green-700 bg-green-100';
+        return 'bg-gradient-to-r from-green-100 to-emerald-100 text-green-700';
       case 'moderate':
-        return 'text-yellow-700 bg-yellow-100';
+        return 'bg-gradient-to-r from-yellow-100 to-orange-100 text-yellow-700';
       case 'urgent':
-        return 'text-red-700 bg-red-100';
+        return 'bg-gradient-to-r from-red-100 to-pink-100 text-red-700';
       default:
-        return 'text-gray-700 bg-gray-100';
+        return 'bg-gradient-to-r from-gray-100 to-slate-100 text-gray-700';
     }
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex items-center justify-center">
         <div className="text-center space-y-4">
-          <Loader2 className="h-8 w-8 animate-spin text-gray-600 mx-auto" />
-          <p className="text-gray-600">Loading meeting preparation...</p>
+          <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-3xl flex items-center justify-center animate-pulse">
+            <Loader2 className="h-8 w-8 animate-spin text-white" />
+          </div>
+          <p className="text-gray-600 font-medium">Loading meeting preparation...</p>
         </div>
       </div>
     );
@@ -121,8 +123,8 @@ export function MeetingPreparation() {
 
   if (!referral) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <Card className="max-w-md">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex items-center justify-center">
+        <Card className="max-w-md border-0 bg-white/80 backdrop-blur-sm shadow-xl rounded-3xl">
           <CardContent className="text-center py-8">
             <p className="text-gray-500">Referral not found.</p>
             <Link to="/referrals" className="text-blue-600 hover:text-blue-700 mt-4 inline-block">
@@ -135,35 +137,43 @@ export function MeetingPreparation() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-4xl mx-auto px-6 py-8 space-y-8">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
+      <div className="max-w-5xl mx-auto px-6 py-8 space-y-8">
         {/* Header */}
-        <div className="text-center space-y-4">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
-            <Users className="h-8 w-8 text-blue-600" />
+        <div className="text-center space-y-4 relative">
+          {/* Decorative elements */}
+          <div className="absolute top-0 left-1/4 w-16 h-16 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full opacity-20 animate-pulse"></div>
+          <div className="absolute top-5 right-1/3 w-12 h-12 bg-gradient-to-br from-pink-400 to-rose-500 rounded-full opacity-20 animate-pulse delay-1000"></div>
+          
+          <div className="relative">
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 rounded-3xl shadow-2xl mb-6">
+              <Users className="h-10 w-10 text-white" />
+            </div>
+            <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
+              Student Support Meeting Preparation
+            </h1>
+            <p className="text-gray-600 text-lg">
+              Comprehensive documentation for {referral.studentFirstName} {referral.studentLastInitial}.
+            </p>
           </div>
-          <h1 className="text-3xl font-light text-gray-900">
-            Student Support Meeting Preparation
-          </h1>
-          <p className="text-gray-600">
-            Comprehensive documentation for {referral.studentFirstName} {referral.studentLastInitial}.
-          </p>
         </div>
 
         {/* Quick Actions */}
-        <Card className="border border-blue-200 bg-blue-50/50">
-          <CardHeader className="pb-4">
-            <CardTitle className="text-lg font-medium text-blue-900 flex items-center gap-2">
-              <FileText className="h-5 w-5" />
+        <Card className="border-0 bg-gradient-to-br from-blue-50 via-cyan-50 to-teal-50 shadow-xl rounded-3xl overflow-hidden">
+          <CardHeader className="bg-gradient-to-r from-blue-500 via-cyan-500 to-teal-500 text-white rounded-t-3xl">
+            <CardTitle className="flex items-center gap-3 text-xl">
+              <div className="w-10 h-10 bg-white/20 rounded-2xl flex items-center justify-center">
+                <FileText className="h-6 w-6" />
+              </div>
               Meeting Documents
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="flex flex-wrap gap-3">
+          <CardContent className="p-6">
+            <div className="flex flex-wrap gap-4">
               <Button
                 onClick={handleGeneratePDF}
                 disabled={isGeneratingPDF}
-                className="bg-blue-600 hover:bg-blue-700 text-white"
+                className="bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 text-white shadow-lg rounded-2xl px-6 py-3 transform hover:scale-105 transition-all duration-200"
               >
                 {isGeneratingPDF ? (
                   <>
@@ -178,12 +188,12 @@ export function MeetingPreparation() {
                 )}
               </Button>
               
-              <Button variant="outline">
+              <Button variant="outline" className="border-gray-300 text-gray-700 hover:bg-white/80 rounded-2xl px-6 py-3">
                 <Printer className="h-4 w-4 mr-2" />
                 Print Summary
               </Button>
               
-              <Button variant="outline">
+              <Button variant="outline" className="border-gray-300 text-gray-700 hover:bg-white/80 rounded-2xl px-6 py-3">
                 <Mail className="h-4 w-4 mr-2" />
                 Email to Team
               </Button>
@@ -192,70 +202,81 @@ export function MeetingPreparation() {
         </Card>
 
         {/* Student Overview */}
-        <Card>
-          <CardHeader className="bg-gray-50 rounded-t-lg">
-            <CardTitle className="text-xl font-medium text-gray-900">
+        <Card className="border-0 bg-white/90 backdrop-blur-sm shadow-xl rounded-3xl overflow-hidden">
+          <CardHeader className="bg-gradient-to-r from-purple-500 via-pink-500 to-rose-500 text-white rounded-t-3xl">
+            <CardTitle className="flex items-center gap-3 text-xl">
+              <div className="w-10 h-10 bg-white/20 rounded-2xl flex items-center justify-center">
+                <User className="h-6 w-6" />
+              </div>
               Student Overview
             </CardTitle>
           </CardHeader>
-          <CardContent className="pt-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                    <span className="text-blue-700 font-semibold text-lg">
+          <CardContent className="p-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="space-y-6">
+                <div className="flex items-center gap-4">
+                  <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-3xl flex items-center justify-center shadow-lg">
+                    <span className="text-white font-bold text-xl">
                       {referral.studentFirstName[0]}{referral.studentLastInitial}
                     </span>
                   </div>
                   <div>
-                    <h3 className="font-semibold text-gray-900">
+                    <h3 className="text-xl font-bold text-gray-900">
                       {referral.studentFirstName} {referral.studentLastInitial}.
                     </h3>
-                    <p className="text-gray-600">Grade {referral.grade}</p>
+                    <p className="text-gray-600 text-lg">Grade {referral.grade}</p>
                   </div>
                 </div>
                 
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
+                <div className="space-y-3">
+                  <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-4 rounded-2xl">
                     <span className="font-medium text-gray-700">Teacher:</span>
-                    <span className="text-gray-600">{referral.teacher}</span>
+                    <span className="text-gray-600 ml-2">{referral.teacher}</span>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-4 rounded-2xl">
                     <span className="font-medium text-gray-700">Position:</span>
-                    <span className="text-gray-600">{referral.teacherPosition}</span>
+                    <span className="text-gray-600 ml-2">{referral.teacherPosition}</span>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="bg-gradient-to-r from-pink-50 to-rose-50 p-4 rounded-2xl">
                     <span className="font-medium text-gray-700">Referral ID:</span>
-                    <span className="text-gray-600">#{referral.id}</span>
+                    <span className="text-gray-600 ml-2">#{referral.id}</span>
                   </div>
                 </div>
               </div>
               
               <div className="space-y-4">
-                <div className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4 text-gray-500" />
-                  <span className="font-medium text-gray-700">Incident Date:</span>
-                  <span className="text-gray-600">{formatIncidentDate(referral.incidentDate)}</span>
+                <div className="flex items-center gap-3 bg-gradient-to-r from-blue-50 to-cyan-50 p-4 rounded-2xl">
+                  <Calendar className="h-5 w-5 text-blue-500" />
+                  <div>
+                    <span className="font-medium text-gray-700">Incident Date:</span>
+                    <p className="text-gray-600">{formatIncidentDate(referral.incidentDate)}</p>
+                  </div>
                 </div>
                 
-                <div className="flex items-center gap-2">
-                  <MapPin className="h-4 w-4 text-gray-500" />
-                  <span className="font-medium text-gray-700">Location:</span>
-                  <span className="text-gray-600">{referral.location}</span>
+                <div className="flex items-center gap-3 bg-gradient-to-r from-green-50 to-emerald-50 p-4 rounded-2xl">
+                  <MapPin className="h-5 w-5 text-green-500" />
+                  <div>
+                    <span className="font-medium text-gray-700">Location:</span>
+                    <p className="text-gray-600">{referral.location}</p>
+                  </div>
                 </div>
                 
-                <div className="flex items-center gap-2">
-                  <Target className="h-4 w-4 text-gray-500" />
-                  <span className="font-medium text-gray-700">Severity:</span>
-                  <Badge className={getSeverityColor(referral.severityLevel)}>
-                    {referral.severityLevel.charAt(0).toUpperCase() + referral.severityLevel.slice(1)}
-                  </Badge>
+                <div className="flex items-center gap-3 bg-gradient-to-r from-orange-50 to-red-50 p-4 rounded-2xl">
+                  <Target className="h-5 w-5 text-orange-500" />
+                  <div>
+                    <span className="font-medium text-gray-700">Severity:</span>
+                    <Badge className={`${getSeverityColor(referral.severityLevel)} ml-2 rounded-xl px-3 py-1`}>
+                      {referral.severityLevel.charAt(0).toUpperCase() + referral.severityLevel.slice(1)}
+                    </Badge>
+                  </div>
                 </div>
                 
-                <div className="flex items-center gap-2">
-                  <Clock className="h-4 w-4 text-gray-500" />
-                  <span className="font-medium text-gray-700">Submitted:</span>
-                  <span className="text-gray-600">{formatDate(referral.createdAt)}</span>
+                <div className="flex items-center gap-3 bg-gradient-to-r from-purple-50 to-pink-50 p-4 rounded-2xl">
+                  <Clock className="h-5 w-5 text-purple-500" />
+                  <div>
+                    <span className="font-medium text-gray-700">Submitted:</span>
+                    <p className="text-gray-600">{formatDate(referral.createdAt)}</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -263,23 +284,21 @@ export function MeetingPreparation() {
         </Card>
 
         {/* Concern Summary */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg font-medium text-gray-900">
-              Concern Summary
-            </CardTitle>
+        <Card className="border-0 bg-white/90 backdrop-blur-sm shadow-xl rounded-3xl overflow-hidden">
+          <CardHeader className="bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 text-white rounded-t-3xl">
+            <CardTitle className="text-xl">Concern Summary</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="p-6 space-y-6">
             <div>
-              <h4 className="font-medium text-gray-900 mb-2">Concern Types</h4>
-              <div className="flex flex-wrap gap-2">
+              <h4 className="font-medium text-gray-900 mb-3">Concern Types</h4>
+              <div className="flex flex-wrap gap-3">
                 {referral.concernTypes.map((type, index) => (
-                  <Badge key={index} variant="outline">
+                  <Badge key={index} variant="outline" className="bg-gradient-to-r from-orange-50 to-red-50 text-orange-700 border-orange-200 rounded-xl px-3 py-2">
                     {type}
                   </Badge>
                 ))}
                 {referral.otherConcernType && (
-                  <Badge variant="outline">
+                  <Badge variant="outline" className="bg-gradient-to-r from-orange-50 to-red-50 text-orange-700 border-orange-200 rounded-xl px-3 py-2">
                     {referral.otherConcernType}
                   </Badge>
                 )}
@@ -287,8 +306,8 @@ export function MeetingPreparation() {
             </div>
             
             <div>
-              <h4 className="font-medium text-gray-900 mb-2">Detailed Description</h4>
-              <div className="bg-amber-50 p-4 rounded-lg border border-amber-200">
+              <h4 className="font-medium text-gray-900 mb-3">Detailed Description</h4>
+              <div className="bg-gradient-to-r from-amber-50 to-orange-50 p-6 rounded-2xl border border-amber-200">
                 <p className="text-gray-700 leading-relaxed">
                   {referral.concernDescription}
                 </p>
@@ -299,22 +318,24 @@ export function MeetingPreparation() {
 
         {/* Actions Taken */}
         {referral.actionsTaken.length > 0 && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg font-medium text-gray-900 flex items-center gap-2">
-                <CheckCircle className="h-5 w-5 text-green-600" />
+          <Card className="border-0 bg-white/90 backdrop-blur-sm shadow-xl rounded-3xl overflow-hidden">
+            <CardHeader className="bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500 text-white rounded-t-3xl">
+              <CardTitle className="flex items-center gap-3 text-xl">
+                <div className="w-10 h-10 bg-white/20 rounded-2xl flex items-center justify-center">
+                  <CheckCircle className="h-6 w-6" />
+                </div>
                 Actions Already Taken
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="flex flex-wrap gap-2">
+            <CardContent className="p-6">
+              <div className="flex flex-wrap gap-3">
                 {referral.actionsTaken.map((action, index) => (
-                  <Badge key={index} variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                  <Badge key={index} variant="outline" className="bg-gradient-to-r from-green-50 to-emerald-50 text-green-700 border-green-200 rounded-xl px-4 py-2">
                     {action}
                   </Badge>
                 ))}
                 {referral.otherActionTaken && (
-                  <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                  <Badge variant="outline" className="bg-gradient-to-r from-green-50 to-emerald-50 text-green-700 border-green-200 rounded-xl px-4 py-2">
                     {referral.otherActionTaken}
                   </Badge>
                 )}
@@ -325,14 +346,12 @@ export function MeetingPreparation() {
 
         {/* AI Recommendations */}
         {referral.aiRecommendations && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg font-medium text-gray-900">
-                Recommended Tier 2 Interventions
-              </CardTitle>
+          <Card className="border-0 bg-white/90 backdrop-blur-sm shadow-xl rounded-3xl overflow-hidden">
+            <CardHeader className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white rounded-t-3xl">
+              <CardTitle className="text-xl">Recommended Tier 2 Interventions</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="bg-blue-50 p-6 rounded-lg border border-blue-200">
+            <CardContent className="p-6 space-y-6">
+              <div className="bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 p-6 rounded-2xl border border-indigo-200">
                 <div className="prose max-w-none">
                   <pre className="whitespace-pre-wrap font-sans text-sm text-gray-700 leading-relaxed">
                     {referral.aiRecommendations}
@@ -340,9 +359,9 @@ export function MeetingPreparation() {
                 </div>
               </div>
               
-              <Alert className="border-amber-200 bg-amber-50">
+              <Alert className="border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl">
                 <AlertTriangle className="h-4 w-4 text-amber-600" />
-                <AlertDescription className="text-sm text-amber-800">
+                <AlertDescription className="text-sm text-amber-800 leading-relaxed">
                   <strong>Meeting Discussion Point:</strong> These AI-generated recommendations should be reviewed and validated by the student support team. Consider which interventions are most appropriate for implementation and what additional resources may be needed.
                 </AlertDescription>
               </Alert>
@@ -351,39 +370,30 @@ export function MeetingPreparation() {
         )}
 
         {/* Meeting Checklist */}
-        <Card className="border border-green-200 bg-green-50/50">
-          <CardHeader>
-            <CardTitle className="text-lg font-medium text-green-900 flex items-center gap-2">
-              <CheckCircle className="h-5 w-5" />
+        <Card className="border-0 bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 shadow-xl rounded-3xl overflow-hidden">
+          <CardHeader className="bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500 text-white rounded-t-3xl">
+            <CardTitle className="flex items-center gap-3 text-xl">
+              <div className="w-10 h-10 bg-white/20 rounded-2xl flex items-center justify-center">
+                <CheckCircle className="h-6 w-6" />
+              </div>
               Meeting Preparation Checklist
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              <div className="flex items-center gap-3">
-                <input type="checkbox" className="rounded border-gray-300" />
-                <span className="text-sm text-green-800">Review student's academic and behavioral history</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <input type="checkbox" className="rounded border-gray-300" />
-                <span className="text-sm text-green-800">Gather input from other teachers who work with this student</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <input type="checkbox" className="rounded border-gray-300" />
-                <span className="text-sm text-green-800">Consider parent/guardian communication and involvement</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <input type="checkbox" className="rounded border-gray-300" />
-                <span className="text-sm text-green-800">Identify available resources and support staff</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <input type="checkbox" className="rounded border-gray-300" />
-                <span className="text-sm text-green-800">Plan timeline for intervention implementation and progress monitoring</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <input type="checkbox" className="rounded border-gray-300" />
-                <span className="text-sm text-green-800">Determine next steps if interventions are not effective</span>
-              </div>
+          <CardContent className="p-6">
+            <div className="space-y-4">
+              {[
+                "Review student's academic and behavioral history",
+                "Gather input from other teachers who work with this student",
+                "Consider parent/guardian communication and involvement",
+                "Identify available resources and support staff",
+                "Plan timeline for intervention implementation and progress monitoring",
+                "Determine next steps if interventions are not effective"
+              ].map((item, index) => (
+                <div key={index} className="flex items-center gap-4 p-4 bg-white/60 rounded-2xl hover:bg-white/80 transition-colors">
+                  <input type="checkbox" className="w-5 h-5 rounded-lg border-gray-300 text-green-600 focus:ring-green-500" />
+                  <span className="text-sm text-green-800 font-medium">{item}</span>
+                </div>
+              ))}
             </div>
           </CardContent>
         </Card>
@@ -392,7 +402,7 @@ export function MeetingPreparation() {
         <div className="text-center">
           <Link 
             to="/referrals"
-            className="inline-flex items-center text-blue-600 hover:text-blue-700 font-medium"
+            className="inline-flex items-center text-blue-600 hover:text-blue-700 font-medium bg-white/60 hover:bg-white/80 px-6 py-3 rounded-2xl transition-colors"
           >
             ← Back to All Referrals
           </Link>

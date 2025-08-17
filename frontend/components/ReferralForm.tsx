@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Checkbox } from '@/components/ui/checkbox';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Loader2, AlertTriangle, CheckCircle, ArrowLeft, Sparkles, HelpCircle } from 'lucide-react';
+import { Loader2, AlertTriangle, CheckCircle, ArrowLeft, Sparkles, HelpCircle, User, Calendar, MapPin, AlertCircle } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { Link } from 'react-router-dom';
 import backend from '~backend/client';
@@ -274,7 +274,7 @@ export function ReferralForm() {
       // Check for follow-up assistance section
       if (trimmedLine === '--- FOLLOW-UP ASSISTANCE ---') {
         return (
-          <div key={index} className="border-t border-gray-300 mt-6 pt-6">
+          <div key={index} className="border-t border-blue-300 mt-6 pt-6">
             <h3 className="text-lg font-semibold text-blue-700 mb-3">
               Follow-up Implementation Assistance
             </h3>
@@ -343,13 +343,13 @@ export function ReferralForm() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-3xl mx-auto px-6 py-8 space-y-8">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
+      <div className="max-w-4xl mx-auto px-6 py-8 space-y-8">
         {/* Back Button */}
         <div className="flex items-center">
           <Link 
             to="/" 
-            className="inline-flex items-center text-gray-600 hover:text-gray-900 font-medium transition-colors"
+            className="inline-flex items-center text-gray-600 hover:text-gray-900 font-medium transition-colors hover:bg-white/60 px-3 py-2 rounded-xl"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Home
@@ -357,24 +357,36 @@ export function ReferralForm() {
         </div>
 
         {/* Header */}
-        <div className="text-center">
-          <h1 className="text-3xl font-light text-gray-900 mb-2">
-            Student Concern Form
-          </h1>
-          <p className="text-gray-600">
-            For AI-Generated Tier 2 Interventions
-          </p>
+        <div className="text-center relative">
+          {/* Decorative elements */}
+          <div className="absolute top-0 left-1/4 w-16 h-16 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full opacity-20 animate-pulse"></div>
+          <div className="absolute top-5 right-1/3 w-12 h-12 bg-gradient-to-br from-pink-400 to-orange-500 rounded-full opacity-20 animate-pulse delay-1000"></div>
+          
+          <div className="relative">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 rounded-3xl shadow-xl mb-4">
+              <Sparkles className="h-8 w-8 text-white" />
+            </div>
+            <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
+              Student Concern Form
+            </h1>
+            <p className="text-gray-600">
+              For AI-Generated Tier 2 Interventions
+            </p>
+          </div>
         </div>
 
         {/* Student Information */}
-        <Card className="border border-gray-200">
-          <CardHeader className="pb-4">
-            <CardTitle className="text-lg font-medium text-gray-900">
+        <Card className="border-0 bg-white/80 backdrop-blur-sm shadow-xl rounded-3xl overflow-hidden">
+          <CardHeader className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white rounded-t-3xl">
+            <CardTitle className="flex items-center gap-3 text-xl">
+              <div className="w-10 h-10 bg-white/20 rounded-2xl flex items-center justify-center">
+                <User className="h-6 w-6" />
+              </div>
               Student Information
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <CardContent className="p-6 space-y-6">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
               <div className="space-y-2">
                 <Label htmlFor="grade" className="text-sm font-medium text-gray-700">
                   Grade *
@@ -384,7 +396,7 @@ export function ReferralForm() {
                   value={formData.grade}
                   onChange={(e) => handleInputChange('grade', e.target.value)}
                   placeholder="e.g., 3rd, 7th, 11th"
-                  className="border-gray-300"
+                  className="border-gray-200 rounded-xl focus:border-blue-500 focus:ring-blue-500"
                 />
               </div>
               
@@ -397,7 +409,7 @@ export function ReferralForm() {
                   value={formData.studentFirstName}
                   onChange={(e) => handleInputChange('studentFirstName', e.target.value)}
                   placeholder="Enter first name"
-                  className="border-gray-300"
+                  className="border-gray-200 rounded-xl focus:border-blue-500 focus:ring-blue-500"
                 />
               </div>
               
@@ -411,7 +423,7 @@ export function ReferralForm() {
                   onChange={(e) => handleInputChange('studentLastInitial', e.target.value)}
                   placeholder="Enter last initial"
                   maxLength={1}
-                  className="border-gray-300"
+                  className="border-gray-200 rounded-xl focus:border-blue-500 focus:ring-blue-500"
                 />
               </div>
             </div>
@@ -419,16 +431,20 @@ export function ReferralForm() {
         </Card>
 
         {/* Incident/Concern */}
-        <Card className="border border-gray-200">
-          <CardHeader className="pb-4">
-            <CardTitle className="text-lg font-medium text-gray-900">
+        <Card className="border-0 bg-white/80 backdrop-blur-sm shadow-xl rounded-3xl overflow-hidden">
+          <CardHeader className="bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 text-white rounded-t-3xl">
+            <CardTitle className="flex items-center gap-3 text-xl">
+              <div className="w-10 h-10 bg-white/20 rounded-2xl flex items-center justify-center">
+                <AlertCircle className="h-6 w-6" />
+              </div>
               Incident/Concern
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <CardContent className="p-6 space-y-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <Label htmlFor="incidentDate" className="text-sm font-medium text-gray-700">
+                <Label htmlFor="incidentDate" className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                  <Calendar className="h-4 w-4" />
                   Date *
                 </Label>
                 <Input
@@ -436,12 +452,13 @@ export function ReferralForm() {
                   type="date"
                   value={formData.incidentDate}
                   onChange={(e) => handleInputChange('incidentDate', e.target.value)}
-                  className="border-gray-300"
+                  className="border-gray-200 rounded-xl focus:border-orange-500 focus:ring-orange-500"
                 />
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="location" className="text-sm font-medium text-gray-700">
+                <Label htmlFor="location" className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                  <MapPin className="h-4 w-4" />
                   Location *
                 </Label>
                 <Input
@@ -449,24 +466,25 @@ export function ReferralForm() {
                   value={formData.location}
                   onChange={(e) => handleInputChange('location', e.target.value)}
                   placeholder="e.g., Classroom, Cafeteria, Hallway"
-                  className="border-gray-300"
+                  className="border-gray-200 rounded-xl focus:border-orange-500 focus:ring-orange-500"
                 />
               </div>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-4">
               <Label className="text-sm font-medium text-gray-700">
                 Type of Concern (check one or more) *
               </Label>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                 {CONCERN_TYPES.map((type) => (
-                  <div key={type} className="flex items-center space-x-2">
+                  <div key={type} className="flex items-center space-x-3 p-3 rounded-xl bg-gradient-to-r from-orange-50 to-red-50 hover:from-orange-100 hover:to-red-100 transition-colors">
                     <Checkbox
                       id={`concern-${type}`}
                       checked={formData.concernTypes.includes(type)}
                       onCheckedChange={(checked) => handleConcernTypeChange(type, checked as boolean)}
+                      className="rounded-lg"
                     />
-                    <Label htmlFor={`concern-${type}`} className="text-sm text-gray-700">
+                    <Label htmlFor={`concern-${type}`} className="text-sm text-gray-700 font-medium">
                       {type}
                     </Label>
                   </div>
@@ -482,7 +500,7 @@ export function ReferralForm() {
                   value={formData.otherConcernType}
                   onChange={(e) => handleInputChange('otherConcernType', e.target.value)}
                   placeholder="Specify other concern type"
-                  className="border-gray-300"
+                  className="border-gray-200 rounded-xl focus:border-orange-500 focus:ring-orange-500"
                 />
               </div>
             </div>
@@ -497,23 +515,23 @@ export function ReferralForm() {
                 onChange={(e) => handleInputChange('concernDescription', e.target.value)}
                 placeholder="Please briefly describe the situation, behavior, or challenge"
                 rows={4}
-                className="border-gray-300 resize-none"
+                className="border-gray-200 rounded-xl focus:border-orange-500 focus:ring-orange-500 resize-none"
               />
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-4">
               <Label className="text-sm font-medium text-gray-700">
                 Severity Level *
               </Label>
               <RadioGroup 
                 value={formData.severityLevel} 
                 onValueChange={(value) => handleInputChange('severityLevel', value)}
-                className="space-y-2"
+                className="space-y-3"
               >
                 {SEVERITY_LEVELS.map((level) => (
-                  <div key={level.value} className="flex items-center space-x-2">
-                    <RadioGroupItem value={level.value} id={`severity-${level.value}`} />
-                    <Label htmlFor={`severity-${level.value}`} className="text-sm text-gray-700">
+                  <div key={level.value} className="flex items-center space-x-3 p-3 rounded-xl bg-gradient-to-r from-yellow-50 to-orange-50 hover:from-yellow-100 hover:to-orange-100 transition-colors">
+                    <RadioGroupItem value={level.value} id={`severity-${level.value}`} className="border-orange-400" />
+                    <Label htmlFor={`severity-${level.value}`} className="text-sm text-gray-700 font-medium">
                       {level.label}
                     </Label>
                   </div>
@@ -521,19 +539,20 @@ export function ReferralForm() {
               </RadioGroup>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-4">
               <Label className="text-sm font-medium text-gray-700">
                 Actions Taken Already (optional)
               </Label>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {ACTIONS_TAKEN.map((action) => (
-                  <div key={action} className="flex items-center space-x-2">
+                  <div key={action} className="flex items-center space-x-3 p-3 rounded-xl bg-gradient-to-r from-green-50 to-emerald-50 hover:from-green-100 hover:to-emerald-100 transition-colors">
                     <Checkbox
                       id={`action-${action}`}
                       checked={formData.actionsTaken.includes(action)}
                       onCheckedChange={(checked) => handleActionTakenChange(action, checked as boolean)}
+                      className="rounded-lg"
                     />
-                    <Label htmlFor={`action-${action}`} className="text-sm text-gray-700">
+                    <Label htmlFor={`action-${action}`} className="text-sm text-gray-700 font-medium">
                       {action}
                     </Label>
                   </div>
@@ -549,7 +568,7 @@ export function ReferralForm() {
                   value={formData.otherActionTaken}
                   onChange={(e) => handleInputChange('otherActionTaken', e.target.value)}
                   placeholder="Specify other action taken"
-                  className="border-gray-300"
+                  className="border-gray-200 rounded-xl focus:border-green-500 focus:ring-green-500"
                 />
               </div>
             </div>
@@ -557,14 +576,17 @@ export function ReferralForm() {
         </Card>
 
         {/* Teacher Information */}
-        <Card className="border border-gray-200">
-          <CardHeader className="pb-4">
-            <CardTitle className="text-lg font-medium text-gray-900">
+        <Card className="border-0 bg-white/80 backdrop-blur-sm shadow-xl rounded-3xl overflow-hidden">
+          <CardHeader className="bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 text-white rounded-t-3xl">
+            <CardTitle className="flex items-center gap-3 text-xl">
+              <div className="w-10 h-10 bg-white/20 rounded-2xl flex items-center justify-center">
+                <User className="h-6 w-6" />
+              </div>
               Teacher Information
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <CardContent className="p-6 space-y-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <Label htmlFor="teacher" className="text-sm font-medium text-gray-700">
                   Name *
@@ -574,7 +596,7 @@ export function ReferralForm() {
                   value={formData.teacher}
                   onChange={(e) => handleInputChange('teacher', e.target.value)}
                   placeholder="Enter teacher name"
-                  className="border-gray-300"
+                  className="border-gray-200 rounded-xl focus:border-emerald-500 focus:ring-emerald-500"
                 />
               </div>
               
@@ -587,7 +609,7 @@ export function ReferralForm() {
                   value={formData.teacherPosition}
                   onChange={(e) => handleInputChange('teacherPosition', e.target.value)}
                   placeholder="e.g., 3rd Grade Teacher, Math Teacher"
-                  className="border-gray-300"
+                  className="border-gray-200 rounded-xl focus:border-emerald-500 focus:ring-emerald-500"
                 />
               </div>
             </div>
@@ -595,20 +617,20 @@ export function ReferralForm() {
         </Card>
 
         {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row gap-3">
+        <div className="flex flex-col sm:flex-row gap-4">
           <Button 
             onClick={generateRecommendations}
             disabled={isGenerating}
-            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+            className="flex-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 text-white shadow-xl rounded-2xl py-6 text-lg font-semibold transition-all duration-200 transform hover:scale-105"
           >
             {isGenerating ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Generating...
+                <Loader2 className="mr-3 h-5 w-5 animate-spin" />
+                Generating Magic...
               </>
             ) : (
               <>
-                <Sparkles className="mr-2 h-4 w-4" />
+                <Sparkles className="mr-3 h-5 w-5" />
                 Generate AI Recommendations
               </>
             )}
@@ -619,17 +641,20 @@ export function ReferralForm() {
               onClick={saveReferral}
               disabled={isSaving || hasSaved}
               variant={hasSaved ? "outline" : "default"}
-              className={hasSaved ? "border-green-500 text-green-600" : "bg-green-600 hover:bg-green-700 text-white"}
+              className={hasSaved 
+                ? "border-green-500 text-green-600 rounded-2xl py-6 px-8" 
+                : "bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-xl rounded-2xl py-6 px-8 transform hover:scale-105 transition-all duration-200"
+              }
             >
               {isSaving ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                   Saving...
                 </>
               ) : hasSaved ? (
                 <>
-                  <CheckCircle className="mr-2 h-4 w-4" />
-                  Saved
+                  <CheckCircle className="mr-2 h-5 w-5" />
+                  Saved Successfully!
                 </>
               ) : (
                 'Save Referral'
@@ -640,31 +665,34 @@ export function ReferralForm() {
           <Button 
             onClick={resetForm} 
             variant="outline"
-            className="border-gray-300 text-gray-700 hover:bg-gray-50"
+            className="border-gray-300 text-gray-700 hover:bg-white/80 rounded-2xl py-6 px-8"
           >
-            Reset
+            Reset Form
           </Button>
         </div>
 
         {/* Recommendations Display */}
         {recommendations && (
-          <Card className="border border-gray-200">
-            <CardHeader className="pb-4">
-              <CardTitle className="text-lg font-medium text-gray-900">
+          <Card className="border-0 bg-white/90 backdrop-blur-sm shadow-xl rounded-3xl overflow-hidden">
+            <CardHeader className="bg-gradient-to-r from-purple-500 via-pink-500 to-rose-500 text-white rounded-t-3xl">
+              <CardTitle className="flex items-center gap-3 text-xl">
+                <div className="w-10 h-10 bg-white/20 rounded-2xl flex items-center justify-center">
+                  <Sparkles className="h-6 w-6" />
+                </div>
                 AI-Generated Recommendations
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="bg-gray-50 p-6 rounded-lg">
+            <CardContent className="p-6 space-y-6">
+              <div className="bg-gradient-to-br from-purple-50 via-pink-50 to-rose-50 p-6 rounded-2xl border border-purple-200">
                 <div className="prose max-w-none">
                   {formatRecommendations(recommendations + (hasFollowUpAssistance ? `\n\n--- FOLLOW-UP ASSISTANCE ---\n\nTeacher's Question: ${followUpQuestion}\n\nAdditional Guidance:\n${followUpAssistance}` : ''))}
                 </div>
               </div>
               
               {disclaimer && (
-                <Alert className="border-amber-200 bg-amber-50">
-                  <AlertTriangle className="h-4 w-4 text-amber-600" />
-                  <AlertDescription className="text-sm text-amber-800">
+                <Alert className="border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl">
+                  <AlertTriangle className="h-5 w-5 text-amber-600" />
+                  <AlertDescription className="text-sm text-amber-800 leading-relaxed">
                     {disclaimer}
                   </AlertDescription>
                 </Alert>
@@ -675,15 +703,17 @@ export function ReferralForm() {
 
         {/* Follow-up Assistance Section */}
         {hasGenerated && (
-          <Card className="border border-blue-200 bg-blue-50/50">
-            <CardHeader className="pb-4">
-              <CardTitle className="text-lg font-medium text-blue-900 flex items-center gap-2">
-                <HelpCircle className="h-5 w-5" />
-                Need Help Implementing These Interventions?
+          <Card className="border-0 bg-gradient-to-br from-blue-50 via-cyan-50 to-teal-50 shadow-xl rounded-3xl overflow-hidden">
+            <CardHeader className="bg-gradient-to-r from-blue-500 via-cyan-500 to-teal-500 text-white rounded-t-3xl">
+              <CardTitle className="flex items-center gap-3 text-xl">
+                <div className="w-10 h-10 bg-white/20 rounded-2xl flex items-center justify-center">
+                  <HelpCircle className="h-6 w-6" />
+                </div>
+                Need Implementation Help?
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-sm text-blue-800">
+            <CardContent className="p-6 space-y-6">
+              <p className="text-blue-800 font-medium">
                 Ask a specific question about implementing any of the recommended interventions and get detailed guidance.
               </p>
               
@@ -697,14 +727,14 @@ export function ReferralForm() {
                   onChange={(e) => setFollowUpQuestion(e.target.value)}
                   placeholder="e.g., How do I set up a behavior chart for this student? What materials do I need for the sensory break area? How often should I check in with the student?"
                   rows={3}
-                  className="border-blue-300 focus:border-blue-500 focus:ring-blue-500 resize-none"
+                  className="border-blue-200 rounded-xl focus:border-blue-500 focus:ring-blue-500 resize-none bg-white/80"
                 />
               </div>
               
               <Button 
                 onClick={generateFollowUpAssistance}
                 disabled={isGeneratingFollowUp || !followUpQuestion.trim()}
-                className="bg-blue-600 hover:bg-blue-700 text-white"
+                className="bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 text-white shadow-lg rounded-2xl py-3 px-6 transform hover:scale-105 transition-all duration-200"
               >
                 {isGeneratingFollowUp ? (
                   <>
@@ -720,9 +750,9 @@ export function ReferralForm() {
               </Button>
               
               {hasFollowUpAssistance && followUpDisclaimer && (
-                <Alert className="border-amber-200 bg-amber-50 mt-4">
+                <Alert className="border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl mt-4">
                   <AlertTriangle className="h-4 w-4 text-amber-600" />
-                  <AlertDescription className="text-sm text-amber-800">
+                  <AlertDescription className="text-sm text-amber-800 leading-relaxed">
                     {followUpDisclaimer}
                   </AlertDescription>
                 </Alert>
