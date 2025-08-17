@@ -45,7 +45,7 @@ export function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
       console.error('Login error:', error);
       toast({
         title: "Login Failed",
-        description: "Invalid admin password. Please try again.",
+        description: "Invalid admin password. Try: demo2024, demo, admin, or password",
         variant: "destructive"
       });
     } finally {
@@ -135,6 +135,8 @@ export function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
                 <strong>Demo Environment</strong>
                 <br />
                 This is a demonstration environment with sample data. All AI features are fully functional using the admin DeepSeek API key.
+                <br /><br />
+                <strong>Try these passwords:</strong> demo2024, demo, admin, or password
               </AlertDescription>
             </Alert>
           </CardContent>

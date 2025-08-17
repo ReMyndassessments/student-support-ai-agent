@@ -47,7 +47,7 @@ export function AdminLoginFooter({ onAdminLogin }: AdminLoginFooterProps) {
       console.error('Login error:', error);
       toast({
         title: "Login Failed",
-        description: "Invalid admin password. Please try again.",
+        description: "Invalid admin password. Try: demo2024, demo, admin, or password",
         variant: "destructive"
       });
     } finally {
@@ -130,6 +130,9 @@ export function AdminLoginFooter({ onAdminLogin }: AdminLoginFooterProps) {
                         {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </Button>
                     </div>
+                    <p className="text-xs text-gray-500">
+                      Try: demo2024, demo, admin, or password
+                    </p>
                   </div>
                   <DialogFooter>
                     <Button

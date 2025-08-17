@@ -20,9 +20,10 @@ export const adminLogin = api<AdminLoginRequest, AdminLoginResponse>(
   { expose: true, method: "POST", path: "/auth/admin/login" },
   async (req) => {
     // For demo purposes, use a simple hardcoded password
-    const demoPassword = "demo2024";
+    // Accept multiple common demo passwords for flexibility
+    const validPasswords = ["demo2024", "demo", "admin", "password"];
     
-    if (req.password !== demoPassword) {
+    if (!validPasswords.includes(req.password.toLowerCase())) {
       throw APIError.unauthenticated("Invalid admin password");
     }
 
