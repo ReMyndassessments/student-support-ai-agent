@@ -123,6 +123,7 @@ export namespace ai {
  */
 import { create as api_referrals_create_create } from "~backend/referrals/create";
 import { generatePDF as api_referrals_generate_pdf_generatePDF } from "~backend/referrals/generate-pdf";
+import { get as api_referrals_get_get } from "~backend/referrals/get";
 import { list as api_referrals_list_list } from "~backend/referrals/list";
 import { shareEmail as api_referrals_share_email_shareEmail } from "~backend/referrals/share-email";
 
@@ -135,6 +136,7 @@ export namespace referrals {
             this.baseClient = baseClient
             this.create = this.create.bind(this)
             this.generatePDF = this.generatePDF.bind(this)
+            this.get = this.get.bind(this)
             this.list = this.list.bind(this)
             this.shareEmail = this.shareEmail.bind(this)
         }
@@ -155,6 +157,15 @@ export namespace referrals {
             // Now make the actual call to the API
             const resp = await this.baseClient.callTypedAPI(`/referrals/${encodeURIComponent(params.referralId)}/pdf`, {method: "POST", body: undefined})
             return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_referrals_generate_pdf_generatePDF>
+        }
+
+        /**
+         * Retrieves a single referral by ID.
+         */
+        public async get(params: { id: number }): Promise<ResponseType<typeof api_referrals_get_get>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/referrals/${encodeURIComponent(params.id)}`, {method: "GET", body: undefined})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_referrals_get_get>
         }
 
         /**
