@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { FileText, List, Home, Menu, X, GraduationCap } from 'lucide-react';
+import { FileText, List, Home, Menu, X, GraduationCap, BookOpen } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 
@@ -22,6 +22,11 @@ export function Navigation() {
       to: '/referrals',
       icon: List,
       label: 'View Referrals'
+    },
+    {
+      to: '/resources',
+      icon: BookOpen,
+      label: 'Resource Library'
     }
   ];
 

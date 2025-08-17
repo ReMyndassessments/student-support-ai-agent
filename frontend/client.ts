@@ -35,6 +35,7 @@ const BROWSER = typeof globalThis === "object" && ("window" in globalThis);
 export class Client {
     public readonly ai: ai.ServiceClient
     public readonly referrals: referrals.ServiceClient
+    public readonly resources: resources.ServiceClient
     private readonly options: ClientOptions
     private readonly target: string
 
@@ -51,6 +52,7 @@ export class Client {
         const base = new BaseClient(this.target, this.options)
         this.ai = new ai.ServiceClient(base)
         this.referrals = new referrals.ServiceClient(base)
+        this.resources = new resources.ServiceClient(base)
     }
 
     /**
@@ -197,6 +199,81 @@ export namespace referrals {
             // Now make the actual call to the API
             const resp = await this.baseClient.callTypedAPI(`/referrals/${encodeURIComponent(params.referralId)}/share`, {method: "POST", body: JSON.stringify(body)})
             return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_referrals_share_email_shareEmail>
+        }
+    }
+}
+
+/**
+ * Import the endpoint handlers to derive the types for the client.
+ */
+import { categories as api_resources_categories_categories } from "~backend/resources/categories";
+import { customize as api_resources_customize_customize } from "~backend/resources/customize";
+import { get as api_resources_get_get } from "~backend/resources/get";
+import { list as api_resources_list_list } from "~backend/resources/list";
+
+export namespace resources {
+
+    export class ServiceClient {
+        private baseClient: BaseClient
+
+        constructor(baseClient: BaseClient) {
+            this.baseClient = baseClient
+            this.categories = this.categories.bind(this)
+            this.customize = this.customize.bind(this)
+            this.get = this.get.bind(this)
+            this.list = this.list.bind(this)
+        }
+
+        /**
+         * Retrieves available categories, types, and filter options for resources.
+         */
+        public async categories(): Promise<ResponseType<typeof api_resources_categories_categories>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/resources/categories`, {method: "GET", body: undefined})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_resources_categories_categories>
+        }
+
+        /**
+         * Customizes a resource template based on specific student needs and AI recommendations.
+         */
+        public async customize(params: RequestType<typeof api_resources_customize_customize>): Promise<ResponseType<typeof api_resources_customize_customize>> {
+            // Construct the body with only the fields which we want encoded within the body (excluding query string or header fields)
+            const body: Record<string, any> = {
+                customizations: params.customizations,
+            }
+
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/resources/${encodeURIComponent(params.resourceId)}/customize`, {method: "POST", body: JSON.stringify(body)})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_resources_customize_customize>
+        }
+
+        /**
+         * Retrieves a single resource by ID.
+         */
+        public async get(params: { id: number }): Promise<ResponseType<typeof api_resources_get_get>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/resources/${encodeURIComponent(params.id)}`, {method: "GET", body: undefined})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_resources_get_get>
+        }
+
+        /**
+         * Retrieves resources with optional filtering and search capabilities.
+         */
+        public async list(params: RequestType<typeof api_resources_list_list>): Promise<ResponseType<typeof api_resources_list_list>> {
+            // Convert our params into the objects we need for the request
+            const query = makeRecord<string, string | string[]>({
+                category:    params.category,
+                concernType: params.concernType,
+                gradeLevel:  params.gradeLevel,
+                limit:       params.limit === undefined ? undefined : String(params.limit),
+                search:      params.search,
+                tags:        params.tags,
+                type:        params.type,
+            })
+
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/resources`, {query, method: "GET", body: undefined})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_resources_list_list>
         }
     }
 }
