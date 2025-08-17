@@ -37,7 +37,6 @@ export function useSubscription(userEmail: string) {
     error,
     refresh,
     hasActiveSubscription: status?.hasActiveSubscription || false,
-    isTrialPeriod: status?.isTrialPeriod || false,
     planType: status?.planType
   };
 }

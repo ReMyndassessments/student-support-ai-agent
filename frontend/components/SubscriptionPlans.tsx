@@ -145,7 +145,7 @@ export function SubscriptionPlans() {
               Unlock the full power of AI-driven student support
             </p>
             <p className="text-sm text-gray-500 font-medium">
-              Start your 14-day free trial today
+              Professional tools for better student outcomes
             </p>
           </div>
         </div>
@@ -213,7 +213,7 @@ export function SubscriptionPlans() {
                     </div>
                     <div className="text-center">
                       <div className="text-4xl font-bold">{plan.price}</div>
-                      <p className="text-white/80 text-sm">14-day free trial</p>
+                      <p className="text-white/80 text-sm">Billed monthly</p>
                     </div>
                   </div>
                 </CardHeader>
@@ -242,7 +242,7 @@ export function SubscriptionPlans() {
                       </>
                     ) : (
                       <>
-                        Start Free Trial
+                        Subscribe Now
                         <ArrowRight className="ml-2 h-5 w-5" />
                       </>
                     )}
@@ -318,8 +318,8 @@ export function SubscriptionPlans() {
           <div className="max-w-3xl mx-auto space-y-6">
             {[
               {
-                question: "What's included in the free trial?",
-                answer: "All plans include a 14-day free trial with full access to all features. No credit card required to start."
+                question: "How does billing work?",
+                answer: "All plans are billed monthly. You can upgrade, downgrade, or cancel your subscription at any time through your account dashboard."
               },
               {
                 question: "Can I change plans later?",
@@ -332,6 +332,10 @@ export function SubscriptionPlans() {
               {
                 question: "Do you offer training and support?",
                 answer: "Yes! School and District plans include training sessions and priority support. Teacher plans have access to our help center and email support."
+              },
+              {
+                question: "What if I need to cancel?",
+                answer: "You can cancel your subscription at any time. You'll continue to have access until the end of your current billing period."
               }
             ].map((faq, index) => (
               <Card key={index} className="border-0 bg-white/80 backdrop-blur-sm shadow-lg rounded-2xl text-left">

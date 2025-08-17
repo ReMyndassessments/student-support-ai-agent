@@ -52,8 +52,6 @@ export function SubscriptionStatus({ userEmail }: SubscriptionStatusProps) {
     switch (statusValue) {
       case 'active':
         return 'bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 border-green-200';
-      case 'trialing':
-        return 'bg-gradient-to-r from-blue-100 to-cyan-100 text-blue-800 border-blue-200';
       case 'canceled':
         return 'bg-gradient-to-r from-red-100 to-pink-100 text-red-800 border-red-200';
       default:
@@ -128,21 +126,19 @@ export function SubscriptionStatus({ userEmail }: SubscriptionStatusProps) {
                   {status.planType?.charAt(0).toUpperCase() + status.planType?.slice(1)} Plan
                 </h3>
                 <Badge className={`${getStatusColor(status.status)} rounded-xl px-3 py-1 font-medium`}>
-                  {status.isTrialPeriod ? 'Free Trial' : status.status?.charAt(0).toUpperCase() + status.status?.slice(1)}
+                  {status.status?.charAt(0).toUpperCase() + status.status?.slice(1)}
                 </Badge>
               </div>
             </div>
 
-            {status.isTrialPeriod && (
-              <Alert className="border-blue-200 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-2xl">
-                <CheckCircle className="h-4 w-4 text-blue-600" />
-                <AlertDescription className="text-blue-800 text-sm">
-                  <strong>Free Trial Active!</strong>
-                  <br />
-                  You're currently enjoying all premium features at no cost.
-                </AlertDescription>
-              </Alert>
-            )}
+            <Alert className="border-green-200 bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl">
+              <CheckCircle className="h-4 w-4 text-green-600" />
+              <AlertDescription className="text-green-800 text-sm">
+                <strong>Subscription Active!</strong>
+                <br />
+                You have full access to all premium features.
+              </AlertDescription>
+            </Alert>
           </div>
 
           <div className="space-y-4">
@@ -150,9 +146,7 @@ export function SubscriptionStatus({ userEmail }: SubscriptionStatusProps) {
               <div className="bg-gradient-to-r from-gray-50 to-slate-50 p-4 rounded-2xl">
                 <div className="flex items-center gap-2 mb-2">
                   <Calendar className="h-4 w-4 text-gray-500" />
-                  <span className="font-medium text-gray-700">
-                    {status.isTrialPeriod ? 'Trial Ends' : 'Next Billing'}
-                  </span>
+                  <span className="font-medium text-gray-700">Next Billing</span>
                 </div>
                 <p className="text-gray-600">{formatDate(status.currentPeriodEnd)}</p>
               </div>

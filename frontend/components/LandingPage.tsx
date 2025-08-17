@@ -74,7 +74,7 @@ export function LandingPage({ userEmail = "teacher@school.edu" }: LandingPagePro
                 <Link to="/subscription/plans">
                   <Button className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 text-white shadow-xl rounded-2xl py-6 px-8 text-lg font-semibold transition-all duration-200 transform hover:scale-105">
                     <CreditCard className="mr-2 h-5 w-5" />
-                    Start Free Trial
+                    Subscribe Now
                   </Button>
                 </Link>
                 <Link to="/subscription/plans">
@@ -178,20 +178,20 @@ export function LandingPage({ userEmail = "teacher@school.edu" }: LandingPagePro
             {[
               {
                 step: '1',
-                title: 'Submit',
-                description: 'Fill out student concern form',
+                title: 'Subscribe',
+                description: 'Choose your plan and get instant access',
                 gradient: 'from-blue-500 to-purple-500'
               },
               {
                 step: '2',
-                title: 'Analyze',
-                description: 'AI generates recommendations',
+                title: 'Submit',
+                description: 'Fill out student concern forms',
                 gradient: 'from-purple-500 to-pink-500'
               },
               {
                 step: '3',
                 title: 'Implement',
-                description: 'Apply with support team',
+                description: 'Apply AI-powered recommendations',
                 gradient: 'from-pink-500 to-rose-500'
               }
             ].map((item, index) => (
@@ -229,7 +229,7 @@ export function LandingPage({ userEmail = "teacher@school.edu" }: LandingPagePro
                 <Link to="/subscription/plans">
                   <Button className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 text-white shadow-xl rounded-2xl py-6 px-8 text-lg font-semibold transition-all duration-200 transform hover:scale-105">
                     <CreditCard className="mr-2 h-5 w-5" />
-                    Start Free Trial
+                    Subscribe Now
                   </Button>
                 </Link>
                 <Link to="/subscription/plans">

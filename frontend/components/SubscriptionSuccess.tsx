@@ -82,7 +82,7 @@ export function SubscriptionSuccess() {
                       <div className="w-6 h-6 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
                         <CheckCircle className="h-4 w-4 text-white" />
                       </div>
-                      <span className="text-gray-700">Your 14-day free trial has started</span>
+                      <span className="text-gray-700">Your subscription is now active</span>
                     </li>
                     <li className="flex items-start gap-3">
                       <div className="w-6 h-6 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -95,6 +95,12 @@ export function SubscriptionSuccess() {
                         <CheckCircle className="h-4 w-4 text-white" />
                       </div>
                       <span className="text-gray-700">You'll receive a confirmation email shortly</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <div className="w-6 h-6 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <CheckCircle className="h-4 w-4 text-white" />
+                      </div>
+                      <span className="text-gray-700">Set up your DeepSeek API key to enable AI features</span>
                     </li>
                   </ul>
                 </div>
@@ -113,6 +119,23 @@ export function SubscriptionSuccess() {
               <div className="space-y-4">
                 <h3 className="text-xl font-bold text-gray-900 mb-3">Quick Actions</h3>
                 
+                <Link to="/profile" className="block">
+                  <Card className="border-0 bg-gradient-to-br from-purple-50 to-pink-50 hover:shadow-lg transition-all duration-200 hover:scale-105 transform rounded-2xl overflow-hidden">
+                    <CardContent className="p-6">
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center">
+                          <Sparkles className="h-6 w-6 text-white" />
+                        </div>
+                        <div>
+                          <h4 className="font-semibold text-gray-900">Set Up API Key</h4>
+                          <p className="text-gray-600 text-sm">Configure your DeepSeek API key for AI features</p>
+                        </div>
+                        <ArrowRight className="h-5 w-5 text-gray-400 ml-auto" />
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
+
                 <Link to="/new-referral" className="block">
                   <Card className="border-0 bg-gradient-to-br from-blue-50 to-purple-50 hover:shadow-lg transition-all duration-200 hover:scale-105 transform rounded-2xl overflow-hidden">
                     <CardContent className="p-6">
@@ -140,23 +163,6 @@ export function SubscriptionSuccess() {
                         <div>
                           <h4 className="font-semibold text-gray-900">View All Referrals</h4>
                           <p className="text-gray-600 text-sm">Manage your student support cases</p>
-                        </div>
-                        <ArrowRight className="h-5 w-5 text-gray-400 ml-auto" />
-                      </div>
-                    </CardContent>
-                  </Card>
-                </Link>
-
-                <Link to="/" className="block">
-                  <Card className="border-0 bg-gradient-to-br from-purple-50 to-pink-50 hover:shadow-lg transition-all duration-200 hover:scale-105 transform rounded-2xl overflow-hidden">
-                    <CardContent className="p-6">
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center">
-                          <Sparkles className="h-6 w-6 text-white" />
-                        </div>
-                        <div>
-                          <h4 className="font-semibold text-gray-900">Explore Features</h4>
-                          <p className="text-gray-600 text-sm">Learn about all available tools</p>
                         </div>
                         <ArrowRight className="h-5 w-5 text-gray-400 ml-auto" />
                       </div>

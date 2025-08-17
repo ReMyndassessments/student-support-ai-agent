@@ -104,9 +104,9 @@ export function SubscriptionGate({ userEmail, children, feature = "this feature"
                   <Alert className="border-blue-200 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-2xl">
                     <Crown className="h-4 w-4 text-blue-600" />
                     <AlertDescription className="text-blue-800 text-sm">
-                      <strong>14-Day Free Trial</strong>
+                      <strong>Professional AI-Powered Support</strong>
                       <br />
-                      Start your subscription today and get full access to all features with no commitment.
+                      Get instant access to evidence-based intervention recommendations tailored to your students' needs.
                     </AlertDescription>
                   </Alert>
                 </div>
@@ -143,7 +143,7 @@ export function SubscriptionGate({ userEmail, children, feature = "this feature"
                     <Link to="/subscription/plans">
                       <Button className="w-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 text-white shadow-xl rounded-2xl py-6 text-lg font-semibold transition-all duration-200 transform hover:scale-105">
                         <CreditCard className="mr-2 h-5 w-5" />
-                        Start Free Trial
+                        Subscribe Now
                       </Button>
                     </Link>
                     
