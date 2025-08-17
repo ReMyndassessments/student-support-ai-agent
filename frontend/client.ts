@@ -36,6 +36,7 @@ export class Client {
     public readonly ai: ai.ServiceClient
     public readonly polar: polar.ServiceClient
     public readonly referrals: referrals.ServiceClient
+    public readonly users: users.ServiceClient
     private readonly options: ClientOptions
     private readonly target: string
 
@@ -53,6 +54,7 @@ export class Client {
         this.ai = new ai.ServiceClient(base)
         this.polar = new polar.ServiceClient(base)
         this.referrals = new referrals.ServiceClient(base)
+        this.users = new users.ServiceClient(base)
     }
 
     /**
@@ -269,6 +271,48 @@ export namespace referrals {
             // Now make the actual call to the API
             const resp = await this.baseClient.callTypedAPI(`/referrals/${encodeURIComponent(params.referralId)}/share`, {method: "POST", body: JSON.stringify(body)})
             return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_referrals_share_email_shareEmail>
+        }
+    }
+}
+
+/**
+ * Import the endpoint handlers to derive the types for the client.
+ */
+import { getProfile as api_users_get_profile_getProfile } from "~backend/users/get-profile";
+import { updateProfile as api_users_update_profile_updateProfile } from "~backend/users/update-profile";
+
+export namespace users {
+
+    export class ServiceClient {
+        private baseClient: BaseClient
+
+        constructor(baseClient: BaseClient) {
+            this.baseClient = baseClient
+            this.getProfile = this.getProfile.bind(this)
+            this.updateProfile = this.updateProfile.bind(this)
+        }
+
+        /**
+         * Retrieves user profile information.
+         */
+        public async getProfile(params: RequestType<typeof api_users_get_profile_getProfile>): Promise<ResponseType<typeof api_users_get_profile_getProfile>> {
+            // Convert our params into the objects we need for the request
+            const query = makeRecord<string, string | string[]>({
+                email: params.email,
+            })
+
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/users/profile`, {query, method: "GET", body: undefined})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_users_get_profile_getProfile>
+        }
+
+        /**
+         * Updates user profile information.
+         */
+        public async updateProfile(params: RequestType<typeof api_users_update_profile_updateProfile>): Promise<ResponseType<typeof api_users_update_profile_updateProfile>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/users/profile`, {method: "PUT", body: JSON.stringify(params)})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_users_update_profile_updateProfile>
         }
     }
 }
