@@ -1,33 +1,46 @@
 import { Link } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { FileText, List, ArrowRight, Plus, Eye, Sparkles, Users, Brain, Shield, CreditCard } from 'lucide-react';
+import { FileText, List, ArrowRight, Plus, Eye, Sparkles, Users, Brain, Shield, CreditCard, Lock } from 'lucide-react';
+import { useSubscription } from '../hooks/useSubscription';
 
-export function LandingPage() {
+interface LandingPageProps {
+  userEmail?: string;
+}
+
+export function LandingPage({ userEmail = "demo@school.edu" }: LandingPageProps) {
+  const { hasActiveSubscription } = useSubscription(userEmail);
+  
+  // Demo user or active subscription can access premium features
+  const canAccessPremiumFeatures = userEmail === "demo@school.edu" || hasActiveSubscription;
+
   const quickActions = [
     {
-      to: '/new-referral',
+      to: canAccessPremiumFeatures ? '/new-referral' : '/subscription/plans',
       icon: Plus,
       title: 'New Referral',
-      description: 'Submit a new student concern',
+      description: canAccessPremiumFeatures ? 'Submit a new student concern' : 'Subscribe to create referrals',
       gradient: 'from-blue-500 via-blue-600 to-purple-600',
-      bgGradient: 'from-blue-50 to-purple-50'
+      bgGradient: 'from-blue-50 to-purple-50',
+      requiresSubscription: true
     },
     {
-      to: '/referrals',
+      to: canAccessPremiumFeatures ? '/referrals' : '/subscription/plans',
       icon: Eye,
       title: 'View Referrals',
-      description: 'Review submitted referrals',
+      description: canAccessPremiumFeatures ? 'Review submitted referrals' : 'Subscribe to view referrals',
       gradient: 'from-emerald-500 via-teal-500 to-cyan-600',
-      bgGradient: 'from-emerald-50 to-cyan-50'
+      bgGradient: 'from-emerald-50 to-cyan-50',
+      requiresSubscription: true
     },
     {
       to: '/subscription/plans',
       icon: CreditCard,
       title: 'Subscribe',
-      description: 'Unlock premium features',
+      description: hasActiveSubscription ? 'Manage your subscription' : 'Unlock premium features',
       gradient: 'from-purple-500 via-pink-500 to-rose-600',
-      bgGradient: 'from-purple-50 to-rose-50'
+      bgGradient: 'from-purple-50 to-rose-50',
+      requiresSubscription: false
     }
   ];
 
@@ -83,21 +96,55 @@ export function LandingPage() {
           </div>
         </div>
 
+        {/* Subscription Status Alert */}
+        {!canAccessPremiumFeatures && (
+          <div className="mb-12">
+            <Card className="border-0 bg-gradient-to-r from-amber-50 to-orange-50 shadow-xl rounded-3xl overflow-hidden border-2 border-amber-200">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl flex items-center justify-center">
+                      <Lock className="h-6 w-6 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-amber-900">Premium Features Locked</h3>
+                      <p className="text-amber-800 text-sm">Subscribe to unlock AI recommendations, referral management, and more.</p>
+                    </div>
+                  </div>
+                  <Link to="/subscription/plans">
+                    <Button className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white rounded-xl">
+                      <CreditCard className="h-4 w-4 mr-2" />
+                      Subscribe Now
+                    </Button>
+                  </Link>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
         {/* Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
           {quickActions.map((action) => {
             const Icon = action.icon;
+            const isLocked = action.requiresSubscription && !canAccessPremiumFeatures;
+            
             return (
               <Link key={action.to} to={action.to} className="group">
-                <Card className={`h-full border-0 bg-gradient-to-br ${action.bgGradient} hover:shadow-2xl transition-all duration-300 group-hover:scale-105 transform rounded-3xl overflow-hidden`}>
+                <Card className={`h-full border-0 bg-gradient-to-br ${action.bgGradient} hover:shadow-2xl transition-all duration-300 group-hover:scale-105 transform rounded-3xl overflow-hidden ${isLocked ? 'opacity-75' : ''}`}>
                   <CardContent className="p-8 text-center relative">
                     {/* Decorative background pattern */}
                     <div className="absolute top-0 right-0 w-32 h-32 opacity-10">
                       <div className={`w-full h-full bg-gradient-to-br ${action.gradient} rounded-full transform translate-x-8 -translate-y-8`}></div>
                     </div>
                     
-                    <div className={`inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br ${action.gradient} rounded-2xl mb-6 shadow-lg group-hover:shadow-xl transition-all duration-300 transform group-hover:scale-110`}>
+                    <div className={`inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br ${action.gradient} rounded-2xl mb-6 shadow-lg group-hover:shadow-xl transition-all duration-300 transform group-hover:scale-110 relative`}>
                       <Icon className="h-8 w-8 text-white" />
+                      {isLocked && (
+                        <div className="absolute -top-1 -right-1 w-5 h-5 bg-amber-500 rounded-full flex items-center justify-center">
+                          <Lock className="h-3 w-3 text-white" />
+                        </div>
+                      )}
                     </div>
                     <h3 className="text-2xl font-bold text-gray-900 mb-3">
                       {action.title}
@@ -106,7 +153,7 @@ export function LandingPage() {
                       {action.description}
                     </p>
                     <div className="inline-flex items-center text-blue-600 font-semibold group-hover:text-blue-700 transition-colors">
-                      Get Started
+                      {isLocked ? 'Subscribe to Access' : 'Get Started'}
                       <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-2" />
                     </div>
                   </CardContent>
@@ -215,9 +262,9 @@ export function LandingPage() {
                     Start Free Trial
                   </Button>
                 </Link>
-                <Link to="/new-referral">
+                <Link to={canAccessPremiumFeatures ? "/new-referral" : "/subscription/plans"}>
                   <Button variant="outline" className="border-gray-300 text-gray-700 hover:bg-white/80 rounded-2xl py-6 px-8 text-lg font-semibold">
-                    Try Demo
+                    {canAccessPremiumFeatures ? "Try Demo" : "View Plans"}
                   </Button>
                 </Link>
               </div>
