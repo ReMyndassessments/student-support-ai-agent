@@ -13,6 +13,7 @@ export function LandingPage({ userEmail = "demo@school.edu" }: LandingPageProps)
   
   // Demo user or active subscription can access premium features
   const canAccessPremiumFeatures = userEmail === "demo@school.edu" || hasActiveSubscription;
+  const isDemoUser = userEmail === "demo@school.edu";
 
   const quickActions = [
     {
@@ -37,7 +38,7 @@ export function LandingPage({ userEmail = "demo@school.edu" }: LandingPageProps)
       to: '/subscription/plans',
       icon: CreditCard,
       title: 'Subscribe',
-      description: hasActiveSubscription ? 'Manage your subscription' : 'Unlock premium features',
+      description: hasActiveSubscription ? 'Manage your subscription' : isDemoUser ? 'View subscription plans' : 'Unlock premium features',
       gradient: 'from-purple-500 via-pink-500 to-rose-600',
       bgGradient: 'from-purple-50 to-rose-50',
       requiresSubscription: false
@@ -93,11 +94,19 @@ export function LandingPage({ userEmail = "demo@school.edu" }: LandingPageProps)
             <p className="text-sm text-gray-500 font-medium">
               from Remynd
             </p>
+            {isDemoUser && (
+              <div className="mt-4">
+                <div className="inline-flex items-center gap-2 bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 px-4 py-2 rounded-full border border-green-200">
+                  <Sparkles className="h-4 w-4" />
+                  <span className="text-sm font-medium">Demo Mode - All Features Unlocked</span>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Subscription Status Alert */}
-        {!canAccessPremiumFeatures && (
+        {/* Subscription Status Alert - Only show for non-demo users without subscription */}
+        {!isDemoUser && !canAccessPremiumFeatures && (
           <div className="mb-12">
             <Card className="border-0 bg-gradient-to-r from-amber-50 to-orange-50 shadow-xl rounded-3xl overflow-hidden border-2 border-amber-200">
               <CardContent className="p-6">
@@ -253,18 +262,33 @@ export function LandingPage({ userEmail = "demo@school.edu" }: LandingPageProps)
                 Ready to Transform Student Support?
               </h2>
               <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
-                Join thousands of educators using AI-powered tools to better support their students.
+                {isDemoUser 
+                  ? "You're experiencing the full power of Concern2Care in demo mode. Ready to get started with your own account?"
+                  : "Join thousands of educators using AI-powered tools to better support their students."
+                }
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link to="/subscription/plans">
-                  <Button className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 text-white shadow-xl rounded-2xl py-6 px-8 text-lg font-semibold transition-all duration-200 transform hover:scale-105">
-                    <CreditCard className="mr-2 h-5 w-5" />
-                    Start Free Trial
-                  </Button>
-                </Link>
+                {!isDemoUser && (
+                  <Link to="/subscription/plans">
+                    <Button className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 text-white shadow-xl rounded-2xl py-6 px-8 text-lg font-semibold transition-all duration-200 transform hover:scale-105">
+                      <CreditCard className="mr-2 h-5 w-5" />
+                      Start Free Trial
+                    </Button>
+                  </Link>
+                )}
                 <Link to={canAccessPremiumFeatures ? "/new-referral" : "/subscription/plans"}>
-                  <Button variant="outline" className="border-gray-300 text-gray-700 hover:bg-white/80 rounded-2xl py-6 px-8 text-lg font-semibold">
-                    {canAccessPremiumFeatures ? "Try Demo" : "View Plans"}
+                  <Button variant={isDemoUser ? "default" : "outline"} className={isDemoUser 
+                    ? "bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 text-white shadow-xl rounded-2xl py-6 px-8 text-lg font-semibold transition-all duration-200 transform hover:scale-105"
+                    : "border-gray-300 text-gray-700 hover:bg-white/80 rounded-2xl py-6 px-8 text-lg font-semibold"
+                  }>
+                    {canAccessPremiumFeatures ? (
+                      <>
+                        <Sparkles className="mr-2 h-5 w-5" />
+                        {isDemoUser ? "Try Demo Features" : "Create Referral"}
+                      </>
+                    ) : (
+                      "View Plans"
+                    )}
                   </Button>
                 </Link>
               </div>
