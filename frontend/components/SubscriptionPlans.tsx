@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, Check, Star, Users, Building, GraduationCap, ArrowRight, Sparkles, Mail } from 'lucide-react';
+import { Loader2, Check, Users, Building, GraduationCap, ArrowRight, Sparkles, Mail } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import backend from '~backend/client';
 
@@ -18,7 +18,6 @@ interface Plan {
   icon: React.ComponentType<{ className?: string }>;
   gradient: string;
   bgGradient: string;
-  popular?: boolean;
 }
 
 const plans: Plan[] = [
@@ -55,8 +54,7 @@ const plans: Plan[] = [
     ],
     icon: Building,
     gradient: 'from-purple-500 to-pink-600',
-    bgGradient: 'from-purple-50 to-pink-50',
-    popular: true
+    bgGradient: 'from-purple-50 to-pink-50'
   },
   {
     id: 'district',
@@ -100,16 +98,31 @@ export function SubscriptionPlans() {
 
     setIsCreatingCheckout(true);
     try {
-      const response = await backend.polar.createCheckout({
-        customerEmail: customerInfo.email,
-        customerName: customerInfo.name || undefined,
-        planType,
-        successUrl: `${window.location.origin}/subscription/success`,
-        cancelUrl: `${window.location.origin}/subscription/plans`
+      // For now, show a message that payment is coming soon
+      toast({
+        title: "Coming Soon",
+        description: "Payment processing is being set up. Please contact us directly for subscription setup.",
+        variant: "default"
       });
+      
+      // Simulate the checkout process
+      setTimeout(() => {
+        const subject = encodeURIComponent(`Subscription Request - ${planType.charAt(0).toUpperCase() + planType.slice(1)} Plan`);
+        const body = encodeURIComponent(`Hello,
 
-      // Redirect to Polar checkout
-      window.location.href = response.checkoutUrl;
+I would like to subscribe to the ${planType.charAt(0).toUpperCase() + planType.slice(1)} Plan for Concern2Care.
+
+Customer Information:
+- Email: ${customerInfo.email}
+- Name: ${customerInfo.name || 'Not provided'}
+- Plan: ${planType.charAt(0).toUpperCase() + planType.slice(1)} Plan (${plans.find(p => p.id === planType)?.price})
+
+Please contact me to complete the subscription setup.
+
+Thank you!`);
+        
+        window.location.href = `mailto:sales@remynd.com?subject=${subject}&body=${body}`;
+      }, 1000);
     } catch (error) {
       console.error('Error creating checkout:', error);
       toast({
@@ -226,18 +239,9 @@ Thank you!`);
             return (
               <Card 
                 key={plan.id} 
-                className={`relative border-0 bg-gradient-to-br ${plan.bgGradient} hover:shadow-2xl transition-all duration-300 hover:scale-105 transform rounded-3xl overflow-hidden ${plan.popular ? 'ring-4 ring-purple-300 ring-opacity-50' : ''}`}
+                className="relative border-0 bg-gradient-to-br from-white/90 to-white/80 backdrop-blur-sm hover:shadow-2xl transition-all duration-300 hover:scale-105 transform rounded-3xl overflow-hidden"
               >
-                {plan.popular && (
-                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 z-10">
-                    <Badge className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-2 rounded-full shadow-xl border-2 border-white text-sm font-bold">
-                      <Star className="h-4 w-4 mr-2 fill-current" />
-                      Most Popular
-                    </Badge>
-                  </div>
-                )}
-                
-                <CardHeader className={`bg-gradient-to-r ${plan.gradient} text-white rounded-t-3xl ${plan.popular ? 'pt-10' : 'pt-6'}`}>
+                <CardHeader className={`bg-gradient-to-r ${plan.gradient} text-white rounded-t-3xl pt-6`}>
                   <div className="text-center space-y-4">
                     <div className={`inline-flex items-center justify-center w-16 h-16 bg-white/20 rounded-2xl shadow-lg`}>
                       <Icon className="h-8 w-8" />
@@ -273,11 +277,11 @@ Thank you!`);
                     {isCreatingCheckout ? (
                       <>
                         <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                        Creating Checkout...
+                        Processing...
                       </>
                     ) : (
                       <>
-                        Subscribe Now
+                        Get Started
                         <ArrowRight className="ml-2 h-5 w-5" />
                       </>
                     )}
@@ -287,6 +291,15 @@ Thank you!`);
             );
           })}
         </div>
+
+        {/* Payment Notice */}
+        <Alert className="max-w-2xl mx-auto mb-12 border-blue-200 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-2xl">
+          <AlertDescription className="text-blue-800 text-center">
+            <strong>Payment Processing Setup in Progress</strong>
+            <br />
+            Our secure payment system is being finalized. For immediate access, please contact us directly and we'll set up your subscription manually.
+          </AlertDescription>
+        </Alert>
 
         {/* Features Comparison */}
         <div className="text-center mb-12">
