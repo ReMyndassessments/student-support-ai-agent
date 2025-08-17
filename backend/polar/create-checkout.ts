@@ -1,8 +1,14 @@
 import { api } from "encore.dev/api";
 import { secret } from "encore.dev/config";
+import { APIError } from "encore.dev/api";
 
 const polarApiKey = secret("PolarAPIKey");
 const polarOrganizationId = secret("PolarOrganizationId");
+
+// Product IDs for each plan - these need to be configured in Polar dashboard
+const teacherProductId = secret("PolarTeacherProductId");
+const schoolProductId = secret("PolarSchoolProductId");
+const districtProductId = secret("PolarDistrictProductId");
 
 export interface CreateCheckoutRequest {
   customerEmail: string;
@@ -22,14 +28,14 @@ export const createCheckout = api<CreateCheckoutRequest, CreateCheckoutResponse>
   { expose: true, method: "POST", path: "/polar/checkout" },
   async (req) => {
     const productIds = {
-      teacher: process.env.POLAR_TEACHER_PRODUCT_ID || 'teacher-plan-id',
-      school: process.env.POLAR_SCHOOL_PRODUCT_ID || 'school-plan-id',
-      district: process.env.POLAR_DISTRICT_PRODUCT_ID || 'district-plan-id'
+      teacher: teacherProductId(),
+      school: schoolProductId(),
+      district: districtProductId()
     };
 
     const productId = productIds[req.planType];
     if (!productId) {
-      throw new Error(`Invalid plan type: ${req.planType}`);
+      throw APIError.invalidArgument(`Product ID not configured for plan type: ${req.planType}`);
     }
 
     try {
@@ -56,7 +62,7 @@ export const createCheckout = api<CreateCheckoutRequest, CreateCheckoutResponse>
       if (!response.ok) {
         const errorData = await response.text();
         console.error('Polar API error:', response.status, errorData);
-        throw new Error(`Failed to create checkout: ${response.status}`);
+        throw APIError.internal(`Failed to create checkout: ${response.status}`);
       }
 
       const checkout = await response.json();
@@ -67,7 +73,10 @@ export const createCheckout = api<CreateCheckoutRequest, CreateCheckoutResponse>
       };
     } catch (error) {
       console.error('Error creating Polar checkout:', error);
-      throw new Error('Failed to create checkout session');
+      if (error instanceof APIError) {
+        throw error;
+      }
+      throw APIError.internal('Failed to create checkout session');
     }
   }
 );

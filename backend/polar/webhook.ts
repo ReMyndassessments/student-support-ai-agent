@@ -1,6 +1,9 @@
 import { api } from "encore.dev/api";
 import { secret } from "encore.dev/config";
 import { subscriptionDB } from "./db";
+import { APIError } from "encore.dev/api";
+import { Header } from "encore.dev/api";
+import crypto from "crypto";
 
 const polarWebhookSecret = secret("PolarWebhookSecret");
 
@@ -9,20 +12,37 @@ export interface PolarWebhookRequest {
   data: any;
 }
 
+interface WebhookHeaders {
+  signature: Header<"polar-signature">;
+}
+
 export interface PolarWebhookResponse {
   success: boolean;
 }
 
 // Handles Polar webhook events for subscription management.
-export const webhook = api<PolarWebhookRequest, PolarWebhookResponse>(
+export const webhook = api<PolarWebhookRequest & WebhookHeaders, PolarWebhookResponse>(
   { expose: true, method: "POST", path: "/polar/webhook" },
   async (req) => {
     try {
-      // Verify webhook signature in production
-      // const signature = req.headers['polar-signature'];
-      // if (!verifyWebhookSignature(signature, req.body, polarWebhookSecret())) {
-      //   throw APIError.unauthenticated("Invalid webhook signature");
-      // }
+      // Verify webhook signature
+      const signature = req.signature;
+      if (!signature) {
+        throw APIError.unauthenticated("Missing webhook signature");
+      }
+
+      // Verify the webhook signature (implement based on Polar's documentation)
+      const isValid = verifyWebhookSignature(
+        JSON.stringify({ type: req.type, data: req.data }),
+        signature,
+        polarWebhookSecret()
+      );
+
+      if (!isValid) {
+        throw APIError.unauthenticated("Invalid webhook signature");
+      }
+
+      console.log(`Processing Polar webhook: ${req.type}`);
 
       switch (req.type) {
         case 'subscription.created':
@@ -37,6 +57,12 @@ export const webhook = api<PolarWebhookRequest, PolarWebhookResponse>(
         case 'subscription.revoked':
           await handleSubscriptionRevoked(req.data);
           break;
+        case 'checkout.created':
+          await handleCheckoutCreated(req.data);
+          break;
+        case 'checkout.updated':
+          await handleCheckoutUpdated(req.data);
+          break;
         default:
           console.log(`Unhandled webhook type: ${req.type}`);
       }
@@ -44,14 +70,40 @@ export const webhook = api<PolarWebhookRequest, PolarWebhookResponse>(
       return { success: true };
     } catch (error) {
       console.error('Error processing Polar webhook:', error);
+      if (error instanceof APIError) {
+        throw error;
+      }
       return { success: false };
     }
   }
 );
 
+function verifyWebhookSignature(payload: string, signature: string, secret: string): boolean {
+  try {
+    // Remove 'sha256=' prefix if present
+    const cleanSignature = signature.replace('sha256=', '');
+    
+    // Create HMAC signature
+    const hmac = crypto.createHmac('sha256', secret);
+    hmac.update(payload, 'utf8');
+    const computedSignature = hmac.digest('hex');
+    
+    // Compare signatures using timing-safe comparison
+    return crypto.timingSafeEqual(
+      Buffer.from(cleanSignature, 'hex'),
+      Buffer.from(computedSignature, 'hex')
+    );
+  } catch (error) {
+    console.error('Error verifying webhook signature:', error);
+    return false;
+  }
+}
+
 async function handleSubscriptionCreated(data: any) {
   const subscription = data.subscription;
   const customer = data.customer;
+  
+  console.log('Creating subscription:', subscription.id);
   
   await subscriptionDB.exec`
     INSERT INTO subscriptions (
@@ -68,10 +120,10 @@ async function handleSubscriptionCreated(data: any) {
       ${subscription.id},
       ${customer.email},
       ${customer.name || ''},
-      ${subscription.product.name},
+      ${subscription.product?.name || 'unknown'},
       ${subscription.status},
-      ${new Date(subscription.current_period_start)},
-      ${new Date(subscription.current_period_end)},
+      ${subscription.current_period_start ? new Date(subscription.current_period_start) : null},
+      ${subscription.current_period_end ? new Date(subscription.current_period_end) : null},
       NOW(),
       NOW()
     )
@@ -87,12 +139,14 @@ async function handleSubscriptionCreated(data: any) {
 async function handleSubscriptionUpdated(data: any) {
   const subscription = data.subscription;
   
+  console.log('Updating subscription:', subscription.id);
+  
   await subscriptionDB.exec`
     UPDATE subscriptions 
     SET 
       status = ${subscription.status},
-      current_period_start = ${new Date(subscription.current_period_start)},
-      current_period_end = ${new Date(subscription.current_period_end)},
+      current_period_start = ${subscription.current_period_start ? new Date(subscription.current_period_start) : null},
+      current_period_end = ${subscription.current_period_end ? new Date(subscription.current_period_end) : null},
       updated_at = NOW()
     WHERE polar_subscription_id = ${subscription.id}
   `;
@@ -100,6 +154,8 @@ async function handleSubscriptionUpdated(data: any) {
 
 async function handleSubscriptionCanceled(data: any) {
   const subscription = data.subscription;
+  
+  console.log('Canceling subscription:', subscription.id);
   
   await subscriptionDB.exec`
     UPDATE subscriptions 
@@ -114,6 +170,8 @@ async function handleSubscriptionCanceled(data: any) {
 async function handleSubscriptionRevoked(data: any) {
   const subscription = data.subscription;
   
+  console.log('Revoking subscription:', subscription.id);
+  
   await subscriptionDB.exec`
     UPDATE subscriptions 
     SET 
@@ -122,4 +180,20 @@ async function handleSubscriptionRevoked(data: any) {
       updated_at = NOW()
     WHERE polar_subscription_id = ${subscription.id}
   `;
+}
+
+async function handleCheckoutCreated(data: any) {
+  const checkout = data.checkout;
+  console.log('Checkout created:', checkout.id);
+  // You can add checkout tracking logic here if needed
+}
+
+async function handleCheckoutUpdated(data: any) {
+  const checkout = data.checkout;
+  console.log('Checkout updated:', checkout.id, 'Status:', checkout.status);
+  
+  // Handle successful checkout completion
+  if (checkout.status === 'confirmed') {
+    console.log('Checkout confirmed, subscription should be created automatically');
+  }
 }

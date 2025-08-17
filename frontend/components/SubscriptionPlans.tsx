@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, Check, Users, Building, GraduationCap, ArrowRight, Sparkles, Mail } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
+import backend from '~backend/client';
 
 interface Plan {
   id: 'teacher' | 'school' | 'district';
@@ -95,17 +96,31 @@ export function SubscriptionPlans() {
 
     setIsCreatingCheckout(true);
     try {
-      // For now, show a message that payment is coming soon
-      toast({
-        title: "Coming Soon",
-        description: "Payment processing is being set up. Please contact us directly for subscription setup.",
-        variant: "default"
+      const response = await backend.polar.createCheckout({
+        customerEmail: customerInfo.email,
+        customerName: customerInfo.name || undefined,
+        planType,
+        successUrl: `${window.location.origin}/subscription/success`,
+        cancelUrl: `${window.location.origin}/subscription/plans`
       });
+
+      // Redirect to Polar checkout
+      window.location.href = response.checkoutUrl;
+    } catch (error) {
+      console.error('Error creating checkout:', error);
       
-      // Simulate the checkout process
-      setTimeout(() => {
-        const subject = encodeURIComponent(`Subscription Request - ${planType.charAt(0).toUpperCase() + planType.slice(1)} Plan`);
-        const body = encodeURIComponent(`Hello,
+      // Check if it's a configuration error
+      if (error instanceof Error && error.message.includes('Product ID not configured')) {
+        toast({
+          title: "Configuration Error",
+          description: "Payment system is still being configured. Please contact us directly for subscription setup.",
+          variant: "destructive"
+        });
+        
+        // Fallback to email contact
+        setTimeout(() => {
+          const subject = encodeURIComponent(`Subscription Request - ${planType.charAt(0).toUpperCase() + planType.slice(1)} Plan`);
+          const body = encodeURIComponent(`Hello,
 
 I would like to subscribe to the ${planType.charAt(0).toUpperCase() + planType.slice(1)} Plan for Concern2Care.
 
@@ -117,16 +132,16 @@ Customer Information:
 Please contact me to complete the subscription setup.
 
 Thank you!`);
-        
-        window.location.href = `mailto:sales@remynd.com?subject=${subject}&body=${body}`;
-      }, 1000);
-    } catch (error) {
-      console.error('Error creating checkout:', error);
-      toast({
-        title: "Error",
-        description: "Failed to create checkout session. Please try again.",
-        variant: "destructive"
-      });
+          
+          window.location.href = `mailto:sales@remynd.com?subject=${subject}&body=${body}`;
+        }, 2000);
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to create checkout session. Please try again.",
+          variant: "destructive"
+        });
+      }
     } finally {
       setIsCreatingCheckout(false);
     }
@@ -274,11 +289,11 @@ Thank you!`);
                     {isCreatingCheckout ? (
                       <>
                         <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                        Processing...
+                        Creating Checkout...
                       </>
                     ) : (
                       <>
-                        Get Started
+                        Subscribe Now
                         <ArrowRight className="ml-2 h-5 w-5" />
                       </>
                     )}
@@ -288,15 +303,6 @@ Thank you!`);
             );
           })}
         </div>
-
-        {/* Payment Notice */}
-        <Alert className="max-w-2xl mx-auto mb-12 border-blue-200 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-2xl">
-          <AlertDescription className="text-blue-800 text-center">
-            <strong>Payment Processing Setup in Progress</strong>
-            <br />
-            Our secure payment system is being finalized. For immediate access, please contact us directly and we'll set up your subscription manually.
-          </AlertDescription>
-        </Alert>
 
         {/* Features Comparison */}
         <div className="text-center mb-12">
