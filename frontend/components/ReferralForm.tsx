@@ -378,11 +378,11 @@ export function ReferralForm() {
         {/* Back Button */}
         <div className="flex items-center">
           <Link 
-            to="/admin" 
+            to="/" 
             className="inline-flex items-center text-gray-600 hover:text-gray-900 font-medium transition-colors hover:bg-white/60 px-3 py-2 rounded-xl"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Admin Dashboard
+            Back to Home
           </Link>
         </div>
 
@@ -729,13 +729,6 @@ export function ReferralForm() {
                   className="bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 text-white shadow-lg rounded-2xl px-6 py-3"
                 >
                   View All Referrals
-                </Button>
-                <Button
-                  onClick={() => navigate(`/meeting/${savedReferralId}`)}
-                  variant="outline"
-                  className="border-green-500 text-green-700 hover:bg-green-50 rounded-2xl px-6 py-3"
-                >
-                  Prepare for Meeting
                 </Button>
                 <Button
                   onClick={resetForm}

@@ -87,19 +87,6 @@ export default function App() {
                 <Route path="/new-referral" element={<ReferralForm />} />
                 <Route path="/referrals" element={<ReferralList />} />
                 <Route path="/meeting/:referralId" element={<MeetingPreparation />} />
-                <Route path="/profile" element={
-                  <div className="max-w-4xl mx-auto px-6 py-8">
-                    <div className="text-center mb-8">
-                      <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
-                        Admin Profile
-                      </h1>
-                      <p className="text-gray-600">
-                        Demo administrator account settings
-                      </p>
-                    </div>
-                    <UserProfile userEmail={user.email} />
-                  </div>
-                } />
               </>
             ) : (
               <>

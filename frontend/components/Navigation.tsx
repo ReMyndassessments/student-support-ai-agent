@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Home, Menu, X, GraduationCap, CreditCard, FileText, Users, User, Shield, LogOut } from 'lucide-react';
+import { Home, Menu, X, GraduationCap, FileText, Users, LogOut } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 
@@ -17,12 +17,7 @@ export function Navigation({ userEmail = "teacher@school.edu", isAdmin = false, 
     {
       to: '/',
       icon: Home,
-      label: 'Landing Page'
-    },
-    {
-      to: '/admin',
-      icon: Shield,
-      label: 'Admin Dashboard'
+      label: 'Home'
     },
     {
       to: '/new-referral',
@@ -33,16 +28,6 @@ export function Navigation({ userEmail = "teacher@school.edu", isAdmin = false, 
       to: '/referrals',
       icon: Users,
       label: 'All Referrals'
-    },
-    {
-      to: '/subscription/plans',
-      icon: CreditCard,
-      label: 'Subscription Plans'
-    },
-    {
-      to: '/profile',
-      icon: User,
-      label: 'Profile'
     }
   ];
 
@@ -51,11 +36,6 @@ export function Navigation({ userEmail = "teacher@school.edu", isAdmin = false, 
       to: '/',
       icon: Home,
       label: 'Home'
-    },
-    {
-      to: '/subscription/plans',
-      icon: CreditCard,
-      label: 'Subscribe'
     }
   ];
 

@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Shield, Users, FileText, Sparkles, LogOut, User, Settings, BarChart3 } from 'lucide-react';
+import { Shield, Users, FileText, Sparkles, LogOut, User, Settings } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import backend from '~backend/client';
 
@@ -40,8 +40,8 @@ export function AdminDashboard({ user, onLogout }: AdminDashboardProps) {
   const demoStats = [
     {
       title: 'Demo Features',
-      value: '5',
-      description: 'Fully functional features',
+      value: '2',
+      description: 'Core features for demonstration',
       icon: Sparkles,
       gradient: 'from-purple-500 to-pink-500'
     },
@@ -53,9 +53,9 @@ export function AdminDashboard({ user, onLogout }: AdminDashboardProps) {
       gradient: 'from-blue-500 to-cyan-500'
     },
     {
-      title: 'Sample Data',
-      value: 'Ready',
-      description: 'Pre-loaded for demonstration',
+      title: 'Demo Ready',
+      value: 'Active',
+      description: 'All systems operational',
       icon: FileText,
       gradient: 'from-emerald-500 to-teal-500'
     }
@@ -64,24 +64,17 @@ export function AdminDashboard({ user, onLogout }: AdminDashboardProps) {
   const quickActions = [
     {
       title: 'Create Sample Referral',
-      description: 'Demonstrate the referral creation process',
+      description: 'Demonstrate the referral creation process with AI recommendations',
       icon: FileText,
       href: '/new-referral',
       gradient: 'from-blue-500 to-purple-500'
     },
     {
       title: 'View All Referrals',
-      description: 'Show existing referrals and management',
+      description: 'Show existing referrals and management capabilities',
       icon: Users,
       href: '/referrals',
       gradient: 'from-emerald-500 to-teal-500'
-    },
-    {
-      title: 'Subscription Plans',
-      description: 'Display pricing and plan options',
-      icon: BarChart3,
-      href: '/subscription/plans',
-      gradient: 'from-amber-500 to-orange-500'
     }
   ];
 
@@ -123,7 +116,7 @@ export function AdminDashboard({ user, onLogout }: AdminDashboardProps) {
           <AlertDescription className="text-blue-800">
             <strong>Demo Environment Active</strong>
             <br />
-            You are logged in as the demo administrator. All features are fully functional with AI capabilities enabled using the admin DeepSeek API key.
+            You are logged in as the demo administrator. All AI features are fully functional with the admin DeepSeek API key.
           </AlertDescription>
         </Alert>
 
@@ -157,11 +150,11 @@ export function AdminDashboard({ user, onLogout }: AdminDashboardProps) {
               <div className="w-10 h-10 bg-white/20 rounded-2xl flex items-center justify-center">
                 <Sparkles className="h-6 w-6" />
               </div>
-              Demo Quick Actions
+              Demo Actions
             </CardTitle>
           </CardHeader>
           <CardContent className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {quickActions.map((action, index) => {
                 const Icon = action.icon;
                 return (
@@ -178,7 +171,7 @@ export function AdminDashboard({ user, onLogout }: AdminDashboardProps) {
                             onClick={() => window.location.href = action.href}
                             className={`w-full bg-gradient-to-r ${action.gradient} hover:opacity-90 text-white rounded-xl`}
                           >
-                            Open Demo
+                            Start Demo
                           </Button>
                         </div>
                       </div>
@@ -244,8 +237,8 @@ export function AdminDashboard({ user, onLogout }: AdminDashboardProps) {
                 <li>Demonstrate the AI-powered recommendations feature</li>
                 <li>Show the follow-up assistance functionality</li>
                 <li>Generate and download a PDF report</li>
-                <li>Display the referral management and meeting preparation tools</li>
-                <li>Explain the subscription plans and pricing structure</li>
+                <li>Display the referral management tools in "All Referrals"</li>
+                <li>Explain the subscription model and value proposition</li>
               </ol>
               <div className="mt-4 p-4 bg-amber-100 rounded-xl">
                 <p className="text-amber-800 text-sm">
