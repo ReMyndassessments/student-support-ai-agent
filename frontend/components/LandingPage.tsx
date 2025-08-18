@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { ArrowRight, Sparkles, Users, Brain, Shield, CreditCard, Mail, Copy, CheckCircle } from 'lucide-react';
+import { ArrowRight, Sparkles, Users, Brain, Shield, CreditCard, Mail, Copy, CheckCircle, UserPlus } from 'lucide-react';
 import { AdminLoginFooter } from './AdminLoginFooter';
 import { useToast } from '@/components/ui/use-toast';
 import { useState } from 'react';
@@ -285,6 +285,13 @@ Thank you!`
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
                 </Link>
+
+                <Link to="/signup">
+                  <Button variant="outline" className="w-full sm:w-auto border-emerald-300 text-emerald-700 hover:bg-emerald-50 rounded-xl sm:rounded-2xl py-4 sm:py-6 px-6 sm:px-8 text-base sm:text-lg font-semibold touch-manipulation active:scale-95">
+                    <UserPlus className="mr-2 h-5 w-5" />
+                    Sign Up as Teacher
+                  </Button>
+                </Link>
               </div>
             </CardContent>
           </Card>
@@ -446,6 +453,12 @@ Thank you!`
                 <Link to="/subscription/plans">
                   <Button variant="outline" className="w-full sm:w-auto border-gray-300 text-gray-700 hover:bg-white/80 rounded-xl sm:rounded-2xl py-4 sm:py-6 px-6 sm:px-8 text-base sm:text-lg font-semibold touch-manipulation active:scale-95">
                     View Plans
+                  </Button>
+                </Link>
+                <Link to="/signup">
+                  <Button variant="outline" className="w-full sm:w-auto border-emerald-300 text-emerald-700 hover:bg-emerald-50 rounded-xl sm:rounded-2xl py-4 sm:py-6 px-6 sm:px-8 text-base sm:text-lg font-semibold touch-manipulation active:scale-95">
+                    <UserPlus className="mr-2 h-5 w-5" />
+                    Sign Up
                   </Button>
                 </Link>
               </div>

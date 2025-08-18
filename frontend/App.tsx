@@ -16,6 +16,7 @@ import { TeacherManagement } from './components/TeacherManagement';
 import { AdminSystemSettings } from './components/AdminSystemSettings';
 import { AdminDemoData } from './components/AdminDemoData';
 import { AuthenticatedApp } from './components/AuthenticatedApp';
+import { TeacherSignupForm } from './components/TeacherSignupForm';
 import { clerkPublishableKey } from './config';
 
 interface User {
@@ -100,6 +101,7 @@ function AppContent() {
             <Route path="/referrals" element={<ReferralList />} />
             <Route path="/meeting/:referralId" element={<MeetingPreparation />} />
             <Route path="/subscription/plans" element={<SubscriptionPlans />} />
+            <Route path="/signup" element={<TeacherSignupForm />} />
           </Routes>
         </main>
         <Toaster />
@@ -116,6 +118,7 @@ function AppContent() {
             <Route path="/" element={<LandingPage onAdminLogin={handleAdminLogin} />} />
             <Route path="/admin-login" element={<AdminLogin onLoginSuccess={handleAdminLogin} />} />
             <Route path="/subscription/plans" element={<SubscriptionPlans />} />
+            <Route path="/signup" element={<TeacherSignupForm />} />
             <Route path="*" element={<LandingPage onAdminLogin={handleAdminLogin} />} />
           </Routes>
         </main>
@@ -204,6 +207,7 @@ function DemoApp() {
             <Route path="/new-referral" element={<ReferralForm />} />
             <Route path="/referrals" element={<ReferralList />} />
             <Route path="/meeting/:referralId" element={<MeetingPreparation />} />
+            <Route path="/signup" element={<TeacherSignupForm />} />
             <Route path="*" element={<LandingPage onAdminLogin={handleAdminLogin} />} />
           </Routes>
         </main>
@@ -223,6 +227,7 @@ function DemoApp() {
           <Route path="/new-referral" element={<ReferralForm />} />
           <Route path="/referrals" element={<ReferralList />} />
           <Route path="/meeting/:referralId" element={<MeetingPreparation />} />
+          <Route path="/signup" element={<TeacherSignupForm />} />
           <Route path="*" element={<LandingPage onAdminLogin={handleAdminLogin} />} />
         </Routes>
       </main>
