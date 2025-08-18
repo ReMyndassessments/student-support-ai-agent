@@ -306,17 +306,19 @@ Thank you!`
                         </ul>
                       </div>
                     </div>
-                    <DialogFooter className="flex-col gap-2">
-                      <Button
-                        onClick={() => handleEmailContact('sales')}
-                        className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-xl"
-                      >
-                        <Mail className="mr-2 h-4 w-4" />
-                        Open Email Client
-                      </Button>
-                      <p className="text-xs text-gray-500 text-center">
-                        If your email client doesn't open, use the copy button above
-                      </p>
+                    <DialogFooter className="pt-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
+                        <Button
+                          onClick={() => handleEmailContact('sales')}
+                          className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-xl"
+                        >
+                          <Mail className="mr-2 h-4 w-4" />
+                          Open Email Client
+                        </Button>
+                        <p className="text-xs text-gray-500 text-center sm:text-left">
+                          If your email client doesn't open, use the copy button above.
+                        </p>
+                      </div>
                     </DialogFooter>
                   </DialogContent>
                 </Dialog>
@@ -392,17 +394,19 @@ Thank you!`
                         </ul>
                       </div>
                     </div>
-                    <DialogFooter className="flex-col gap-2">
-                      <Button
-                        onClick={() => handleEmailContact('demo')}
-                        className="w-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white rounded-xl"
-                      >
-                        <Mail className="mr-2 h-4 w-4" />
-                        Open Email Client
-                      </Button>
-                      <p className="text-xs text-gray-500 text-center">
-                        If your email client doesn't open, use the copy button above
-                      </p>
+                    <DialogFooter className="pt-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
+                        <Button
+                          onClick={() => handleEmailContact('demo')}
+                          className="w-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white rounded-xl"
+                        >
+                          <Mail className="mr-2 h-4 w-4" />
+                          Open Email Client
+                        </Button>
+                        <p className="text-xs text-gray-500 text-center sm:text-left">
+                          If your email client doesn't open, use the copy button above.
+                        </p>
+                      </div>
                     </DialogFooter>
                   </DialogContent>
                 </Dialog>
