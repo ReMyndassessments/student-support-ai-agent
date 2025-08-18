@@ -35,16 +35,55 @@ export function LandingPage({ userEmail = "teacher@school.edu", onAdminLogin }: 
   ];
 
   const handleDemoRequest = () => {
-    const subject = encodeURIComponent('Demo Request for Concern2Care');
-    const body = encodeURIComponent(`Hello,
+    try {
+      const subject = encodeURIComponent('Demo Request for Concern2Care');
+      const body = encodeURIComponent(`Hello,
 
 I would like to request a demo of Concern2Care for my school/district.
 
 Please contact me to schedule a demonstration.
 
 Thank you!`);
-    
-    window.location.href = `mailto:c2c_demo@remynd.online?subject=${subject}&body=${body}`;
+      
+      const mailtoUrl = `mailto:c2c_demo@remynd.online?subject=${subject}&body=${body}`;
+      console.log('Opening demo request email:', mailtoUrl);
+      window.open(mailtoUrl, '_blank');
+    } catch (error) {
+      console.error('Error opening email client:', error);
+      // Fallback: copy email to clipboard or show email address
+      navigator.clipboard?.writeText('c2c_demo@remynd.online').then(() => {
+        alert('Demo email address copied to clipboard: c2c_demo@remynd.online');
+      }).catch(() => {
+        alert('Please email c2c_demo@remynd.online for a demo request');
+      });
+    }
+  };
+
+  const handleContactSales = () => {
+    try {
+      const subject = encodeURIComponent('Subscription Inquiry for Concern2Care');
+      const body = encodeURIComponent(`Hello,
+
+I'm interested in subscribing to Concern2Care. Please contact me with:
+
+- Subscription details and pricing
+- Payment methods
+- Setup instructions
+
+Thank you!`);
+      
+      const mailtoUrl = `mailto:sales@remynd.com?subject=${subject}&body=${body}`;
+      console.log('Opening sales contact email:', mailtoUrl);
+      window.open(mailtoUrl, '_blank');
+    } catch (error) {
+      console.error('Error opening email client:', error);
+      // Fallback: copy email to clipboard or show email address
+      navigator.clipboard?.writeText('sales@remynd.com').then(() => {
+        alert('Sales email address copied to clipboard: sales@remynd.com');
+      }).catch(() => {
+        alert('Please email sales@remynd.com for subscription information');
+      });
+    }
   };
 
   return (
@@ -86,12 +125,13 @@ Thank you!`);
                 Plus professional reports and streamlined communication with your school's support team. With Concern2Care, you can quickly capture a concern and receive research-based, ready-to-use interventions that help your students succeed.
               </p>
               <div className="flex flex-col gap-3 sm:flex-row sm:gap-4 justify-center">
-                <Link to="/subscription/plans">
-                  <Button className="w-full sm:w-auto bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 text-white shadow-xl rounded-xl sm:rounded-2xl py-4 sm:py-6 px-6 sm:px-8 text-base sm:text-lg font-semibold transition-all duration-200 transform hover:scale-105 active:scale-95 touch-manipulation">
-                    <CreditCard className="mr-2 h-5 w-5" />
-                    Subscribe Now
-                  </Button>
-                </Link>
+                <Button 
+                  onClick={handleContactSales}
+                  className="w-full sm:w-auto bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 text-white shadow-xl rounded-xl sm:rounded-2xl py-4 sm:py-6 px-6 sm:px-8 text-base sm:text-lg font-semibold transition-all duration-200 transform hover:scale-105 active:scale-95 touch-manipulation"
+                >
+                  <Mail className="mr-2 h-5 w-5" />
+                  Contact Sales
+                </Button>
                 <Button 
                   onClick={handleDemoRequest}
                   variant="outline" 
@@ -249,12 +289,13 @@ Thank you!`);
                 Join thousands of educators using AI-powered tools to better support their students.
               </p>
               <div className="flex flex-col gap-3 sm:flex-row sm:gap-4 justify-center">
-                <Link to="/subscription/plans">
-                  <Button className="w-full sm:w-auto bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 text-white shadow-xl rounded-xl sm:rounded-2xl py-4 sm:py-6 px-6 sm:px-8 text-base sm:text-lg font-semibold transition-all duration-200 transform hover:scale-105 active:scale-95 touch-manipulation">
-                    <CreditCard className="mr-2 h-5 w-5" />
-                    Subscribe Now
-                  </Button>
-                </Link>
+                <Button 
+                  onClick={handleContactSales}
+                  className="w-full sm:w-auto bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 text-white shadow-xl rounded-xl sm:rounded-2xl py-4 sm:py-6 px-6 sm:px-8 text-base sm:text-lg font-semibold transition-all duration-200 transform hover:scale-105 active:scale-95 touch-manipulation"
+                >
+                  <Mail className="mr-2 h-5 w-5" />
+                  Contact Sales
+                </Button>
                 <Button 
                   onClick={handleDemoRequest}
                   variant="outline" 

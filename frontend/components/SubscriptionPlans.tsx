@@ -13,34 +13,67 @@ export function SubscriptionPlans() {
   const { getToken, isSignedIn } = useAuth();
 
   const handleDemoRequest = () => {
-    const subject = encodeURIComponent('Demo Request for Concern2Care');
-    const body = encodeURIComponent(`Hello,
+    try {
+      const subject = encodeURIComponent('Demo Request for Concern2Care');
+      const body = encodeURIComponent(`Hello,
 
 I would like to request a demo of Concern2Care.
 
 Please contact me to schedule a demonstration.
 
 Thank you!`);
-    
-    window.location.href = `mailto:c2c_demo@remynd.online?subject=${subject}&body=${body}`;
+      
+      const mailtoUrl = `mailto:c2c_demo@remynd.online?subject=${subject}&body=${body}`;
+      console.log('Opening mailto URL:', mailtoUrl);
+      window.open(mailtoUrl, '_blank');
+      
+      toast({
+        title: "Email Client Opening",
+        description: "Your email client should open with a pre-filled demo request."
+      });
+    } catch (error) {
+      console.error('Error opening email client:', error);
+      toast({
+        title: "Email Error",
+        description: "Please manually email c2c_demo@remynd.online for a demo request.",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleSubscriptionContact = () => {
-    const subject = encodeURIComponent('Teacher Subscription Request - Concern2Care');
-    const body = encodeURIComponent(`Hello,
+    try {
+      const subject = encodeURIComponent('Teacher Subscription Request - Concern2Care');
+      const body = encodeURIComponent(`Hello,
 
 I would like to subscribe to Concern2Care as an individual teacher.
 
 Please contact me to complete the subscription setup and provide payment instructions.
 
 Thank you!`);
-    
-    window.location.href = `mailto:sales@remynd.com?subject=${subject}&body=${body}`;
+      
+      const mailtoUrl = `mailto:sales@remynd.com?subject=${subject}&body=${body}`;
+      console.log('Opening mailto URL:', mailtoUrl);
+      window.open(mailtoUrl, '_blank');
+      
+      toast({
+        title: "Email Client Opening",
+        description: "Your email client should open with a pre-filled subscription request."
+      });
+    } catch (error) {
+      console.error('Error opening email client:', error);
+      toast({
+        title: "Email Error",
+        description: "Please manually email sales@remynd.com for subscription information.",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleContactSales = () => {
-    const subject = encodeURIComponent('Concern2Care Subscription Inquiry');
-    const body = encodeURIComponent(`Hello,
+    try {
+      const subject = encodeURIComponent('Concern2Care Subscription Inquiry');
+      const body = encodeURIComponent(`Hello,
 
 I'm interested in subscribing to Concern2Care as a teacher. Please contact me with:
 
@@ -50,11 +83,26 @@ I'm interested in subscribing to Concern2Care as a teacher. Please contact me wi
 - Any current promotions
 
 Thank you!`);
-    
-    window.location.href = `mailto:sales@remynd.com?subject=${subject}&body=${body}`;
+      
+      const mailtoUrl = `mailto:sales@remynd.com?subject=${subject}&body=${body}`;
+      console.log('Opening mailto URL:', mailtoUrl);
+      window.open(mailtoUrl, '_blank');
+      
+      toast({
+        title: "Email Client Opening",
+        description: "Your email client should open with a pre-filled inquiry."
+      });
+    } catch (error) {
+      console.error('Error opening email client:', error);
+      toast({
+        title: "Email Error",
+        description: "Please manually email sales@remynd.com for more information.",
+        variant: "destructive"
+      });
+    }
   };
 
-  const handlePolarCheckout = async (planType: 'teacher' | 'school' | 'district') => {
+  const handlePolarCheckout = async () => {
     if (!isSignedIn) {
       toast({
         title: "Sign In Required",
@@ -66,24 +114,59 @@ Thank you!`);
 
     setIsCreatingCheckout(true);
     try {
+      console.log('Starting Polar checkout process...');
       const token = await getToken();
+      console.log('Got auth token:', token ? 'Token received' : 'No token');
+      
+      if (!token) {
+        throw new Error('No authentication token available');
+      }
+
       const response = await backend.with({ 
         auth: async () => ({ authorization: `Bearer ${token}` })
       }).polar.createCheckout({
-        planType,
+        planType: 'teacher',
         successUrl: `${window.location.origin}/subscription/success`,
         cancelUrl: `${window.location.origin}/subscription/plans`
       });
 
-      // Redirect to Polar checkout
-      window.location.href = response.checkoutUrl;
+      console.log('Polar checkout response:', response);
+
+      if (response.checkoutUrl) {
+        console.log('Redirecting to Polar checkout:', response.checkoutUrl);
+        window.location.href = response.checkoutUrl;
+      } else {
+        throw new Error('No checkout URL received from Polar');
+      }
     } catch (error) {
-      console.error('Error creating checkout:', error);
+      console.error('Error creating Polar checkout:', error);
+      
+      let errorMessage = "Failed to create checkout session.";
+      if (error instanceof Error) {
+        if (error.message.includes('Polar API key not configured')) {
+          errorMessage = "Payment system is not configured. Please contact sales directly.";
+        } else if (error.message.includes('Product ID not configured')) {
+          errorMessage = "Product configuration error. Please contact sales directly.";
+        } else if (error.message.includes('401')) {
+          errorMessage = "Authentication error. Please try signing in again.";
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
       toast({
         title: "Checkout Error",
-        description: "Failed to create checkout session. Please try again or contact support.",
+        description: errorMessage,
         variant: "destructive"
       });
+
+      // Fall back to contact sales
+      setTimeout(() => {
+        toast({
+          title: "Alternative Option",
+          description: "Please use the 'Contact Sales' button below for direct subscription setup.",
+        });
+      }, 2000);
     } finally {
       setIsCreatingCheckout(false);
     }
@@ -117,13 +200,13 @@ Thank you!`);
           </div>
         </div>
 
-        {/* Payment Options Notice */}
-        <Alert className="max-w-4xl mx-auto mb-8 sm:mb-12 border-blue-200 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-2xl">
-          <CreditCard className="h-5 w-5 text-blue-600" />
-          <AlertDescription className="text-blue-800 text-sm sm:text-base">
-            <strong>Multiple Payment Options Available</strong>
+        {/* Payment System Status */}
+        <Alert className="max-w-4xl mx-auto mb-8 sm:mb-12 border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl">
+          <AlertTriangle className="h-5 w-5 text-amber-600" />
+          <AlertDescription className="text-amber-800 text-sm sm:text-base">
+            <strong>Payment System Setup in Progress</strong>
             <br />
-            Choose between secure online checkout or direct contact for personalized setup and payment options.
+            We're currently finalizing our automated payment system. For immediate access, please contact our sales team directly for secure payment options and quick account setup.
           </AlertDescription>
         </Alert>
 
@@ -172,42 +255,36 @@ Thank you!`);
               </div>
               
               <div className="space-y-3 sm:space-y-4">
-                {isSignedIn ? (
+                {/* Primary CTA - Contact Sales */}
+                <Button
+                  onClick={handleContactSales}
+                  className="w-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 text-white shadow-xl rounded-xl sm:rounded-2xl py-4 sm:py-6 text-base sm:text-lg font-semibold transition-all duration-200 transform hover:scale-105 active:scale-95 touch-manipulation"
+                >
+                  <Mail className="mr-2 h-5 w-5" />
+                  Contact Sales to Subscribe
+                </Button>
+
+                {/* Secondary CTA - Try Checkout (if signed in) */}
+                {isSignedIn && (
                   <Button
-                    onClick={() => handlePolarCheckout('teacher')}
+                    onClick={handlePolarCheckout}
                     disabled={isCreatingCheckout}
-                    className="w-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 text-white shadow-xl rounded-xl sm:rounded-2xl py-4 sm:py-6 text-base sm:text-lg font-semibold transition-all duration-200 transform hover:scale-105 active:scale-95 touch-manipulation"
+                    variant="outline"
+                    className="w-full border-blue-300 text-blue-700 hover:bg-blue-50 rounded-xl sm:rounded-2xl py-3 sm:py-4 text-sm sm:text-base font-semibold touch-manipulation active:scale-95"
                   >
                     {isCreatingCheckout ? (
                       <>
-                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                        Creating Checkout...
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Trying Checkout...
                       </>
                     ) : (
                       <>
-                        <CreditCard className="mr-2 h-5 w-5" />
-                        Subscribe Now - Secure Checkout
+                        <CreditCard className="mr-2 h-4 w-4" />
+                        Try Online Checkout (Beta)
                       </>
                     )}
                   </Button>
-                ) : (
-                  <Button
-                    onClick={handleSubscriptionContact}
-                    className="w-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 text-white shadow-xl rounded-xl sm:rounded-2xl py-4 sm:py-6 text-base sm:text-lg font-semibold transition-all duration-200 transform hover:scale-105 active:scale-95 touch-manipulation"
-                  >
-                    Get Started - Contact Us
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </Button>
                 )}
-                
-                <Button
-                  onClick={handleSubscriptionContact}
-                  variant="outline"
-                  className="w-full border-gray-300 text-gray-700 hover:bg-gray-50 rounded-xl sm:rounded-2xl py-3 sm:py-4 text-sm sm:text-base font-semibold touch-manipulation active:scale-95"
-                >
-                  <Mail className="mr-2 h-4 w-4" />
-                  Contact Sales Instead
-                </Button>
                 
                 <Button
                   onClick={handleDemoRequest}
@@ -354,9 +431,12 @@ Thank you!`);
                     <Mail className="h-5 w-5 text-blue-600" />
                     <div>
                       <p className="font-medium text-gray-900">Email</p>
-                      <a href="mailto:sales@remynd.com" className="text-blue-600 hover:text-blue-700 text-sm">
+                      <button 
+                        onClick={() => window.open('mailto:sales@remynd.com', '_blank')}
+                        className="text-blue-600 hover:text-blue-700 text-sm underline"
+                      >
                         sales@remynd.com
-                      </a>
+                      </button>
                     </div>
                   </div>
                   <div className="bg-gradient-to-r from-emerald-50 to-teal-50 p-4 rounded-xl border border-emerald-200">
@@ -374,9 +454,12 @@ Thank you!`);
                     <Sparkles className="h-5 w-5 text-amber-600" />
                     <div>
                       <p className="font-medium text-gray-900">Demo Requests</p>
-                      <a href="mailto:c2c_demo@remynd.online" className="text-amber-600 hover:text-amber-700 text-sm">
+                      <button 
+                        onClick={() => window.open('mailto:c2c_demo@remynd.online', '_blank')}
+                        className="text-amber-600 hover:text-amber-700 text-sm underline"
+                      >
                         c2c_demo@remynd.online
-                      </a>
+                      </button>
                     </div>
                   </div>
                   <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-4 rounded-xl border border-purple-200">
@@ -474,7 +557,7 @@ Thank you!`);
             {[
               {
                 question: "How do I subscribe as a teacher?",
-                answer: "You can either use our secure online checkout or contact our sales team at sales@remynd.com. We accept bank transfers, checks, and credit card payments through our secure payment portal."
+                answer: "Contact our sales team at sales@remynd.com for personalized setup. We accept bank transfers, checks, and credit card payments through our secure payment portal."
               },
               {
                 question: "Can my school purchase subscriptions for multiple teachers?",
@@ -482,11 +565,11 @@ Thank you!`);
               },
               {
                 question: "What payment methods do you accept?",
-                answer: "We accept credit cards through our secure online checkout, as well as bank transfers and checks for direct contact subscriptions. Our sales team will provide detailed payment instructions based on your preference."
+                answer: "We accept credit cards, bank transfers, and checks. Our sales team will provide detailed payment instructions based on your preference and can set up secure payment options."
               },
               {
                 question: "How quickly can I get started?",
-                answer: "With online checkout, your account is activated immediately. For direct contact subscriptions, we can activate your account within 24 hours after payment is processed."
+                answer: "We can typically activate your account within 24-48 hours after payment is processed. Contact us for expedited setup if needed."
               },
               {
                 question: "Is my student data secure?",
@@ -526,33 +609,13 @@ Thank you!`);
                 Join teachers who are already using AI-powered tools to better support their students.
               </p>
               <div className="flex flex-col gap-3 sm:flex-row sm:gap-4 justify-center">
-                {isSignedIn ? (
-                  <Button
-                    onClick={() => handlePolarCheckout('teacher')}
-                    disabled={isCreatingCheckout}
-                    className="w-full sm:w-auto bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 text-white shadow-xl rounded-xl sm:rounded-2xl py-4 sm:py-6 px-6 sm:px-8 text-base sm:text-lg font-semibold transition-all duration-200 transform hover:scale-105 active:scale-95 touch-manipulation"
-                  >
-                    {isCreatingCheckout ? (
-                      <>
-                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                        Creating Checkout...
-                      </>
-                    ) : (
-                      <>
-                        <CreditCard className="mr-2 h-5 w-5" />
-                        Subscribe Now
-                      </>
-                    )}
-                  </Button>
-                ) : (
-                  <Button
-                    onClick={handleContactSales}
-                    className="w-full sm:w-auto bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 text-white shadow-xl rounded-xl sm:rounded-2xl py-4 sm:py-6 px-6 sm:px-8 text-base sm:text-lg font-semibold transition-all duration-200 transform hover:scale-105 active:scale-95 touch-manipulation"
-                  >
-                    <Mail className="mr-2 h-5 w-5" />
-                    Subscribe Now
-                  </Button>
-                )}
+                <Button
+                  onClick={handleContactSales}
+                  className="w-full sm:w-auto bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 text-white shadow-xl rounded-xl sm:rounded-2xl py-4 sm:py-6 px-6 sm:px-8 text-base sm:text-lg font-semibold transition-all duration-200 transform hover:scale-105 active:scale-95 touch-manipulation"
+                >
+                  <Mail className="mr-2 h-5 w-5" />
+                  Subscribe Now
+                </Button>
                 <Button
                   onClick={handleDemoRequest}
                   variant="outline"

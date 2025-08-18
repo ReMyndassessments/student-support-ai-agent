@@ -22,10 +22,13 @@ export const createCheckout = api<CreateCheckoutRequest, CreateCheckoutResponse>
   { expose: true, method: "POST", path: "/polar/checkout", auth: true },
   async (req) => {
     const auth = getAuthData()!;
-    const apiKey = polarApiKey();
     
+    console.log('Creating Polar checkout for user:', auth.email);
+    
+    const apiKey = polarApiKey();
     if (!apiKey) {
-      throw APIError.invalidArgument("Polar API key not configured. Please contact support.");
+      console.error('Polar API key not configured');
+      throw APIError.invalidArgument("Polar API key not configured. Please contact support for direct subscription setup.");
     }
     
     if (req.planType !== 'teacher') {
@@ -34,16 +37,16 @@ export const createCheckout = api<CreateCheckoutRequest, CreateCheckoutResponse>
 
     const productId = polarTeacherProductId();
     if (!productId) {
-      throw APIError.invalidArgument(`Product ID not configured for teacher plan. Please contact support.`);
+      console.error('Polar teacher product ID not configured');
+      throw APIError.invalidArgument("Product ID not configured for teacher plan. Please contact support for direct subscription setup.");
     }
 
     try {
       // Create checkout session with Polar API
-      // IMPORTANT: Use the authenticated user's email, not a provided email
       const checkoutData = {
         product_id: productId,
         customer_email: auth.email,
-        customer_name: auth.name,
+        customer_name: auth.name || auth.email,
         success_url: req.successUrl,
         cancel_url: req.cancelUrl || req.successUrl,
         metadata: {
@@ -52,6 +55,11 @@ export const createCheckout = api<CreateCheckoutRequest, CreateCheckoutResponse>
           user_id: auth.userID
         }
       };
+
+      console.log('Sending request to Polar API with data:', {
+        ...checkoutData,
+        product_id: productId.substring(0, 10) + '...' // Log partial ID for security
+      });
 
       const response = await fetch('https://api.polar.sh/v1/checkouts', {
         method: 'POST',
@@ -62,15 +70,30 @@ export const createCheckout = api<CreateCheckoutRequest, CreateCheckoutResponse>
         body: JSON.stringify(checkoutData)
       });
 
+      console.log('Polar API response status:', response.status);
+
       if (!response.ok) {
         const errorText = await response.text();
         console.error(`Polar API error: ${response.status} - ${errorText}`);
-        throw new Error(`Polar API error: ${response.status}`);
+        
+        if (response.status === 401) {
+          throw APIError.invalidArgument("Invalid Polar API key configuration. Please contact support for direct subscription setup.");
+        } else if (response.status === 404) {
+          throw APIError.invalidArgument("Product not found in Polar. Please contact support for direct subscription setup.");
+        } else if (response.status === 400) {
+          throw APIError.invalidArgument("Invalid request to payment system. Please contact support for direct subscription setup.");
+        } else {
+          throw APIError.internal("Payment system temporarily unavailable. Please contact support for direct subscription setup.");
+        }
       }
 
       const checkout = await response.json();
+      console.log('Polar checkout created successfully:', checkout.id);
       
-      console.log(`Checkout created for ${auth.email} - ${req.planType} plan: ${checkout.id}`);
+      if (!checkout.url) {
+        console.error('No checkout URL in Polar response:', checkout);
+        throw APIError.internal("Invalid response from payment system. Please contact support for direct subscription setup.");
+      }
       
       return {
         checkoutUrl: checkout.url,
@@ -79,15 +102,17 @@ export const createCheckout = api<CreateCheckoutRequest, CreateCheckoutResponse>
     } catch (error) {
       console.error('Error creating Polar checkout:', error);
       
-      if (error instanceof Error && error.message.includes('401')) {
-        throw APIError.invalidArgument("Invalid Polar API key. Please check your API key in your profile settings.");
+      if (error instanceof APIError) {
+        throw error;
       }
       
-      if (error instanceof Error && error.message.includes('404')) {
-        throw APIError.invalidArgument("Product not found. Please check product configuration.");
+      if (error instanceof Error) {
+        if (error.message.includes('fetch')) {
+          throw APIError.internal("Unable to connect to payment system. Please contact support for direct subscription setup.");
+        }
       }
       
-      throw APIError.internal("Failed to create checkout session. Please try again or contact support.");
+      throw APIError.internal("Payment system error. Please contact support for direct subscription setup.");
     }
   }
 );

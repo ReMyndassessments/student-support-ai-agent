@@ -16,21 +16,34 @@ export function SubscriptionGate({ userEmail, children, feature = "this feature"
   const { hasActiveSubscription, loading } = useSubscription(userEmail);
 
   const handleDemoRequest = () => {
-    const subject = encodeURIComponent('Demo Request for Concern2Care');
-    const body = encodeURIComponent(`Hello,
+    try {
+      const subject = encodeURIComponent('Demo Request for Concern2Care');
+      const body = encodeURIComponent(`Hello,
 
 I would like to request a demo of Concern2Care.
 
 Please contact me to schedule a demonstration.
 
 Thank you!`);
-    
-    window.location.href = `mailto:c2c_demo@remynd.online?subject=${subject}&body=${body}`;
+      
+      const mailtoUrl = `mailto:c2c_demo@remynd.online?subject=${subject}&body=${body}`;
+      console.log('Opening demo request email:', mailtoUrl);
+      window.open(mailtoUrl, '_blank');
+    } catch (error) {
+      console.error('Error opening email client:', error);
+      // Fallback
+      navigator.clipboard?.writeText('c2c_demo@remynd.online').then(() => {
+        alert('Demo email address copied to clipboard: c2c_demo@remynd.online');
+      }).catch(() => {
+        alert('Please email c2c_demo@remynd.online for a demo request');
+      });
+    }
   };
 
   const handleContactSales = () => {
-    const subject = encodeURIComponent('Teacher Subscription Request for Concern2Care');
-    const body = encodeURIComponent(`Hello,
+    try {
+      const subject = encodeURIComponent('Teacher Subscription Request for Concern2Care');
+      const body = encodeURIComponent(`Hello,
 
 I would like to subscribe to Concern2Care as a teacher to access ${feature}.
 
@@ -40,8 +53,19 @@ Please contact me with:
 - Setup instructions
 
 Thank you!`);
-    
-    window.location.href = `mailto:sales@remynd.com?subject=${subject}&body=${body}`;
+      
+      const mailtoUrl = `mailto:sales@remynd.com?subject=${subject}&body=${body}`;
+      console.log('Opening sales contact email:', mailtoUrl);
+      window.open(mailtoUrl, '_blank');
+    } catch (error) {
+      console.error('Error opening email client:', error);
+      // Fallback
+      navigator.clipboard?.writeText('sales@remynd.com').then(() => {
+        alert('Sales email address copied to clipboard: sales@remynd.com');
+      }).catch(() => {
+        alert('Please email sales@remynd.com for subscription information');
+      });
+    }
   };
 
   if (loading) {
@@ -233,9 +257,12 @@ Thank you!`);
                   </div>
                   <h4 className="font-semibold text-emerald-900 mb-2">Teacher Subscriptions</h4>
                   <p className="text-emerald-700 text-sm mb-3">Get pricing and payment options</p>
-                  <a href="mailto:sales@remynd.com" className="text-emerald-600 hover:text-emerald-700 font-medium">
+                  <button 
+                    onClick={() => window.open('mailto:sales@remynd.com', '_blank')}
+                    className="text-emerald-600 hover:text-emerald-700 font-medium underline"
+                  >
                     sales@remynd.com
-                  </a>
+                  </button>
                 </div>
                 <div className="text-center">
                   <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-r from-amber-500 to-orange-600 rounded-2xl shadow-lg mb-3">
@@ -243,9 +270,12 @@ Thank you!`);
                   </div>
                   <h4 className="font-semibold text-emerald-900 mb-2">Demos & Questions</h4>
                   <p className="text-emerald-700 text-sm mb-3">See the platform in action</p>
-                  <a href="mailto:c2c_demo@remynd.online" className="text-emerald-600 hover:text-emerald-700 font-medium">
+                  <button 
+                    onClick={() => window.open('mailto:c2c_demo@remynd.online', '_blank')}
+                    className="text-emerald-600 hover:text-emerald-700 font-medium underline"
+                  >
                     c2c_demo@remynd.online
-                  </a>
+                  </button>
                 </div>
               </div>
               <div className="mt-6 text-center">
