@@ -63,15 +63,15 @@ export function AdminDashboard({ user, onLogout }: AdminDashboardProps) {
 
   const quickActions = [
     {
-      title: 'Create Sample Referral',
-      description: 'Demonstrate the referral creation process with AI recommendations',
+      title: 'Create Sample Support Request',
+      description: 'Demonstrate the support request creation process with AI recommendations',
       icon: FileText,
       href: '/new-referral',
       gradient: 'from-blue-500 to-purple-500'
     },
     {
-      title: 'View All Referrals',
-      description: 'Show existing referrals and management capabilities',
+      title: 'View All Support Requests',
+      description: 'Show existing support requests and management capabilities',
       icon: Users,
       href: '/referrals',
       gradient: 'from-emerald-500 to-teal-500'
@@ -233,11 +233,11 @@ export function AdminDashboard({ user, onLogout }: AdminDashboardProps) {
             <div className="space-y-4">
               <h3 className="font-semibold text-amber-900">How to conduct the demo:</h3>
               <ol className="list-decimal list-inside space-y-2 text-amber-800">
-                <li>Start by creating a new student referral to show the form interface</li>
+                <li>Start by creating a new student support request to show the form interface</li>
                 <li>Demonstrate the AI-powered recommendations feature</li>
                 <li>Show the follow-up assistance functionality</li>
                 <li>Generate and download a PDF report</li>
-                <li>Display the referral management tools in "All Referrals"</li>
+                <li>Display the support request management tools in "All Support Requests"</li>
                 <li>Explain the subscription model and value proposition</li>
               </ol>
               <div className="mt-4 p-4 bg-amber-100 rounded-xl">

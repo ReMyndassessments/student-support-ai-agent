@@ -195,7 +195,7 @@ export namespace referrals {
         }
 
         /**
-         * Creates a new student referral form.
+         * Creates a new student support request form.
          */
         public async create(params: RequestType<typeof api_referrals_create_create>): Promise<ResponseType<typeof api_referrals_create_create>> {
             // Now make the actual call to the API
@@ -204,16 +204,16 @@ export namespace referrals {
         }
 
         /**
-         * Generates a PDF report for a referral suitable for student support meetings.
+         * Generates a PDF report for a support request suitable for student support meetings.
          */
-        public async generatePDF(params: { referralId: number }): Promise<ResponseType<typeof api_referrals_generate_pdf_generatePDF>> {
+        public async generatePDF(params: { supportRequestId: number }): Promise<ResponseType<typeof api_referrals_generate_pdf_generatePDF>> {
             // Now make the actual call to the API
-            const resp = await this.baseClient.callTypedAPI(`/referrals/${encodeURIComponent(params.referralId)}/pdf`, {method: "POST", body: undefined})
+            const resp = await this.baseClient.callTypedAPI(`/referrals/${encodeURIComponent(params.supportRequestId)}/pdf`, {method: "POST", body: undefined})
             return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_referrals_generate_pdf_generatePDF>
         }
 
         /**
-         * Retrieves a single referral by ID.
+         * Retrieves a single support request by ID.
          */
         public async get(params: { id: number }): Promise<ResponseType<typeof api_referrals_get_get>> {
             // Now make the actual call to the API
@@ -222,7 +222,7 @@ export namespace referrals {
         }
 
         /**
-         * Retrieves all referrals, optionally filtered by teacher.
+         * Retrieves all support requests, optionally filtered by teacher.
          */
         public async list(params: RequestType<typeof api_referrals_list_list>): Promise<ResponseType<typeof api_referrals_list_list>> {
             // Convert our params into the objects we need for the request
@@ -237,7 +237,7 @@ export namespace referrals {
         }
 
         /**
-         * Shares a referral via email for student support meetings.
+         * Shares a support request via email for student support meetings.
          */
         public async shareEmail(params: RequestType<typeof api_referrals_share_email_shareEmail>): Promise<ResponseType<typeof api_referrals_share_email_shareEmail>> {
             // Construct the body with only the fields which we want encoded within the body (excluding query string or header fields)
@@ -248,7 +248,7 @@ export namespace referrals {
             }
 
             // Now make the actual call to the API
-            const resp = await this.baseClient.callTypedAPI(`/referrals/${encodeURIComponent(params.referralId)}/share`, {method: "POST", body: JSON.stringify(body)})
+            const resp = await this.baseClient.callTypedAPI(`/referrals/${encodeURIComponent(params.supportRequestId)}/share`, {method: "POST", body: JSON.stringify(body)})
             return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_referrals_share_email_shareEmail>
         }
     }
@@ -258,9 +258,13 @@ export namespace referrals {
  * Import the endpoint handlers to derive the types for the client.
  */
 import { checkAccess as api_users_check_access_checkAccess } from "~backend/users/check-access";
+import { createUserByAdmin as api_users_create_user_by_admin_createUserByAdmin } from "~backend/users/create-user-by-admin";
+import { deleteUserByAdmin as api_users_delete_user_by_admin_deleteUserByAdmin } from "~backend/users/delete-user-by-admin";
 import { getProfile as api_users_get_profile_getProfile } from "~backend/users/get-profile";
-import { purchaseReferralPackage as api_users_purchase_referral_package_purchaseReferralPackage } from "~backend/users/purchase-referral-package";
+import { listUsers as api_users_list_users_listUsers } from "~backend/users/list-users";
+import { purchaseSupportRequestPackage as api_users_purchase_referral_package_purchaseSupportRequestPackage } from "~backend/users/purchase-referral-package";
 import { updateProfile as api_users_update_profile_updateProfile } from "~backend/users/update-profile";
+import { updateUserByAdmin as api_users_update_user_by_admin_updateUserByAdmin } from "~backend/users/update-user-by-admin";
 
 export namespace users {
 
@@ -270,9 +274,13 @@ export namespace users {
         constructor(baseClient: BaseClient) {
             this.baseClient = baseClient
             this.checkAccess = this.checkAccess.bind(this)
+            this.createUserByAdmin = this.createUserByAdmin.bind(this)
+            this.deleteUserByAdmin = this.deleteUserByAdmin.bind(this)
             this.getProfile = this.getProfile.bind(this)
-            this.purchaseReferralPackage = this.purchaseReferralPackage.bind(this)
+            this.listUsers = this.listUsers.bind(this)
+            this.purchaseSupportRequestPackage = this.purchaseSupportRequestPackage.bind(this)
             this.updateProfile = this.updateProfile.bind(this)
+            this.updateUserByAdmin = this.updateUserByAdmin.bind(this)
         }
 
         /**
@@ -285,6 +293,24 @@ export namespace users {
         }
 
         /**
+         * Creates a new user (teacher). For admins only.
+         */
+        public async createUserByAdmin(params: RequestType<typeof api_users_create_user_by_admin_createUserByAdmin>): Promise<ResponseType<typeof api_users_create_user_by_admin_createUserByAdmin>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/users/admin/create`, {method: "POST", body: JSON.stringify(params)})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_users_create_user_by_admin_createUserByAdmin>
+        }
+
+        /**
+         * Deletes a user. For admins only.
+         */
+        public async deleteUserByAdmin(params: { id: number }): Promise<ResponseType<typeof api_users_delete_user_by_admin_deleteUserByAdmin>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/users/admin/${encodeURIComponent(params.id)}`, {method: "DELETE", body: undefined})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_users_delete_user_by_admin_deleteUserByAdmin>
+        }
+
+        /**
          * Retrieves the authenticated user's profile information.
          */
         public async getProfile(): Promise<ResponseType<typeof api_users_get_profile_getProfile>> {
@@ -294,12 +320,21 @@ export namespace users {
         }
 
         /**
-         * Purchases additional referral packages for the authenticated user.
+         * Lists all users in the system. For admins only.
          */
-        public async purchaseReferralPackage(params: RequestType<typeof api_users_purchase_referral_package_purchaseReferralPackage>): Promise<ResponseType<typeof api_users_purchase_referral_package_purchaseReferralPackage>> {
+        public async listUsers(): Promise<ResponseType<typeof api_users_list_users_listUsers>> {
             // Now make the actual call to the API
-            const resp = await this.baseClient.callTypedAPI(`/users/purchase-referral-package`, {method: "POST", body: JSON.stringify(params)})
-            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_users_purchase_referral_package_purchaseReferralPackage>
+            const resp = await this.baseClient.callTypedAPI(`/users/admin/list`, {method: "GET", body: undefined})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_users_list_users_listUsers>
+        }
+
+        /**
+         * Purchases additional support request packages for the authenticated user.
+         */
+        public async purchaseSupportRequestPackage(params: RequestType<typeof api_users_purchase_referral_package_purchaseSupportRequestPackage>): Promise<ResponseType<typeof api_users_purchase_referral_package_purchaseSupportRequestPackage>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/users/purchase-support-request-package`, {method: "POST", body: JSON.stringify(params)})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_users_purchase_referral_package_purchaseSupportRequestPackage>
         }
 
         /**
@@ -309,6 +344,26 @@ export namespace users {
             // Now make the actual call to the API
             const resp = await this.baseClient.callTypedAPI(`/users/profile`, {method: "PUT", body: JSON.stringify(params)})
             return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_users_update_profile_updateProfile>
+        }
+
+        /**
+         * Updates a user's profile. For admins only.
+         */
+        public async updateUserByAdmin(params: RequestType<typeof api_users_update_user_by_admin_updateUserByAdmin>): Promise<ResponseType<typeof api_users_update_user_by_admin_updateUserByAdmin>> {
+            // Construct the body with only the fields which we want encoded within the body (excluding query string or header fields)
+            const body: Record<string, any> = {
+                email:                params.email,
+                name:                 params.name,
+                schoolDistrict:       params.schoolDistrict,
+                schoolName:           params.schoolName,
+                subscriptionEndDate:  params.subscriptionEndDate,
+                supportRequestsLimit: params.supportRequestsLimit,
+                teacherType:          params.teacherType,
+            }
+
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/users/admin/${encodeURIComponent(params.id)}`, {method: "PUT", body: JSON.stringify(body)})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_users_update_user_by_admin_updateUserByAdmin>
         }
     }
 }

@@ -130,14 +130,14 @@ Thank you!`;
               
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                 {[
-                  '5 referrals per month included',
+                  '5 support requests per month included',
                   'AI-powered Tier 2 recommendations',
                   'PDF report generation',
                   'Email sharing with colleagues',
                   'Follow-up implementation assistance',
                   'Personal DeepSeek API key integration',
                   'Professional documentation tools',
-                  'Purchase additional referral packages ($5 for 10)'
+                  'Purchase additional support request packages ($5 for 10)'
                 ].map((feature, index) => (
                   <div key={index} className="flex items-start gap-3">
                     <div className="w-5 h-5 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">

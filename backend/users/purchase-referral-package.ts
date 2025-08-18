@@ -3,20 +3,20 @@ import { userDB } from "./db";
 import { APIError } from "encore.dev/api";
 import { getAuthData } from "~encore/auth";
 
-export interface PurchaseReferralPackageRequest {
-  packages: number; // Number of 10-referral packages to purchase
+export interface PurchaseSupportRequestPackageRequest {
+  packages: number; // Number of 10-support request packages to purchase
 }
 
-export interface PurchaseReferralPackageResponse {
+export interface PurchaseSupportRequestPackageResponse {
   success: boolean;
   newPackageCount: number;
   newTotalLimit: number;
   checkoutUrl?: string; // For future payment integration
 }
 
-// Purchases additional referral packages for the authenticated user.
-export const purchaseReferralPackage = api<PurchaseReferralPackageRequest, PurchaseReferralPackageResponse>(
-  { expose: true, method: "POST", path: "/users/purchase-referral-package", auth: true },
+// Purchases additional support request packages for the authenticated user.
+export const purchaseSupportRequestPackage = api<PurchaseSupportRequestPackageRequest, PurchaseSupportRequestPackageResponse>(
+  { expose: true, method: "POST", path: "/users/purchase-support-request-package", auth: true },
   async (req) => {
     const auth = getAuthData()!;
 

@@ -345,7 +345,7 @@ Thank you!`
               },
               {
                 title: 'Streamlined Communication',
-                description: 'Simple referral forms, organized case management, and seamless collaboration with your school\'s support team.',
+                description: 'Simple support request forms, organized case management, and seamless collaboration with your school\'s support team.',
                 gradient: 'from-pink-500 to-rose-500'
               },
               {

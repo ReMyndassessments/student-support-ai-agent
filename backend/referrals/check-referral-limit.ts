@@ -18,7 +18,7 @@ export interface SupportRequestLimitResponse {
 
 // Checks if a user can create a new support request based on their monthly limit.
 export const checkSupportRequestLimit = api<CheckSupportRequestLimitRequest, SupportRequestLimitResponse>(
-  { expose: false, method: "GET", path: "/users/check-support-request-limit" },
+  { expose: false, method: "GET", path: "/referrals/check-support-request-limit" },
   async (req) => {
     // For demo admin, always allow
     if (req.email === 'admin@concern2care.demo') {

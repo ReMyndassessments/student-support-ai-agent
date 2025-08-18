@@ -4,7 +4,7 @@ import { users } from "~encore/clients";
 import { APIError } from "encore.dev/api";
 import { getAuthData } from "~encore/auth";
 
-export interface CreateReferralRequest {
+export interface CreateSupportRequestRequest {
   studentFirstName: string;
   studentLastInitial: string;
   grade: string;
@@ -21,7 +21,7 @@ export interface CreateReferralRequest {
   aiRecommendations?: string;
 }
 
-export interface Referral {
+export interface SupportRequest {
   id: number;
   studentFirstName: string;
   studentLastInitial: string;
@@ -40,19 +40,19 @@ export interface Referral {
   createdAt: Date;
 }
 
-// Creates a new student referral form.
-export const create = api<CreateReferralRequest, Referral>(
+// Creates a new student support request form.
+export const create = api<CreateSupportRequestRequest, SupportRequest>(
   { expose: true, method: "POST", path: "/referrals", auth: true },
   async (req) => {
     const auth = getAuthData()!;
 
-    // Check referral limit for authenticated users
+    // Check support request limit for authenticated users
     if (auth.email !== 'admin@concern2care.demo') {
-      const limitCheck = await users.checkReferralLimit({ email: auth.email });
+      const limitCheck = await users.checkSupportRequestLimit({ email: auth.email });
       
-      if (!limitCheck.canCreateReferral) {
+      if (!limitCheck.canCreateSupportRequest) {
         throw APIError.resourceExhausted(
-          `Referral limit reached: ${limitCheck.reason}. You have used ${limitCheck.referralsUsed} of ${limitCheck.totalLimit} referrals this month.`
+          `Support request limit reached: ${limitCheck.reason}. You have used ${limitCheck.supportRequestsUsed} of ${limitCheck.totalLimit} support requests this month.`
         );
       }
     }
@@ -112,16 +112,16 @@ export const create = api<CreateReferralRequest, Referral>(
     `;
 
     if (!row) {
-      throw new Error("Failed to create referral");
+      throw new Error("Failed to create support request");
     }
 
-    // Increment referral usage count for non-admin users
+    // Increment support request usage count for non-admin users
     if (auth.email !== 'admin@concern2care.demo') {
       try {
-        await users.incrementReferralUsage({ email: auth.email });
+        await users.incrementSupportRequestUsage({ email: auth.email });
       } catch (error) {
-        console.error('Failed to increment referral usage:', error);
-        // Don't fail the referral creation if usage tracking fails
+        console.error('Failed to increment support request usage:', error);
+        // Don't fail the support request creation if usage tracking fails
       }
     }
 

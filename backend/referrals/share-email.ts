@@ -3,7 +3,7 @@ import { referralDB } from "./db";
 import { APIError } from "encore.dev/api";
 
 export interface ShareEmailRequest {
-  referralId: number;
+  supportRequestId: number;
   recipientEmail: string;
   senderName: string;
   message?: string;
@@ -14,11 +14,11 @@ export interface ShareEmailResponse {
   message: string;
 }
 
-// Shares a referral via email for student support meetings.
+// Shares a support request via email for student support meetings.
 export const shareEmail = api<ShareEmailRequest, ShareEmailResponse>(
-  { expose: true, method: "POST", path: "/referrals/:referralId/share" },
+  { expose: true, method: "POST", path: "/referrals/:supportRequestId/share" },
   async (req) => {
-    const referral = await referralDB.queryRow<{
+    const supportRequest = await referralDB.queryRow<{
       id: number;
       student_first_name: string;
       student_last_initial: string;
@@ -36,63 +36,63 @@ export const shareEmail = api<ShareEmailRequest, ShareEmailResponse>(
       ai_recommendations: string | null;
       created_at: Date;
     }>`
-      SELECT * FROM referrals WHERE id = ${req.referralId}
+      SELECT * FROM referrals WHERE id = ${req.supportRequestId}
     `;
 
-    if (!referral) {
-      throw APIError.notFound("Referral not found");
+    if (!supportRequest) {
+      throw APIError.notFound("Support request not found");
     }
 
-    const concernTypes = JSON.parse(referral.concern_types);
-    const actionsTaken = JSON.parse(referral.actions_taken);
+    const concernTypes = JSON.parse(supportRequest.concern_types);
+    const actionsTaken = JSON.parse(supportRequest.actions_taken);
 
     // Create email content
-    const emailSubject = `Student Support Referral: ${referral.student_first_name} ${referral.student_last_initial}. (Grade ${referral.grade})`;
+    const emailSubject = `Student Support Request: ${supportRequest.student_first_name} ${supportRequest.student_last_initial}. (Grade ${supportRequest.grade})`;
     
     const emailBody = `
 Dear Colleague,
 
-${req.senderName} has shared a student support referral with you for an upcoming meeting.
+${req.senderName} has shared a student support request with you for an upcoming meeting.
 
 ${req.message ? `Message from ${req.senderName}: ${req.message}\n\n` : ''}
 
-STUDENT SUPPORT REFERRAL SUMMARY
-================================
+STUDENT SUPPORT REQUEST SUMMARY
+===============================
 
 Student Information:
-- Name: ${referral.student_first_name} ${referral.student_last_initial}.
-- Grade: ${referral.grade}
-- Teacher: ${referral.teacher} (${referral.teacher_position})
-- Referral ID: #${referral.id}
+- Name: ${supportRequest.student_first_name} ${supportRequest.student_last_initial}.
+- Grade: ${supportRequest.grade}
+- Teacher: ${supportRequest.teacher} (${supportRequest.teacher_position})
+- Support Request ID: #${supportRequest.id}
 
 Incident Details:
-- Date: ${new Date(referral.incident_date).toLocaleDateString('en-US', {
+- Date: ${new Date(supportRequest.incident_date).toLocaleDateString('en-US', {
   year: 'numeric',
   month: 'long',
   day: 'numeric'
 })}
-- Location: ${referral.location}
-- Severity Level: ${referral.severity_level.charAt(0).toUpperCase() + referral.severity_level.slice(1)}
+- Location: ${supportRequest.location}
+- Severity Level: ${supportRequest.severity_level.charAt(0).toUpperCase() + supportRequest.severity_level.slice(1)}
 
 Concern Types:
-${concernTypes.map((type: string) => `- ${type}`).join('\n')}${referral.other_concern_type ? `\n- ${referral.other_concern_type}` : ''}
+${concernTypes.map((type: string) => `- ${type}`).join('\n')}${supportRequest.other_concern_type ? `\n- ${supportRequest.other_concern_type}` : ''}
 
 Concern Description:
-${referral.concern_description}
+${supportRequest.concern_description}
 
-${actionsTaken.length > 0 || referral.other_action_taken ? `
+${actionsTaken.length > 0 || supportRequest.other_action_taken ? `
 Actions Already Taken:
-${actionsTaken.map((action: string) => `- ${action}`).join('\n')}${referral.other_action_taken ? `\n- ${referral.other_action_taken}` : ''}
+${actionsTaken.map((action: string) => `- ${action}`).join('\n')}${supportRequest.other_action_taken ? `\n- ${supportRequest.other_action_taken}` : ''}
 ` : ''}
 
-${referral.ai_recommendations ? `
+${supportRequest.ai_recommendations ? `
 AI-Generated Tier 2 Intervention Recommendations:
-${referral.ai_recommendations}
+${supportRequest.ai_recommendations}
 
 ⚠️ IMPORTANT DISCLAIMER: These AI-generated recommendations are for informational purposes only and should not replace professional educational assessment. Please refer this student to your school's student support department for proper evaluation and vetting. All AI-generated suggestions must be reviewed and approved by qualified educational professionals before implementation.
 ` : ''}
 
-Submitted: ${referral.created_at.toLocaleDateString('en-US', {
+Submitted: ${supportRequest.created_at.toLocaleDateString('en-US', {
   year: 'numeric',
   month: 'long',
   day: 'numeric',
@@ -116,7 +116,7 @@ Generated by Concern2Care from Remynd
       
       return {
         success: true,
-        message: `Referral shared successfully with ${req.recipientEmail}`
+        message: `Support request shared successfully with ${req.recipientEmail}`
       };
     } catch (error) {
       console.error('Error sending email:', error);

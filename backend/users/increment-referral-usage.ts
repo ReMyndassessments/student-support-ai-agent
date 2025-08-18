@@ -2,18 +2,18 @@ import { api } from "encore.dev/api";
 import { userDB } from "./db";
 import { APIError } from "encore.dev/api";
 
-export interface IncrementReferralUsageRequest {
+export interface IncrementSupportRequestUsageRequest {
   email: string;
 }
 
-export interface IncrementReferralUsageResponse {
+export interface IncrementSupportRequestUsageResponse {
   success: boolean;
   newUsageCount: number;
 }
 
-// Increments the user's monthly referral usage count.
-export const incrementReferralUsage = api<IncrementReferralUsageRequest, IncrementReferralUsageResponse>(
-  { expose: false, method: "POST", path: "/users/increment-referral-usage" },
+// Increments the user's monthly support request usage count.
+export const incrementSupportRequestUsage = api<IncrementSupportRequestUsageRequest, IncrementSupportRequestUsageResponse>(
+  { expose: false, method: "POST", path: "/users/increment-support-request-usage" },
   async (req) => {
     // For demo admin, just return success without incrementing
     if (req.email === 'admin@concern2care.demo') {

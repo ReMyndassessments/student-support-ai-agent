@@ -38,13 +38,13 @@ export function AuthenticatedApp({ user }: AuthenticatedAppProps) {
           <Route path="/" element={<LandingPage userEmail={userEmail} />} />
           
           <Route path="/new-referral" element={
-            <SubscriptionGate feature="referral creation">
+            <SubscriptionGate feature="support request creation">
               <ReferralForm />
             </SubscriptionGate>
           } />
           
           <Route path="/referrals" element={
-            <SubscriptionGate feature="referral management">
+            <SubscriptionGate feature="support request management">
               <ReferralList />
             </SubscriptionGate>
           } />

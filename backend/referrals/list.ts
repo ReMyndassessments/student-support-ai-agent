@@ -2,12 +2,12 @@ import { api } from "encore.dev/api";
 import { Query } from "encore.dev/api";
 import { referralDB } from "./db";
 
-export interface ListReferralsRequest {
+export interface ListSupportRequestsRequest {
   limit?: Query<number>;
   teacher?: Query<string>;
 }
 
-export interface Referral {
+export interface SupportRequest {
   id: number;
   studentFirstName: string;
   studentLastInitial: string;
@@ -26,12 +26,12 @@ export interface Referral {
   createdAt: Date;
 }
 
-export interface ListReferralsResponse {
-  referrals: Referral[];
+export interface ListSupportRequestsResponse {
+  supportRequests: SupportRequest[];
 }
 
-// Retrieves all referrals, optionally filtered by teacher.
-export const list = api<ListReferralsRequest, ListReferralsResponse>(
+// Retrieves all support requests, optionally filtered by teacher.
+export const list = api<ListSupportRequestsRequest, ListSupportRequestsResponse>(
   { expose: true, method: "GET", path: "/referrals" },
   async (req) => {
     const limit = req.limit || 50;
@@ -87,7 +87,7 @@ export const list = api<ListReferralsRequest, ListReferralsResponse>(
       created_at: Date;
     }>(query, ...params);
 
-    const referrals: Referral[] = rows.map(row => ({
+    const supportRequests: SupportRequest[] = rows.map(row => ({
       id: row.id,
       studentFirstName: row.student_first_name,
       studentLastInitial: row.student_last_initial,
@@ -106,6 +106,6 @@ export const list = api<ListReferralsRequest, ListReferralsResponse>(
       createdAt: row.created_at
     }));
 
-    return { referrals };
+    return { supportRequests };
   }
 );

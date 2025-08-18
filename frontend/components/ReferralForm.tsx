@@ -61,8 +61,8 @@ export function ReferralForm() {
   const [isSaving, setIsSaving] = useState(false);
   const [hasGenerated, setHasGenerated] = useState(false);
   const [hasSaved, setHasSaved] = useState(false);
-  const [savedReferralId, setSavedReferralId] = useState<number | null>(null);
-  const [referralLimitError, setReferralLimitError] = useState<string | null>(null);
+  const [savedSupportRequestId, setSavedSupportRequestId] = useState<number | null>(null);
+  const [supportRequestLimitError, setSupportRequestLimitError] = useState<string | null>(null);
   
   // Follow-up assistance state
   const [followUpQuestion, setFollowUpQuestion] = useState('');
@@ -94,7 +94,7 @@ export function ReferralForm() {
     setHasGenerated(false);
     setHasSaved(false);
     setHasFollowUpAssistance(false);
-    setReferralLimitError(null);
+    setSupportRequestLimitError(null);
   };
 
   const handleConcernTypeChange = (concernType: string, checked: boolean) => {
@@ -134,7 +134,7 @@ export function ReferralForm() {
     }
 
     setIsGenerating(true);
-    setReferralLimitError(null);
+    setSupportRequestLimitError(null);
     try {
       const request: GenerateRecommendationsRequest = {
         studentFirstName: formData.studentFirstName,
@@ -236,18 +236,18 @@ export function ReferralForm() {
     }
   };
 
-  const saveReferral = async () => {
+  const saveSupportRequest = async () => {
     if (!hasGenerated) {
       toast({
         title: "Generate Recommendations First",
-        description: "Please generate AI recommendations before saving the referral.",
+        description: "Please generate AI recommendations before saving the support request.",
         variant: "destructive"
       });
       return;
     }
 
     setIsSaving(true);
-    setReferralLimitError(null);
+    setSupportRequestLimitError(null);
     try {
       const finalRecommendations = hasFollowUpAssistance 
         ? `${recommendations}\n\n--- FOLLOW-UP ASSISTANCE ---\n\nTeacher's Question: ${followUpQuestion}\n\nAdditional Guidance:\n${followUpAssistance}`
@@ -271,18 +271,18 @@ export function ReferralForm() {
       });
 
       setHasSaved(true);
-      setSavedReferralId(response.id);
+      setSavedSupportRequestId(response.id);
       toast({
-        title: "Referral Saved",
-        description: "The referral form has been saved successfully."
+        title: "Support Request Saved",
+        description: "The support request form has been saved successfully."
       });
     } catch (error) {
-      console.error('Error saving referral:', error);
-      const errorMessage = error instanceof Error ? error.message : "Failed to save referral. Please try again.";
+      console.error('Error saving support request:', error);
+      const errorMessage = error instanceof Error ? error.message : "Failed to save support request. Please try again.";
       
-      // Check if it's a referral limit error
-      if (errorMessage.includes("Referral limit reached")) {
-        setReferralLimitError(errorMessage);
+      // Check if it's a support request limit error
+      if (errorMessage.includes("Support request limit reached")) {
+        setSupportRequestLimitError(errorMessage);
       }
       
       toast({
@@ -315,12 +315,12 @@ export function ReferralForm() {
     setDisclaimer('');
     setHasGenerated(false);
     setHasSaved(false);
-    setSavedReferralId(null);
+    setSavedSupportRequestId(null);
     setFollowUpQuestion('');
     setFollowUpAssistance('');
     setFollowUpDisclaimer('');
     setHasFollowUpAssistance(false);
-    setReferralLimitError(null);
+    setSupportRequestLimitError(null);
     
     // Reset expanded sections
     setExpandedSections({
@@ -458,8 +458,8 @@ export function ReferralForm() {
           </AlertDescription>
         </Alert>
 
-        {/* Referral Limit Error */}
-        {referralLimitError && (
+        {/* Support Request Limit Error */}
+        {supportRequestLimitError && (
           <Alert className="border-red-200 bg-gradient-to-r from-red-50 to-pink-50 rounded-2xl">
             <AlertTriangle className="h-4 w-4 text-red-600" />
             <AlertDescription className="text-red-800 text-sm">
@@ -467,12 +467,12 @@ export function ReferralForm() {
                 <div>
                   <strong>Monthly Limit Reached</strong>
                   <br />
-                  {referralLimitError}
+                  {supportRequestLimitError}
                 </div>
                 <Link to="/profile">
                   <Button size="sm" className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white rounded-xl ml-4">
                     <ShoppingCart className="h-4 w-4 mr-2" />
-                    Buy More Referrals
+                    Buy More Support Requests
                   </Button>
                 </Link>
               </div>
@@ -773,7 +773,7 @@ export function ReferralForm() {
           
           {hasGenerated && (
             <Button 
-              onClick={saveReferral}
+              onClick={saveSupportRequest}
               disabled={isSaving || hasSaved}
               variant={hasSaved ? "outline" : "default"}
               className={hasSaved 
@@ -792,7 +792,7 @@ export function ReferralForm() {
                   Saved Successfully!
                 </>
               ) : (
-                'Save Referral'
+                'Save Support Request'
               )}
             </Button>
           )}
@@ -807,14 +807,14 @@ export function ReferralForm() {
         </div>
 
         {/* Success Actions */}
-        {hasSaved && savedReferralId && (
+        {hasSaved && savedSupportRequestId && (
           <Card className="border-0 bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 shadow-xl rounded-2xl sm:rounded-3xl overflow-hidden">
             <CardHeader className="bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500 text-white rounded-t-2xl sm:rounded-t-3xl">
               <CardTitle className="flex items-center gap-3 text-lg sm:text-xl">
                 <div className="w-8 h-8 sm:w-10 sm:h-10 bg-white/20 rounded-xl sm:rounded-2xl flex items-center justify-center">
                   <CheckCircle className="h-5 w-5 sm:h-6 sm:w-6" />
                 </div>
-                Referral Saved Successfully!
+                Support Request Saved Successfully!
               </CardTitle>
             </CardHeader>
             <CardContent className="p-4 sm:p-6">
@@ -823,14 +823,14 @@ export function ReferralForm() {
                   onClick={() => navigate('/referrals')}
                   className="bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 text-white shadow-lg rounded-2xl px-6 py-3 touch-manipulation active:scale-95"
                 >
-                  View All Referrals
+                  View All Support Requests
                 </Button>
                 <Button
                   onClick={resetForm}
                   variant="outline"
                   className="border-gray-300 text-gray-700 hover:bg-white/80 rounded-2xl px-6 py-3 touch-manipulation active:scale-95"
                 >
-                  Create Another Referral
+                  Create Another Support Request
                 </Button>
               </div>
             </CardContent>

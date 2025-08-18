@@ -2,11 +2,11 @@ import { api } from "encore.dev/api";
 import { referralDB } from "./db";
 import { APIError } from "encore.dev/api";
 
-export interface GetReferralRequest {
+export interface GetSupportRequestRequest {
   id: number;
 }
 
-export interface Referral {
+export interface SupportRequest {
   id: number;
   studentFirstName: string;
   studentLastInitial: string;
@@ -25,8 +25,8 @@ export interface Referral {
   createdAt: Date;
 }
 
-// Retrieves a single referral by ID.
-export const get = api<GetReferralRequest, Referral>(
+// Retrieves a single support request by ID.
+export const get = api<GetSupportRequestRequest, SupportRequest>(
   { expose: true, method: "GET", path: "/referrals/:id" },
   async (req) => {
     const row = await referralDB.queryRow<{
@@ -51,7 +51,7 @@ export const get = api<GetReferralRequest, Referral>(
     `;
 
     if (!row) {
-      throw APIError.notFound("Referral not found");
+      throw APIError.notFound("Support request not found");
     }
 
     return {

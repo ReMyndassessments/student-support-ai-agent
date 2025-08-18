@@ -11,14 +11,14 @@ import { Loader2, AlertTriangle, Search, ArrowLeft, FileText, Share2, Mail, Down
 import { useToast } from '@/components/ui/use-toast';
 import { Link } from 'react-router-dom';
 import backend from '~backend/client';
-import type { Referral } from '~backend/referrals/list';
+import type { SupportRequest } from '~backend/referrals/list';
 
 export function ReferralList() {
-  const [referrals, setReferrals] = useState<Referral[]>([]);
-  const [cachedReferrals, setCachedReferrals] = useState<Referral[]>([]);
+  const [supportRequests, setSupportRequests] = useState<SupportRequest[]>([]);
+  const [cachedSupportRequests, setCachedSupportRequests] = useState<SupportRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [teacherFilter, setTeacherFilter] = useState('');
-  const [selectedReferral, setSelectedReferral] = useState<Referral | null>(null);
+  const [selectedSupportRequest, setSelectedSupportRequest] = useState<SupportRequest | null>(null);
   const [isEmailDialogOpen, setIsEmailDialogOpen] = useState(false);
   const [emailForm, setEmailForm] = useState({
     recipientEmail: '',
@@ -27,7 +27,7 @@ export function ReferralList() {
   });
   const [isSharing, setIsSharing] = useState(false);
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
-  const [expandedReferrals, setExpandedReferrals] = useState<Set<number>>(new Set());
+  const [expandedSupportRequests, setExpandedSupportRequests] = useState<Set<number>>(new Set());
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const { toast } = useToast();
 
@@ -36,8 +36,8 @@ export function ReferralList() {
     const handleOnline = () => {
       setIsOnline(true);
       // Reload data when coming back online
-      if (cachedReferrals.length === 0) {
-        loadReferrals();
+      if (cachedSupportRequests.length === 0) {
+        loadSupportRequests();
       }
     };
     const handleOffline = () => setIsOnline(false);
@@ -49,44 +49,44 @@ export function ReferralList() {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
     };
-  }, [cachedReferrals.length]);
+  }, [cachedSupportRequests.length]);
 
   useEffect(() => {
-    loadReferrals();
+    loadSupportRequests();
   }, [teacherFilter]);
 
-  // Cache referrals in localStorage
+  // Cache support requests in localStorage
   useEffect(() => {
-    if (referrals.length > 0) {
-      localStorage.setItem('cachedReferrals', JSON.stringify(referrals));
-      setCachedReferrals(referrals);
+    if (supportRequests.length > 0) {
+      localStorage.setItem('cachedSupportRequests', JSON.stringify(supportRequests));
+      setCachedSupportRequests(supportRequests);
     }
-  }, [referrals]);
+  }, [supportRequests]);
 
-  // Load cached referrals on mount
+  // Load cached support requests on mount
   useEffect(() => {
-    const cached = localStorage.getItem('cachedReferrals');
+    const cached = localStorage.getItem('cachedSupportRequests');
     if (cached) {
       try {
         const parsedCached = JSON.parse(cached);
-        setCachedReferrals(parsedCached);
+        setCachedSupportRequests(parsedCached);
         if (!isOnline) {
-          setReferrals(parsedCached);
+          setSupportRequests(parsedCached);
           setLoading(false);
         }
       } catch (error) {
-        console.error('Error parsing cached referrals:', error);
+        console.error('Error parsing cached support requests:', error);
       }
     }
   }, [isOnline]);
 
-  const loadReferrals = async () => {
+  const loadSupportRequests = async () => {
     if (!isOnline) {
       // Use cached data when offline
-      const filtered = cachedReferrals.filter(referral => 
-        !teacherFilter || referral.teacher.toLowerCase().includes(teacherFilter.toLowerCase())
+      const filtered = cachedSupportRequests.filter(supportRequest => 
+        !teacherFilter || supportRequest.teacher.toLowerCase().includes(teacherFilter.toLowerCase())
       );
-      setReferrals(filtered);
+      setSupportRequests(filtered);
       setLoading(false);
       return;
     }
@@ -97,25 +97,25 @@ export function ReferralList() {
         limit: 50,
         teacher: teacherFilter || undefined
       });
-      setReferrals(response.referrals);
+      setSupportRequests(response.supportRequests);
     } catch (error) {
-      console.error('Error loading referrals:', error);
+      console.error('Error loading support requests:', error);
       
       // Fall back to cached data if available
-      if (cachedReferrals.length > 0) {
-        const filtered = cachedReferrals.filter(referral => 
-          !teacherFilter || referral.teacher.toLowerCase().includes(teacherFilter.toLowerCase())
+      if (cachedSupportRequests.length > 0) {
+        const filtered = cachedSupportRequests.filter(supportRequest => 
+          !teacherFilter || supportRequest.teacher.toLowerCase().includes(teacherFilter.toLowerCase())
         );
-        setReferrals(filtered);
+        setSupportRequests(filtered);
         toast({
           title: "Using Offline Data",
-          description: "Showing cached referrals. Connect to internet for latest data.",
+          description: "Showing cached support requests. Connect to internet for latest data.",
           variant: "destructive"
         });
       } else {
         toast({
           title: "Error",
-          description: "Failed to load referrals. Please try again.",
+          description: "Failed to load support requests. Please try again.",
           variant: "destructive"
         });
       }
@@ -124,13 +124,13 @@ export function ReferralList() {
     }
   };
 
-  const toggleReferralExpansion = (referralId: number) => {
-    setExpandedReferrals(prev => {
+  const toggleSupportRequestExpansion = (supportRequestId: number) => {
+    setExpandedSupportRequests(prev => {
       const newSet = new Set(prev);
-      if (newSet.has(referralId)) {
-        newSet.delete(referralId);
+      if (newSet.has(supportRequestId)) {
+        newSet.delete(supportRequestId);
       } else {
-        newSet.add(referralId);
+        newSet.add(supportRequestId);
       }
       return newSet;
     });
@@ -146,7 +146,7 @@ export function ReferralList() {
       return;
     }
 
-    if (!selectedReferral || !emailForm.recipientEmail || !emailForm.senderName) {
+    if (!selectedSupportRequest || !emailForm.recipientEmail || !emailForm.senderName) {
       toast({
         title: "Missing Information",
         description: "Please fill in all required fields.",
@@ -158,7 +158,7 @@ export function ReferralList() {
     setIsSharing(true);
     try {
       const response = await backend.referrals.shareEmail({
-        referralId: selectedReferral.id,
+        supportRequestId: selectedSupportRequest.id,
         recipientEmail: emailForm.recipientEmail,
         senderName: emailForm.senderName,
         message: emailForm.message || undefined
@@ -190,7 +190,7 @@ export function ReferralList() {
     }
   };
 
-  const handleGeneratePDF = async (referral: Referral) => {
+  const handleGeneratePDF = async (supportRequest: SupportRequest) => {
     if (!isOnline) {
       toast({
         title: "Offline Mode",
@@ -203,7 +203,7 @@ export function ReferralList() {
     setIsGeneratingPDF(true);
     try {
       const response = await backend.referrals.generatePDF({
-        referralId: referral.id
+        supportRequestId: supportRequest.id
       });
 
       // Create a blob from the base64 PDF content
@@ -223,7 +223,7 @@ export function ReferralList() {
 
       toast({
         title: "PDF Generated",
-        description: "The referral PDF has been downloaded successfully."
+        description: "The support request PDF has been downloaded successfully."
       });
     } catch (error) {
       console.error('Error generating PDF:', error);
@@ -237,19 +237,19 @@ export function ReferralList() {
     }
   };
 
-  const handlePrintView = (referral: Referral) => {
+  const handlePrintView = (supportRequest: SupportRequest) => {
     // Open a new window with a print-friendly view
     const printWindow = window.open('', '_blank');
     if (!printWindow) return;
 
-    const concernTypes = referral.concernTypes.concat(referral.otherConcernType ? [referral.otherConcernType] : []);
-    const actionsTaken = referral.actionsTaken.concat(referral.otherActionTaken ? [referral.otherActionTaken] : []);
+    const concernTypes = supportRequest.concernTypes.concat(supportRequest.otherConcernType ? [supportRequest.otherConcernType] : []);
+    const actionsTaken = supportRequest.actionsTaken.concat(supportRequest.otherActionTaken ? [supportRequest.otherActionTaken] : []);
 
     printWindow.document.write(`
       <!DOCTYPE html>
       <html>
       <head>
-        <title>Student Support Referral - ${referral.studentFirstName} ${referral.studentLastInitial}.</title>
+        <title>Student Support Request - ${supportRequest.studentFirstName} ${supportRequest.studentLastInitial}.</title>
         <style>
           body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 20px; }
           .header { text-align: center; border-bottom: 2px solid #2563eb; padding-bottom: 20px; margin-bottom: 30px; }
@@ -269,7 +269,7 @@ export function ReferralList() {
       </head>
       <body>
         <div class="header">
-          <h1>Student Support Referral</h1>
+          <h1>Student Support Request</h1>
           <p><strong>Concern2Care</strong> - AI-Powered Student Support System</p>
           <p>Generated on ${new Date().toLocaleDateString()}</p>
         </div>
@@ -279,19 +279,19 @@ export function ReferralList() {
           <div class="info-grid">
             <div class="info-item">
               <div class="info-label">Student Name:</div>
-              <div class="info-value">${referral.studentFirstName} ${referral.studentLastInitial}.</div>
+              <div class="info-value">${supportRequest.studentFirstName} ${supportRequest.studentLastInitial}.</div>
             </div>
             <div class="info-item">
               <div class="info-label">Grade:</div>
-              <div class="info-value">${referral.grade}</div>
+              <div class="info-value">${supportRequest.grade}</div>
             </div>
             <div class="info-item">
               <div class="info-label">Teacher:</div>
-              <div class="info-value">${referral.teacher}</div>
+              <div class="info-value">${supportRequest.teacher}</div>
             </div>
             <div class="info-item">
               <div class="info-label">Position:</div>
-              <div class="info-value">${referral.teacherPosition}</div>
+              <div class="info-value">${supportRequest.teacherPosition}</div>
             </div>
           </div>
         </div>
@@ -301,19 +301,19 @@ export function ReferralList() {
           <div class="info-grid">
             <div class="info-item">
               <div class="info-label">Date:</div>
-              <div class="info-value">${formatIncidentDate(referral.incidentDate)}</div>
+              <div class="info-value">${formatIncidentDate(supportRequest.incidentDate)}</div>
             </div>
             <div class="info-item">
               <div class="info-label">Location:</div>
-              <div class="info-value">${referral.location}</div>
+              <div class="info-value">${supportRequest.location}</div>
             </div>
             <div class="info-item">
               <div class="info-label">Severity:</div>
-              <div class="info-value">${referral.severityLevel.charAt(0).toUpperCase() + referral.severityLevel.slice(1)}</div>
+              <div class="info-value">${supportRequest.severityLevel.charAt(0).toUpperCase() + supportRequest.severityLevel.slice(1)}</div>
             </div>
             <div class="info-item">
-              <div class="info-label">Referral ID:</div>
-              <div class="info-value">#${referral.id}</div>
+              <div class="info-label">Support Request ID:</div>
+              <div class="info-value">#${supportRequest.id}</div>
             </div>
           </div>
         </div>
@@ -327,7 +327,7 @@ export function ReferralList() {
 
         <div class="section">
           <div class="section-title">Concern Description</div>
-          <div class="concern-description">${referral.concernDescription}</div>
+          <div class="concern-description">${supportRequest.concernDescription}</div>
         </div>
 
         ${actionsTaken.length > 0 ? `
@@ -339,11 +339,11 @@ export function ReferralList() {
         </div>
         ` : ''}
 
-        ${referral.aiRecommendations ? `
+        ${supportRequest.aiRecommendations ? `
         <div class="section">
           <div class="section-title">AI-Generated Recommendations</div>
           <div class="recommendations">
-            <pre style="white-space: pre-wrap; font-family: Arial, sans-serif;">${referral.aiRecommendations}</pre>
+            <pre style="white-space: pre-wrap; font-family: Arial, sans-serif;">${supportRequest.aiRecommendations}</pre>
           </div>
           <div class="disclaimer">
             <strong>⚠️ DISCLAIMER:</strong> These AI-generated recommendations are for informational purposes only and should not replace professional educational assessment.
@@ -499,10 +499,10 @@ export function ReferralList() {
               <FileText className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
             </div>
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2">
-              Student Referrals
+              Student Support Requests
             </h1>
             <p className="text-gray-600 text-sm sm:text-base">
-              View and manage submitted student support referrals
+              View and manage submitted student support requests
             </p>
           </div>
         </div>
@@ -514,7 +514,7 @@ export function ReferralList() {
             <AlertDescription className="text-amber-800 text-sm">
               <strong>Offline Mode</strong>
               <br />
-              You're viewing cached referrals. Some features like PDF generation and email sharing are unavailable offline.
+              You're viewing cached support requests. Some features like PDF generation and email sharing are unavailable offline.
             </AlertDescription>
           </Alert>
         )}
@@ -526,7 +526,7 @@ export function ReferralList() {
               <div className="w-8 h-8 sm:w-10 sm:h-10 bg-white/20 rounded-xl sm:rounded-2xl flex items-center justify-center">
                 <Search className="h-5 w-5 sm:h-6 sm:w-6" />
               </div>
-              Filter Referrals
+              Filter Support Requests
               {!isOnline && (
                 <div className="ml-auto flex items-center text-amber-200 text-sm">
                   <WifiOff className="h-4 w-4 mr-1" />
@@ -558,10 +558,10 @@ export function ReferralList() {
               <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl sm:rounded-3xl flex items-center justify-center animate-pulse">
                 <Loader2 className="h-6 w-6 sm:h-8 sm:w-8 animate-spin text-white" />
               </div>
-              <p className="text-gray-600 font-medium text-sm sm:text-base">Loading referrals...</p>
+              <p className="text-gray-600 font-medium text-sm sm:text-base">Loading support requests...</p>
             </div>
           </div>
-        ) : referrals.length === 0 ? (
+        ) : supportRequests.length === 0 ? (
           <Card className="border-0 bg-white/80 backdrop-blur-sm shadow-xl rounded-2xl sm:rounded-3xl">
             <CardContent className="text-center py-12 sm:py-16">
               <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-gray-400 to-gray-500 rounded-2xl sm:rounded-3xl flex items-center justify-center mx-auto mb-4">
@@ -569,22 +569,22 @@ export function ReferralList() {
               </div>
               <p className="text-gray-500 text-base sm:text-lg">
                 {teacherFilter 
-                  ? `No referrals found for teacher "${teacherFilter}"`
-                  : "No referrals have been submitted yet."
+                  ? `No support requests found for teacher "${teacherFilter}"`
+                  : "No support requests have been submitted yet."
                 }
               </p>
             </CardContent>
           </Card>
         ) : (
-          /* Referrals List */
+          /* Support Requests List */
           <div className="space-y-4 sm:space-y-6">
-            {referrals.map((referral) => {
-              const isExpanded = expandedReferrals.has(referral.id);
+            {supportRequests.map((supportRequest) => {
+              const isExpanded = expandedSupportRequests.has(supportRequest.id);
               return (
-                <Card key={referral.id} className="border-0 bg-white/90 backdrop-blur-sm shadow-xl rounded-2xl sm:rounded-3xl overflow-hidden hover:shadow-2xl transition-all duration-300">
+                <Card key={supportRequest.id} className="border-0 bg-white/90 backdrop-blur-sm shadow-xl rounded-2xl sm:rounded-3xl overflow-hidden hover:shadow-2xl transition-all duration-300">
                   <CardHeader 
                     className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white rounded-t-2xl sm:rounded-t-3xl cursor-pointer touch-manipulation active:scale-[0.99] transition-transform"
-                    onClick={() => toggleReferralExpansion(referral.id)}
+                    onClick={() => toggleSupportRequestExpansion(supportRequest.id)}
                   >
                     <div className="flex flex-col gap-4">
                       <div className="flex items-start justify-between">
@@ -594,26 +594,26 @@ export function ReferralList() {
                               <User className="h-5 w-5 sm:h-6 sm:w-6" />
                             </div>
                             <div className="flex-1">
-                              <div>{referral.studentFirstName} {referral.studentLastInitial}.</div>
+                              <div>{supportRequest.studentFirstName} {supportRequest.studentLastInitial}.</div>
                               <div className="text-sm text-blue-100 font-normal">
-                                Grade {referral.grade} • ID: {referral.id}
+                                Grade {supportRequest.grade} • ID: {supportRequest.id}
                               </div>
                             </div>
                           </CardTitle>
                           <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm text-blue-100">
                             <div className="flex items-center gap-1 bg-white/10 px-2 py-1 rounded-lg">
                               <User className="h-3 w-3" />
-                              <span>{referral.teacher}</span>
+                              <span>{supportRequest.teacher}</span>
                             </div>
                             <div className="flex items-center gap-1 bg-white/10 px-2 py-1 rounded-lg">
                               <Calendar className="h-3 w-3" />
-                              <span>{formatDate(referral.createdAt)}</span>
+                              <span>{formatDate(supportRequest.createdAt)}</span>
                             </div>
                           </div>
                         </div>
                         <div className="flex flex-col items-end gap-2">
-                          <Badge className={`${getSeverityBadgeColor(referral.severityLevel)} rounded-xl px-2 py-1 font-medium text-xs`}>
-                            {referral.severityLevel.charAt(0).toUpperCase() + referral.severityLevel.slice(1)}
+                          <Badge className={`${getSeverityBadgeColor(supportRequest.severityLevel)} rounded-xl px-2 py-1 font-medium text-xs`}>
+                            {supportRequest.severityLevel.charAt(0).toUpperCase() + supportRequest.severityLevel.slice(1)}
                           </Badge>
                           <div className="flex items-center">
                             {isExpanded ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
@@ -635,7 +635,7 @@ export function ReferralList() {
                             variant="outline"
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleGeneratePDF(referral);
+                              handleGeneratePDF(supportRequest);
                             }}
                             disabled={isGeneratingPDF || !isOnline}
                             className="text-xs bg-white/10 border-white/30 text-white hover:bg-white/20 rounded-xl touch-manipulation active:scale-95"
@@ -653,7 +653,7 @@ export function ReferralList() {
                             variant="outline"
                             onClick={(e) => {
                               e.stopPropagation();
-                              handlePrintView(referral);
+                              handlePrintView(supportRequest);
                             }}
                             className="text-xs bg-white/10 border-white/30 text-white hover:bg-white/20 rounded-xl touch-manipulation active:scale-95"
                           >
@@ -676,7 +676,7 @@ export function ReferralList() {
                                     });
                                     return;
                                   }
-                                  setSelectedReferral(referral);
+                                  setSelectedSupportRequest(supportRequest);
                                 }}
                                 disabled={!isOnline}
                                 className="text-xs bg-white/10 border-white/30 text-white hover:bg-white/20 rounded-xl touch-manipulation active:scale-95"
@@ -687,9 +687,9 @@ export function ReferralList() {
                             </DialogTrigger>
                             <DialogContent className="sm:max-w-md rounded-3xl mx-4">
                               <DialogHeader>
-                                <DialogTitle>Share Referral via Email</DialogTitle>
+                                <DialogTitle>Share Support Request via Email</DialogTitle>
                                 <DialogDescription>
-                                  Send this referral to colleagues for the student support meeting.
+                                  Send this support request to colleagues for the student support meeting.
                                 </DialogDescription>
                               </DialogHeader>
                               <div className="space-y-4">
@@ -762,7 +762,7 @@ export function ReferralList() {
                             Incident Date
                           </h4>
                           <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-3 rounded-xl">
-                            <p className="text-sm text-gray-700">{formatIncidentDate(referral.incidentDate)}</p>
+                            <p className="text-sm text-gray-700">{formatIncidentDate(supportRequest.incidentDate)}</p>
                           </div>
                         </div>
                         <div className="space-y-2">
@@ -771,7 +771,7 @@ export function ReferralList() {
                             Location
                           </h4>
                           <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-3 rounded-xl">
-                            <p className="text-sm text-gray-700">{referral.location}</p>
+                            <p className="text-sm text-gray-700">{supportRequest.location}</p>
                           </div>
                         </div>
                       </div>
@@ -780,14 +780,14 @@ export function ReferralList() {
                       <div className="space-y-3">
                         <h4 className="font-medium text-gray-900 text-sm sm:text-base">Concern Types</h4>
                         <div className="flex flex-wrap gap-2">
-                          {referral.concernTypes.map((type, index) => (
+                          {supportRequest.concernTypes.map((type, index) => (
                             <Badge key={index} variant="outline" className="bg-gradient-to-r from-purple-50 to-pink-50 text-purple-700 border-purple-200 rounded-xl px-2 py-1 text-xs">
                               {type}
                             </Badge>
                           ))}
-                          {referral.otherConcernType && (
+                          {supportRequest.otherConcernType && (
                             <Badge variant="outline" className="bg-gradient-to-r from-purple-50 to-pink-50 text-purple-700 border-purple-200 rounded-xl px-2 py-1 text-xs">
-                              {referral.otherConcernType}
+                              {supportRequest.otherConcernType}
                             </Badge>
                           )}
                         </div>
@@ -798,25 +798,25 @@ export function ReferralList() {
                         <h4 className="font-medium text-gray-900 text-sm sm:text-base">Concern Description</h4>
                         <div className="bg-gradient-to-r from-amber-50 to-orange-50 p-4 rounded-2xl border border-amber-200">
                           <p className="text-gray-700 text-sm leading-relaxed">
-                            {referral.concernDescription}
+                            {supportRequest.concernDescription}
                           </p>
                         </div>
                       </div>
 
                       {/* Actions Taken */}
-                      {referral.actionsTaken.length > 0 && (
+                      {supportRequest.actionsTaken.length > 0 && (
                         <div className="space-y-3">
                           <h4 className="font-medium text-gray-900 text-sm sm:text-base">Actions Already Taken</h4>
                           <div className="bg-gradient-to-r from-indigo-50 to-blue-50 p-4 rounded-2xl border border-indigo-200">
                             <div className="flex flex-wrap gap-2">
-                              {referral.actionsTaken.map((action, index) => (
+                              {supportRequest.actionsTaken.map((action, index) => (
                                 <Badge key={index} variant="outline" className="bg-gradient-to-r from-indigo-100 to-blue-100 text-indigo-700 border-indigo-300 rounded-xl px-2 py-1 text-xs">
                                   {action}
                                 </Badge>
                               ))}
-                              {referral.otherActionTaken && (
+                              {supportRequest.otherActionTaken && (
                                 <Badge variant="outline" className="bg-gradient-to-r from-indigo-100 to-blue-100 text-indigo-700 border-indigo-300 rounded-xl px-2 py-1 text-xs">
-                                  {referral.otherActionTaken}
+                                  {supportRequest.otherActionTaken}
                                 </Badge>
                               )}
                             </div>
@@ -825,12 +825,12 @@ export function ReferralList() {
                       )}
 
                       {/* AI Recommendations */}
-                      {referral.aiRecommendations && (
+                      {supportRequest.aiRecommendations && (
                         <div className="space-y-4">
                           <h4 className="font-medium text-gray-900 text-sm sm:text-base">AI-Generated Recommendations</h4>
                           <div className="bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 p-4 sm:p-6 rounded-2xl border border-emerald-200">
                             <div className="prose max-w-none text-sm">
-                              {formatRecommendations(referral.aiRecommendations)}
+                              {formatRecommendations(supportRequest.aiRecommendations)}
                             </div>
                           </div>
                           

@@ -15,9 +15,9 @@ export interface UserProfile {
   additionalSubjects?: string[];
   teacherType?: string;
   schoolYear?: string;
-  referralsUsedThisMonth: number;
-  referralsLimit: number;
-  additionalReferralPackages: number;
+  supportRequestsUsedThisMonth: number;
+  supportRequestsLimit: number;
+  additionalSupportRequestPackages: number;
   subscriptionStartDate?: Date;
   subscriptionEndDate?: Date;
   hasDeepSeekApiKey: boolean;
@@ -113,9 +113,9 @@ export const getProfile = api<void, UserProfile>(
       additionalSubjects: user.additional_subjects || undefined,
       teacherType: user.teacher_type || undefined,
       schoolYear: user.school_year || undefined,
-      referralsUsedThisMonth: user.referrals_used_this_month,
-      referralsLimit: user.referrals_limit,
-      additionalReferralPackages: user.additional_referral_packages,
+      supportRequestsUsedThisMonth: user.referrals_used_this_month,
+      supportRequestsLimit: user.referrals_limit,
+      additionalSupportRequestPackages: user.additional_referral_packages,
       subscriptionStartDate: user.subscription_start_date || undefined,
       subscriptionEndDate: user.subscription_end_date || undefined,
       hasDeepSeekApiKey: !!user.deepseek_api_key,

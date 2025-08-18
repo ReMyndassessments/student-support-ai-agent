@@ -7,31 +7,31 @@ import { Loader2, AlertTriangle, Users, Calendar, MapPin, FileText, Download, Pr
 import { useToast } from '@/components/ui/use-toast';
 import { useParams, Link } from 'react-router-dom';
 import backend from '~backend/client';
-import type { Referral } from '~backend/referrals/get';
+import type { SupportRequest } from '~backend/referrals/get';
 
 export function MeetingPreparation() {
   const { referralId } = useParams<{ referralId: string }>();
-  const [referral, setReferral] = useState<Referral | null>(null);
+  const [supportRequest, setSupportRequest] = useState<SupportRequest | null>(null);
   const [loading, setLoading] = useState(true);
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
     if (referralId) {
-      loadReferral();
+      loadSupportRequest();
     }
   }, [referralId]);
 
-  const loadReferral = async () => {
+  const loadSupportRequest = async () => {
     try {
       setLoading(true);
       const response = await backend.referrals.get({ id: parseInt(referralId!) });
-      setReferral(response);
+      setSupportRequest(response);
     } catch (error) {
-      console.error('Error loading referral:', error);
+      console.error('Error loading support request:', error);
       toast({
         title: "Error",
-        description: "Failed to load referral. Please try again.",
+        description: "Failed to load support request. Please try again.",
         variant: "destructive"
       });
     } finally {
@@ -40,12 +40,12 @@ export function MeetingPreparation() {
   };
 
   const handleGeneratePDF = async () => {
-    if (!referral) return;
+    if (!supportRequest) return;
     
     setIsGeneratingPDF(true);
     try {
       const response = await backend.referrals.generatePDF({
-        referralId: referral.id
+        supportRequestId: supportRequest.id
       });
 
       const pdfBlob = new Blob([
@@ -119,14 +119,14 @@ export function MeetingPreparation() {
     );
   }
 
-  if (!referral) {
+  if (!supportRequest) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex items-center justify-center">
         <Card className="max-w-md border-0 bg-white/80 backdrop-blur-sm shadow-xl rounded-3xl">
           <CardContent className="text-center py-8">
-            <p className="text-gray-500">Referral not found.</p>
+            <p className="text-gray-500">Support request not found.</p>
             <Link to="/referrals" className="text-blue-600 hover:text-blue-700 mt-4 inline-block">
-              Return to Referrals
+              Return to Support Requests
             </Link>
           </CardContent>
         </Card>
@@ -151,7 +151,7 @@ export function MeetingPreparation() {
               Student Support Meeting Preparation
             </h1>
             <p className="text-gray-600 text-lg">
-              Comprehensive documentation for {referral.studentFirstName} {referral.studentLastInitial}.
+              Comprehensive documentation for {supportRequest.studentFirstName} {supportRequest.studentLastInitial}.
             </p>
           </div>
         </div>
@@ -215,29 +215,29 @@ export function MeetingPreparation() {
                 <div className="flex items-center gap-4">
                   <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-3xl flex items-center justify-center shadow-lg">
                     <span className="text-white font-bold text-xl">
-                      {referral.studentFirstName[0]}{referral.studentLastInitial}
+                      {supportRequest.studentFirstName[0]}{supportRequest.studentLastInitial}
                     </span>
                   </div>
                   <div>
                     <h3 className="text-xl font-bold text-gray-900">
-                      {referral.studentFirstName} {referral.studentLastInitial}.
+                      {supportRequest.studentFirstName} {supportRequest.studentLastInitial}.
                     </h3>
-                    <p className="text-gray-600 text-lg">Grade {referral.grade}</p>
+                    <p className="text-gray-600 text-lg">Grade {supportRequest.grade}</p>
                   </div>
                 </div>
                 
                 <div className="space-y-3">
                   <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-4 rounded-2xl">
                     <span className="font-medium text-gray-700">Teacher:</span>
-                    <span className="text-gray-600 ml-2">{referral.teacher}</span>
+                    <span className="text-gray-600 ml-2">{supportRequest.teacher}</span>
                   </div>
                   <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-4 rounded-2xl">
                     <span className="font-medium text-gray-700">Position:</span>
-                    <span className="text-gray-600 ml-2">{referral.teacherPosition}</span>
+                    <span className="text-gray-600 ml-2">{supportRequest.teacherPosition}</span>
                   </div>
                   <div className="bg-gradient-to-r from-pink-50 to-rose-50 p-4 rounded-2xl">
-                    <span className="font-medium text-gray-700">Referral ID:</span>
-                    <span className="text-gray-600 ml-2">#{referral.id}</span>
+                    <span className="font-medium text-gray-700">Support Request ID:</span>
+                    <span className="text-gray-600 ml-2">#{supportRequest.id}</span>
                   </div>
                 </div>
               </div>
@@ -247,7 +247,7 @@ export function MeetingPreparation() {
                   <Calendar className="h-5 w-5 text-blue-500" />
                   <div>
                     <span className="font-medium text-gray-700">Incident Date:</span>
-                    <p className="text-gray-600">{formatIncidentDate(referral.incidentDate)}</p>
+                    <p className="text-gray-600">{formatIncidentDate(supportRequest.incidentDate)}</p>
                   </div>
                 </div>
                 
@@ -255,7 +255,7 @@ export function MeetingPreparation() {
                   <MapPin className="h-5 w-5 text-green-500" />
                   <div>
                     <span className="font-medium text-gray-700">Location:</span>
-                    <p className="text-gray-600">{referral.location}</p>
+                    <p className="text-gray-600">{supportRequest.location}</p>
                   </div>
                 </div>
                 
@@ -263,8 +263,8 @@ export function MeetingPreparation() {
                   <Target className="h-5 w-5 text-orange-500" />
                   <div>
                     <span className="font-medium text-gray-700">Severity:</span>
-                    <Badge className={`${getSeverityColor(referral.severityLevel)} ml-2 rounded-xl px-3 py-1`}>
-                      {referral.severityLevel.charAt(0).toUpperCase() + referral.severityLevel.slice(1)}
+                    <Badge className={`${getSeverityColor(supportRequest.severityLevel)} ml-2 rounded-xl px-3 py-1`}>
+                      {supportRequest.severityLevel.charAt(0).toUpperCase() + supportRequest.severityLevel.slice(1)}
                     </Badge>
                   </div>
                 </div>
@@ -273,7 +273,7 @@ export function MeetingPreparation() {
                   <Clock className="h-5 w-5 text-purple-500" />
                   <div>
                     <span className="font-medium text-gray-700">Submitted:</span>
-                    <p className="text-gray-600">{formatDate(referral.createdAt)}</p>
+                    <p className="text-gray-600">{formatDate(supportRequest.createdAt)}</p>
                   </div>
                 </div>
               </div>
@@ -290,14 +290,14 @@ export function MeetingPreparation() {
             <div>
               <h4 className="font-medium text-gray-900 mb-3">Concern Types</h4>
               <div className="flex flex-wrap gap-3">
-                {referral.concernTypes.map((type, index) => (
+                {supportRequest.concernTypes.map((type, index) => (
                   <Badge key={index} variant="outline" className="bg-gradient-to-r from-orange-50 to-red-50 text-orange-700 border-orange-200 rounded-xl px-3 py-2">
                     {type}
                   </Badge>
                 ))}
-                {referral.otherConcernType && (
+                {supportRequest.otherConcernType && (
                   <Badge variant="outline" className="bg-gradient-to-r from-orange-50 to-red-50 text-orange-700 border-orange-200 rounded-xl px-3 py-2">
-                    {referral.otherConcernType}
+                    {supportRequest.otherConcernType}
                   </Badge>
                 )}
               </div>
@@ -307,7 +307,7 @@ export function MeetingPreparation() {
               <h4 className="font-medium text-gray-900 mb-3">Detailed Description</h4>
               <div className="bg-gradient-to-r from-amber-50 to-orange-50 p-6 rounded-2xl border border-amber-200">
                 <p className="text-gray-700 leading-relaxed">
-                  {referral.concernDescription}
+                  {supportRequest.concernDescription}
                 </p>
               </div>
             </div>
@@ -315,7 +315,7 @@ export function MeetingPreparation() {
         </Card>
 
         {/* Actions Taken */}
-        {referral.actionsTaken.length > 0 && (
+        {supportRequest.actionsTaken.length > 0 && (
           <Card className="border-0 bg-white/90 backdrop-blur-sm shadow-xl rounded-3xl overflow-hidden">
             <CardHeader className="bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500 text-white rounded-t-3xl">
               <CardTitle className="flex items-center gap-3 text-xl">
@@ -327,14 +327,14 @@ export function MeetingPreparation() {
             </CardHeader>
             <CardContent className="p-6">
               <div className="flex flex-wrap gap-3">
-                {referral.actionsTaken.map((action, index) => (
+                {supportRequest.actionsTaken.map((action, index) => (
                   <Badge key={index} variant="outline" className="bg-gradient-to-r from-green-50 to-emerald-50 text-green-700 border-green-200 rounded-xl px-4 py-2">
                     {action}
                   </Badge>
                 ))}
-                {referral.otherActionTaken && (
+                {supportRequest.otherActionTaken && (
                   <Badge variant="outline" className="bg-gradient-to-r from-green-50 to-emerald-50 text-green-700 border-green-200 rounded-xl px-4 py-2">
-                    {referral.otherActionTaken}
+                    {supportRequest.otherActionTaken}
                   </Badge>
                 )}
               </div>
@@ -343,7 +343,7 @@ export function MeetingPreparation() {
         )}
 
         {/* AI Recommendations */}
-        {referral.aiRecommendations && (
+        {supportRequest.aiRecommendations && (
           <Card className="border-0 bg-white/90 backdrop-blur-sm shadow-xl rounded-3xl overflow-hidden">
             <CardHeader className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white rounded-t-3xl">
               <CardTitle className="text-xl">Recommended Tier 2 Interventions</CardTitle>
@@ -352,7 +352,7 @@ export function MeetingPreparation() {
               <div className="bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 p-6 rounded-2xl border border-indigo-200">
                 <div className="prose max-w-none">
                   <pre className="whitespace-pre-wrap font-sans text-sm text-gray-700 leading-relaxed">
-                    {referral.aiRecommendations}
+                    {supportRequest.aiRecommendations}
                   </pre>
                 </div>
               </div>
@@ -396,13 +396,13 @@ export function MeetingPreparation() {
           </CardContent>
         </Card>
 
-        {/* Back to Referrals */}
+        {/* Back to Support Requests */}
         <div className="text-center">
           <Link 
             to="/referrals"
             className="inline-flex items-center text-blue-600 hover:text-blue-700 font-medium bg-white/60 hover:bg-white/80 px-6 py-3 rounded-2xl transition-colors"
           >
-            ← Back to All Referrals
+            ← Back to All Support Requests
           </Link>
         </div>
       </div>

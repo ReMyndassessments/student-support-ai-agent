@@ -3,7 +3,7 @@ import { referralDB } from "./db";
 import { APIError } from "encore.dev/api";
 
 export interface GeneratePDFRequest {
-  referralId: number;
+  supportRequestId: number;
 }
 
 export interface GeneratePDFResponse {
@@ -11,11 +11,11 @@ export interface GeneratePDFResponse {
   filename: string;
 }
 
-// Generates a PDF report for a referral suitable for student support meetings.
+// Generates a PDF report for a support request suitable for student support meetings.
 export const generatePDF = api<GeneratePDFRequest, GeneratePDFResponse>(
-  { expose: true, method: "POST", path: "/referrals/:referralId/pdf" },
+  { expose: true, method: "POST", path: "/referrals/:supportRequestId/pdf" },
   async (req) => {
-    const referral = await referralDB.queryRow<{
+    const supportRequest = await referralDB.queryRow<{
       id: number;
       student_first_name: string;
       student_last_initial: string;
@@ -33,15 +33,15 @@ export const generatePDF = api<GeneratePDFRequest, GeneratePDFResponse>(
       ai_recommendations: string | null;
       created_at: Date;
     }>`
-      SELECT * FROM referrals WHERE id = ${req.referralId}
+      SELECT * FROM referrals WHERE id = ${req.supportRequestId}
     `;
 
-    if (!referral) {
-      throw APIError.notFound("Referral not found");
+    if (!supportRequest) {
+      throw APIError.notFound("Support request not found");
     }
 
-    const concernTypes = JSON.parse(referral.concern_types);
-    const actionsTaken = JSON.parse(referral.actions_taken);
+    const concernTypes = JSON.parse(supportRequest.concern_types);
+    const actionsTaken = JSON.parse(supportRequest.actions_taken);
 
     // Create HTML content for PDF generation
     const htmlContent = `
@@ -49,7 +49,7 @@ export const generatePDF = api<GeneratePDFRequest, GeneratePDFResponse>(
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Student Support Referral - ${referral.student_first_name} ${referral.student_last_initial}.</title>
+    <title>Student Support Request - ${supportRequest.student_first_name} ${supportRequest.student_last_initial}.</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -172,7 +172,7 @@ export const generatePDF = api<GeneratePDFRequest, GeneratePDFResponse>(
 </head>
 <body>
     <div class="header">
-        <h1>Student Support Referral</h1>
+        <h1>Student Support Request</h1>
         <p><strong>Concern2Care</strong> - AI-Powered Student Support System</p>
         <p>Generated on ${new Date().toLocaleDateString('en-US', { 
           year: 'numeric', 
@@ -188,19 +188,19 @@ export const generatePDF = api<GeneratePDFRequest, GeneratePDFResponse>(
         <div class="info-grid">
             <div class="info-item">
                 <div class="info-label">Student Name:</div>
-                <div class="info-value">${referral.student_first_name} ${referral.student_last_initial}.</div>
+                <div class="info-value">${supportRequest.student_first_name} ${supportRequest.student_last_initial}.</div>
             </div>
             <div class="info-item">
                 <div class="info-label">Grade:</div>
-                <div class="info-value">${referral.grade}</div>
+                <div class="info-value">${supportRequest.grade}</div>
             </div>
             <div class="info-item">
                 <div class="info-label">Teacher:</div>
-                <div class="info-value">${referral.teacher}</div>
+                <div class="info-value">${supportRequest.teacher}</div>
             </div>
             <div class="info-item">
                 <div class="info-label">Position:</div>
-                <div class="info-value">${referral.teacher_position}</div>
+                <div class="info-value">${supportRequest.teacher_position}</div>
             </div>
         </div>
     </div>
@@ -210,7 +210,7 @@ export const generatePDF = api<GeneratePDFRequest, GeneratePDFResponse>(
         <div class="info-grid">
             <div class="info-item">
                 <div class="info-label">Date of Incident:</div>
-                <div class="info-value">${new Date(referral.incident_date).toLocaleDateString('en-US', {
+                <div class="info-value">${new Date(supportRequest.incident_date).toLocaleDateString('en-US', {
                   year: 'numeric',
                   month: 'long', 
                   day: 'numeric'
@@ -218,19 +218,19 @@ export const generatePDF = api<GeneratePDFRequest, GeneratePDFResponse>(
             </div>
             <div class="info-item">
                 <div class="info-label">Location:</div>
-                <div class="info-value">${referral.location}</div>
+                <div class="info-value">${supportRequest.location}</div>
             </div>
             <div class="info-item">
                 <div class="info-label">Severity Level:</div>
                 <div class="info-value">
-                    <span class="badge severity-${referral.severity_level.toLowerCase()}">
-                        ${referral.severity_level.charAt(0).toUpperCase() + referral.severity_level.slice(1)}
+                    <span class="badge severity-${supportRequest.severity_level.toLowerCase()}">
+                        ${supportRequest.severity_level.charAt(0).toUpperCase() + supportRequest.severity_level.slice(1)}
                     </span>
                 </div>
             </div>
             <div class="info-item">
-                <div class="info-label">Referral ID:</div>
-                <div class="info-value">#${referral.id}</div>
+                <div class="info-label">Support Request ID:</div>
+                <div class="info-value">#${supportRequest.id}</div>
             </div>
         </div>
     </div>
@@ -239,32 +239,32 @@ export const generatePDF = api<GeneratePDFRequest, GeneratePDFResponse>(
         <div class="section-title">Concern Types</div>
         <div style="margin: 15px 0;">
             ${concernTypes.map((type: string) => `<span class="badge">${type}</span>`).join('')}
-            ${referral.other_concern_type ? `<span class="badge">${referral.other_concern_type}</span>` : ''}
+            ${supportRequest.other_concern_type ? `<span class="badge">${supportRequest.other_concern_type}</span>` : ''}
         </div>
     </div>
 
     <div class="section">
         <div class="section-title">Concern Description</div>
         <div class="concern-description">
-            ${referral.concern_description}
+            ${supportRequest.concern_description}
         </div>
     </div>
 
-    ${actionsTaken.length > 0 || referral.other_action_taken ? `
+    ${actionsTaken.length > 0 || supportRequest.other_action_taken ? `
     <div class="section">
         <div class="section-title">Actions Already Taken</div>
         <div style="margin: 15px 0;">
             ${actionsTaken.map((action: string) => `<span class="badge">${action}</span>`).join('')}
-            ${referral.other_action_taken ? `<span class="badge">${referral.other_action_taken}</span>` : ''}
+            ${supportRequest.other_action_taken ? `<span class="badge">${supportRequest.other_action_taken}</span>` : ''}
         </div>
     </div>
     ` : ''}
 
-    ${referral.ai_recommendations ? `
+    ${supportRequest.ai_recommendations ? `
     <div class="section">
         <div class="section-title">AI-Generated Tier 2 Intervention Recommendations</div>
         <div class="recommendations">
-            ${formatRecommendationsForPDF(referral.ai_recommendations)}
+            ${formatRecommendationsForPDF(supportRequest.ai_recommendations)}
         </div>
         <div class="disclaimer">
             <strong>⚠️ IMPORTANT DISCLAIMER:</strong> These AI-generated recommendations are for informational purposes only and should not replace professional educational assessment. Please refer this student to your school's student support department for proper evaluation and vetting. All AI-generated suggestions must be reviewed and approved by qualified educational professionals before implementation.
@@ -273,7 +273,7 @@ export const generatePDF = api<GeneratePDFRequest, GeneratePDFResponse>(
     ` : ''}
 
     <div class="footer">
-        <p>Generated by Concern2Care from Remynd | Submitted: ${referral.created_at.toLocaleDateString('en-US', {
+        <p>Generated by Concern2Care from Remynd | Submitted: ${supportRequest.created_at.toLocaleDateString('en-US', {
           year: 'numeric',
           month: 'long',
           day: 'numeric',
@@ -288,7 +288,7 @@ export const generatePDF = api<GeneratePDFRequest, GeneratePDFResponse>(
     // In a real implementation, you would use a library like Puppeteer or similar
     const pdfContent = Buffer.from(htmlContent).toString('base64');
     
-    const filename = `student-referral-${referral.student_first_name}-${referral.student_last_initial}-${referral.id}.pdf`;
+    const filename = `student-support-request-${supportRequest.student_first_name}-${supportRequest.student_last_initial}-${supportRequest.id}.pdf`;
 
     return {
       pdfContent,

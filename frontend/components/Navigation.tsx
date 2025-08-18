@@ -63,12 +63,12 @@ export function Navigation({ userEmail, userName, isAdmin = false, onLogout, onA
     {
       to: '/new-referral',
       icon: FileText,
-      label: 'New Referral'
+      label: 'New Support Request'
     },
     {
       to: '/referrals',
       icon: Users,
-      label: 'All Referrals'
+      label: 'All Support Requests'
     }
   ];
 
@@ -81,12 +81,12 @@ export function Navigation({ userEmail, userName, isAdmin = false, onLogout, onA
     {
       to: '/new-referral',
       icon: FileText,
-      label: 'New Referral'
+      label: 'New Support Request'
     },
     {
       to: '/referrals',
       icon: Users,
-      label: 'My Referrals'
+      label: 'My Support Requests'
     },
     {
       to: '/profile',
@@ -118,12 +118,12 @@ export function Navigation({ userEmail, userName, isAdmin = false, onLogout, onA
     {
       to: '/new-referral',
       icon: FileText,
-      label: 'Demo Referral'
+      label: 'Demo Support Request'
     },
     {
       to: '/referrals',
       icon: Users,
-      label: 'Demo Referrals'
+      label: 'Demo Support Requests'
     },
     {
       to: '/subscription/plans',
