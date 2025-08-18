@@ -1,3 +1,9 @@
-// The Clerk publishable key, to initialize Clerk.
-// Leave empty to disable authentication and run in demo mode
-export const clerkPublishableKey = "pk_test_c2hpbmluZy13aGlwcGV0LTgwLmNsZXJrLmFjY291bnRzLmRldiQ";
+// Configuration file for Concern2Care
+// All configuration values for the application
+
+// Demo mode configuration
+export const isDemoMode = true;
+
+// Application settings
+export const appName = "Concern2Care";
+export const appDescription = "AI-Powered Student Support System";

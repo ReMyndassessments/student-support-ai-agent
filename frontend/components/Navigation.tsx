@@ -2,8 +2,6 @@ import { Link, useLocation } from 'react-router-dom';
 import { Home, Menu, X, GraduationCap, FileText, Users, LogOut, CreditCard, User, Wifi, WifiOff, Shield, Settings, Database } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { SignInButton, UserButton, useAuth } from '@clerk/clerk-react';
-import { clerkPublishableKey } from '../config';
 
 interface NavigationProps {
   userEmail?: string;
@@ -17,10 +15,6 @@ export function Navigation({ userEmail, userName, isAdmin = false, onLogout, onA
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
-  
-  // Only use Clerk hooks if Clerk is available
-  const authHooks = clerkPublishableKey ? useAuth() : { isSignedIn: false };
-  const { isSignedIn } = authHooks;
 
   // Monitor online/offline status
   useEffect(() => {
@@ -92,43 +86,6 @@ export function Navigation({ userEmail, userName, isAdmin = false, onLogout, onA
     }
   ];
 
-  const authenticatedNavItems = [
-    {
-      to: '/',
-      icon: Home,
-      label: 'Home'
-    },
-    {
-      to: '/new-referral',
-      icon: FileText,
-      label: 'New Support Request'
-    },
-    {
-      to: '/referrals',
-      icon: Users,
-      label: 'My Support Requests'
-    },
-    {
-      to: '/profile',
-      icon: User,
-      label: 'Profile'
-    }
-  ];
-
-  const publicNavItems = [
-    {
-      to: '/',
-      icon: Home,
-      label: 'Home'
-    },
-    {
-      to: '/subscription/plans',
-      icon: CreditCard,
-      label: 'Subscribe'
-    }
-  ];
-
-  // In demo mode (no Clerk), show demo navigation
   const demoNavItems = [
     {
       to: '/',
@@ -152,7 +109,7 @@ export function Navigation({ userEmail, userName, isAdmin = false, onLogout, onA
     }
   ];
 
-  const navItems = isAdmin ? adminNavItems : (clerkPublishableKey ? (isSignedIn ? authenticatedNavItems : publicNavItems) : demoNavItems);
+  const navItems = isAdmin ? adminNavItems : demoNavItems;
 
   return (
     <>
@@ -173,7 +130,7 @@ export function Navigation({ userEmail, userName, isAdmin = false, onLogout, onA
                     ADMIN
                   </div>
                 )}
-                {!clerkPublishableKey && !isAdmin && (
+                {!isAdmin && (
                   <div className="px-1.5 py-0.5 sm:px-2 sm:py-1 bg-gradient-to-r from-blue-100 to-cyan-100 text-blue-800 text-xs font-medium rounded-md sm:rounded-lg">
                     DEMO
                   </div>
@@ -220,7 +177,7 @@ export function Navigation({ userEmail, userName, isAdmin = false, onLogout, onA
               
               {/* Authentication */}
               <div className="ml-4 flex items-center space-x-2">
-                {isAdmin && onLogout ? (
+                {isAdmin && onLogout && (
                   <Button
                     onClick={onLogout}
                     variant="outline"
@@ -230,27 +187,7 @@ export function Navigation({ userEmail, userName, isAdmin = false, onLogout, onA
                     <LogOut className="h-4 w-4 mr-2" />
                     <span className="hidden lg:inline">Logout</span>
                   </Button>
-                ) : clerkPublishableKey ? (
-                  isSignedIn ? (
-                    <UserButton 
-                      appearance={{
-                        elements: {
-                          avatarBox: "w-8 h-8"
-                        }
-                      }}
-                    />
-                  ) : (
-                    <SignInButton mode="modal">
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        className="border-blue-300 text-blue-700 hover:bg-blue-50 rounded-xl touch-manipulation"
-                      >
-                        Sign In
-                      </Button>
-                    </SignInButton>
-                  )
-                ) : null}
+                )}
               </div>
             </div>
 
@@ -359,7 +296,7 @@ export function Navigation({ userEmail, userName, isAdmin = false, onLogout, onA
               
               {/* Mobile Authentication */}
               <div className="p-4 border-t border-gray-200">
-                {isAdmin && onLogout ? (
+                {isAdmin && onLogout && (
                   <Button
                     onClick={() => {
                       setIsMobileMenuOpen(false);
@@ -371,17 +308,7 @@ export function Navigation({ userEmail, userName, isAdmin = false, onLogout, onA
                     <LogOut className="h-4 w-4 mr-2" />
                     Logout
                   </Button>
-                ) : clerkPublishableKey && !isSignedIn ? (
-                  <SignInButton mode="modal">
-                    <Button 
-                      variant="outline" 
-                      className="w-full justify-start border-blue-300 text-blue-700 hover:bg-blue-50 rounded-xl touch-manipulation active:scale-95 transition-transform"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      Sign In
-                    </Button>
-                  </SignInButton>
-                ) : null}
+                )}
               </div>
             </div>
           </div>
