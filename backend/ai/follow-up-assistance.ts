@@ -24,6 +24,17 @@ export const followUpAssistance = api<FollowUpAssistanceRequest, FollowUpAssista
   async (req) => {
     const auth = getAuthData()!;
     
+    // For demo admin, return mock assistance
+    if (auth.isAdmin) {
+      const mockAssistance = generateMockFollowUpAssistance(req);
+      const disclaimer = "⚠️ IMPORTANT DISCLAIMER: This AI-generated assistance is for informational purposes only and should not replace professional educational consultation. Please work with your school's student support department, special education team, or educational specialists for comprehensive guidance. All suggestions should be reviewed and approved by qualified educational professionals before implementation.";
+      
+      return {
+        assistance: mockAssistance,
+        disclaimer
+      };
+    }
+    
     // Check user access to follow-up assistance feature
     const accessCheck = await users.checkAccess({ 
       email: auth.email, 
@@ -45,21 +56,6 @@ export const followUpAssistance = api<FollowUpAssistanceRequest, FollowUpAssista
         throw APIError.invalidArgument("No DeepSeek API key found. Please add your API key in your profile settings to use AI features.");
       }
     } catch (error) {
-      throw APIError.invalidArgument("No DeepSeek API key available. Please add your API key in your profile settings.");
-    }
-
-    // For demo purposes, if using demo admin key, return mock assistance
-    if (apiKey === 'demo-admin-key-placeholder') {
-      const mockAssistance = generateMockFollowUpAssistance(req);
-      const disclaimer = "⚠️ IMPORTANT DISCLAIMER: This AI-generated assistance is for informational purposes only and should not replace professional educational consultation. Please work with your school's student support department, special education team, or educational specialists for comprehensive guidance. All suggestions should be reviewed and approved by qualified educational professionals before implementation.";
-      
-      return {
-        assistance: mockAssistance,
-        disclaimer
-      };
-    }
-
-    if (!apiKey) {
       throw APIError.invalidArgument("No DeepSeek API key available. Please add your API key in your profile settings.");
     }
 

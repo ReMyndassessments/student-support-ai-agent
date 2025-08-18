@@ -73,7 +73,7 @@ export const checkAccess = api<CheckAccessRequest, AccessResponse>(
       const suggestedPlan = getSuggestedPlan(req.feature, planType);
       return {
         hasAccess: false,
-        reason: `Feature requires ${suggestedPlan} plan or higher`,
+        reason: `This feature requires an active subscription.`,
         planType,
         subscriptionStatus: subscription.status,
         requiresUpgrade: true,
@@ -90,55 +90,12 @@ export const checkAccess = api<CheckAccessRequest, AccessResponse>(
 );
 
 function checkFeatureAccess(feature: string, planType: string): boolean {
-  const featureMatrix: Record<string, string[]> = {
-    'referral_creation': ['teacher', 'school', 'district'],
-    'ai_recommendations': ['teacher', 'school', 'district'],
-    'pdf_generation': ['teacher', 'school', 'district'],
-    'email_sharing': ['teacher', 'school', 'district'],
-    'follow_up_assistance': ['teacher', 'school', 'district'],
-    'multi_teacher_collaboration': ['school', 'district'],
-    'school_analytics': ['school', 'district'],
-    'admin_dashboard': ['school', 'district'],
-    'priority_support': ['school', 'district'],
-    'custom_branding': ['school', 'district'],
-    'data_export': ['school', 'district'],
-    'district_analytics': ['district'],
-    'custom_integrations': ['district'],
-    'dedicated_account_manager': ['district'],
-    'training_onboarding': ['district'],
-    'sla_guarantee': ['district'],
-    'white_label': ['district']
-  };
-
-  const allowedPlans = featureMatrix[feature] || [];
+  // All features are available on the teacher plan.
+  const allowedPlans = ['teacher'];
   return allowedPlans.includes(planType);
 }
 
 function getSuggestedPlan(feature: string, currentPlan: string): string {
-  const featureMatrix: Record<string, string[]> = {
-    'referral_creation': ['teacher', 'school', 'district'],
-    'ai_recommendations': ['teacher', 'school', 'district'],
-    'pdf_generation': ['teacher', 'school', 'district'],
-    'email_sharing': ['teacher', 'school', 'district'],
-    'follow_up_assistance': ['teacher', 'school', 'district'],
-    'multi_teacher_collaboration': ['school', 'district'],
-    'school_analytics': ['school', 'district'],
-    'admin_dashboard': ['school', 'district'],
-    'priority_support': ['school', 'district'],
-    'custom_branding': ['school', 'district'],
-    'data_export': ['school', 'district'],
-    'district_analytics': ['district'],
-    'custom_integrations': ['district'],
-    'dedicated_account_manager': ['district'],
-    'training_onboarding': ['district'],
-    'sla_guarantee': ['district'],
-    'white_label': ['district']
-  };
-
-  const allowedPlans = featureMatrix[feature] || ['teacher'];
-  
-  // Return the lowest tier plan that supports this feature
-  if (allowedPlans.includes('teacher')) return 'teacher';
-  if (allowedPlans.includes('school')) return 'school';
-  return 'district';
+  // Since there's only a teacher plan, it's always the suggested plan.
+  return 'teacher';
 }

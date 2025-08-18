@@ -4,9 +4,10 @@ import { secret } from "encore.dev/config";
 import { getAuthData } from "~encore/auth";
 
 const polarApiKey = secret("PolarApiKey");
+const polarTeacherProductId = secret("PolarTeacherProductId");
 
 export interface CreateCheckoutRequest {
-  planType: 'teacher' | 'school' | 'district';
+  planType: 'teacher';
   successUrl: string;
   cancelUrl?: string;
 }
@@ -15,13 +16,6 @@ export interface CreateCheckoutResponse {
   checkoutUrl: string;
   checkoutId: string;
 }
-
-// Product IDs for each plan - these need to be configured in Polar
-const PRODUCT_IDS = {
-  teacher: secret("PolarTeacherProductId"),
-  school: secret("PolarSchoolProductId"),
-  district: secret("PolarDistrictProductId")
-};
 
 // Creates a Polar checkout session for subscription purchase.
 export const createCheckout = api<CreateCheckoutRequest, CreateCheckoutResponse>(
@@ -34,9 +28,13 @@ export const createCheckout = api<CreateCheckoutRequest, CreateCheckoutResponse>
       throw APIError.invalidArgument("Polar API key not configured. Please contact support.");
     }
     
-    const productId = PRODUCT_IDS[req.planType]();
+    if (req.planType !== 'teacher') {
+      throw APIError.invalidArgument("Invalid plan type specified.");
+    }
+
+    const productId = polarTeacherProductId();
     if (!productId) {
-      throw APIError.invalidArgument(`Product ID not configured for ${req.planType} plan. Please contact support.`);
+      throw APIError.invalidArgument(`Product ID not configured for teacher plan. Please contact support.`);
     }
 
     try {
@@ -82,7 +80,7 @@ export const createCheckout = api<CreateCheckoutRequest, CreateCheckoutResponse>
       console.error('Error creating Polar checkout:', error);
       
       if (error instanceof Error && error.message.includes('401')) {
-        throw APIError.invalidArgument("Invalid Polar API key. Please check configuration.");
+        throw APIError.invalidArgument("Invalid Polar API key. Please check your API key in your profile settings.");
       }
       
       if (error instanceof Error && error.message.includes('404')) {

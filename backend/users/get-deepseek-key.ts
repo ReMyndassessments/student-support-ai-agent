@@ -2,6 +2,9 @@ import { api } from "encore.dev/api";
 import { Query } from "encore.dev/api";
 import { userDB } from "./db";
 import { APIError } from "encore.dev/api";
+import { secret } from "encore.dev/config";
+
+const adminDeepSeekApiKey = secret("AdminDeepSeekAPIKey");
 
 export interface GetDeepSeekKeyRequest {
   email: Query<string>;
@@ -18,10 +21,10 @@ export const getDeepSeekKey = api<GetDeepSeekKeyRequest, DeepSeekKeyResponse>(
   async (req) => {
     // For demo purposes, check if this is the admin demo user
     if (req.email === 'admin@concern2care.demo') {
-      // Return a placeholder for demo - in production this would use a real admin key
+      const key = adminDeepSeekApiKey();
       return {
-        hasKey: true,
-        key: 'demo-admin-key-placeholder'
+        hasKey: !!key,
+        key: key || undefined
       };
     }
 

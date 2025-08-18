@@ -30,6 +30,17 @@ export const generateRecommendations = api<GenerateRecommendationsRequest, Gener
   async (req) => {
     const auth = getAuthData()!;
     
+    // For demo admin, return mock recommendations
+    if (auth.isAdmin) {
+      const mockRecommendations = generateMockRecommendations(req);
+      const disclaimer = "⚠️ IMPORTANT DISCLAIMER: These AI-generated recommendations are for informational purposes only and should not replace professional educational assessment. Please refer this student to your school's student support department for proper evaluation and vetting. All AI-generated suggestions must be reviewed and approved by qualified educational professionals before implementation.";
+      
+      return {
+        recommendations: mockRecommendations,
+        disclaimer
+      };
+    }
+
     // Check user access to AI recommendations feature
     const accessCheck = await users.checkAccess({ 
       email: auth.email, 
@@ -51,21 +62,6 @@ export const generateRecommendations = api<GenerateRecommendationsRequest, Gener
         throw APIError.invalidArgument("No DeepSeek API key found. Please add your API key in your profile settings to use AI features.");
       }
     } catch (error) {
-      throw APIError.invalidArgument("No DeepSeek API key available. Please add your API key in your profile settings.");
-    }
-
-    // For demo purposes, if using demo admin key, return mock recommendations
-    if (apiKey === 'demo-admin-key-placeholder') {
-      const mockRecommendations = generateMockRecommendations(req);
-      const disclaimer = "⚠️ IMPORTANT DISCLAIMER: These AI-generated recommendations are for informational purposes only and should not replace professional educational assessment. Please refer this student to your school's student support department for proper evaluation and vetting. All AI-generated suggestions must be reviewed and approved by qualified educational professionals before implementation.";
-      
-      return {
-        recommendations: mockRecommendations,
-        disclaimer
-      };
-    }
-
-    if (!apiKey) {
       throw APIError.invalidArgument("No DeepSeek API key available. Please add your API key in your profile settings.");
     }
 
