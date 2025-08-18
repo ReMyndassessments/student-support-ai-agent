@@ -2,79 +2,8 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Users, Building, GraduationCap, ArrowRight, Sparkles, Mail, AlertTriangle, Shield, Phone, ExternalLink } from 'lucide-react';
+import { GraduationCap, ArrowRight, Sparkles, Mail, AlertTriangle, Shield, Phone, Users, Heart } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
-
-interface Plan {
-  id: 'teacher' | 'school' | 'district';
-  name: string;
-  price: string;
-  description: string;
-  features: string[];
-  icon: React.ComponentType<{ className?: string }>;
-  gradient: string;
-  bgGradient: string;
-}
-
-const plans: Plan[] = [
-  {
-    id: 'teacher',
-    name: 'Teacher Plan',
-    price: '$15/month',
-    description: 'Perfect for individual teachers',
-    features: [
-      'Unlimited student referrals',
-      'AI-powered recommendations',
-      'PDF report generation',
-      'Email sharing',
-      'Follow-up assistance',
-      'Personal API key integration',
-      'Basic analytics'
-    ],
-    icon: GraduationCap,
-    gradient: 'from-blue-500 to-cyan-600',
-    bgGradient: 'from-blue-50 to-cyan-50'
-  },
-  {
-    id: 'school',
-    name: 'School Plan',
-    price: '$125/month',
-    description: 'For schools with collaboration features',
-    features: [
-      'Everything in Teacher Plan',
-      'Multi-teacher collaboration',
-      'School-wide analytics',
-      'Admin dashboard',
-      'Priority support',
-      'Custom branding',
-      'Data export tools',
-      'Bulk user management'
-    ],
-    icon: Building,
-    gradient: 'from-purple-500 to-pink-600',
-    bgGradient: 'from-purple-50 to-pink-50'
-  },
-  {
-    id: 'district',
-    name: 'District Plan',
-    price: '$1,250/month',
-    description: 'For school districts and large organizations',
-    features: [
-      'Everything in School Plan',
-      'District-wide deployment',
-      'Advanced analytics & reporting',
-      'Custom integrations',
-      'Dedicated account manager',
-      'Training & onboarding',
-      'SLA guarantee',
-      'White-label options',
-      'Enterprise security'
-    ],
-    icon: Users,
-    gradient: 'from-emerald-500 to-teal-600',
-    bgGradient: 'from-emerald-50 to-teal-50'
-  }
-];
 
 export function SubscriptionPlans() {
   const { toast } = useToast();
@@ -83,7 +12,7 @@ export function SubscriptionPlans() {
     const subject = encodeURIComponent('Demo Request for Concern2Care');
     const body = encodeURIComponent(`Hello,
 
-I would like to request a demo of Concern2Care for my school/district.
+I would like to request a demo of Concern2Care.
 
 Please contact me to schedule a demonstration.
 
@@ -92,17 +21,11 @@ Thank you!`);
     window.location.href = `mailto:c2c_demo@remynd.online?subject=${subject}&body=${body}`;
   };
 
-  const handleSubscriptionContact = (planType: 'teacher' | 'school' | 'district') => {
-    const plan = plans.find(p => p.id === planType);
-    const subject = encodeURIComponent(`Subscription Request - ${plan?.name}`);
+  const handleSubscriptionContact = () => {
+    const subject = encodeURIComponent('Teacher Subscription Request - Concern2Care');
     const body = encodeURIComponent(`Hello,
 
-I would like to subscribe to the ${plan?.name} for Concern2Care.
-
-Plan Details:
-- Plan: ${plan?.name}
-- Price: ${plan?.price}
-- Description: ${plan?.description}
+I would like to subscribe to Concern2Care as an individual teacher.
 
 Please contact me to complete the subscription setup and provide payment instructions.
 
@@ -115,9 +38,9 @@ Thank you!`);
     const subject = encodeURIComponent('Concern2Care Subscription Inquiry');
     const body = encodeURIComponent(`Hello,
 
-I'm interested in subscribing to Concern2Care. Please contact me with:
+I'm interested in subscribing to Concern2Care as a teacher. Please contact me with:
 
-- Available subscription options
+- Subscription details and pricing
 - Payment methods
 - Setup instructions
 - Any current promotions
@@ -129,7 +52,7 @@ Thank you!`);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
         {/* Header */}
         <div className="text-center mb-12 sm:mb-16 relative">
           {/* Decorative elements - hidden on mobile */}
@@ -139,32 +62,21 @@ Thank you!`);
           
           <div className="relative">
             <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 rounded-2xl sm:rounded-3xl shadow-2xl mb-4 sm:mb-6 transform hover:scale-110 transition-transform duration-300">
-              <Sparkles className="h-8 w-8 sm:h-10 sm:w-10 text-white" />
+              <GraduationCap className="h-8 w-8 sm:h-10 sm:w-10 text-white" />
             </div>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-3 sm:mb-4">
               <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
-                Choose Your Plan
+                Simple Teacher Pricing
               </span>
             </h1>
             <p className="text-lg sm:text-xl lg:text-2xl text-gray-700 mb-2 font-medium">
-              Unlock the full power of AI-driven student support
+              One plan designed specifically for teachers
             </p>
             <p className="text-sm text-gray-500 font-medium">
-              Professional tools for better student outcomes
+              No complicated tiers, just the tools you need
             </p>
           </div>
         </div>
-
-        {/* Individual Account Notice */}
-        <Alert className="max-w-4xl mx-auto mb-8 sm:mb-12 border-blue-200 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-2xl">
-          <Shield className="h-5 w-5 text-blue-600" />
-          <AlertDescription className="text-blue-800 text-sm sm:text-base">
-            <strong>Individual Account Required</strong>
-            <br />
-            Each teacher needs their own personal subscription to ensure secure access, data privacy compliance, 
-            and personalized AI recommendations. This prevents account sharing and protects student data.
-          </AlertDescription>
-        </Alert>
 
         {/* Payment System Notice */}
         <Alert className="max-w-4xl mx-auto mb-8 sm:mb-12 border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl">
@@ -174,6 +86,83 @@ Thank you!`);
             <br />
             We're currently setting up automated payments. In the meantime, please contact us directly to set up your subscription. 
             We'll provide secure payment options and get you started quickly!
+          </AlertDescription>
+        </Alert>
+
+        {/* Main Teacher Plan */}
+        <div className="max-w-2xl mx-auto mb-12 sm:mb-16">
+          <Card className="border-0 bg-gradient-to-br from-white/90 to-white/80 backdrop-blur-sm shadow-2xl rounded-2xl sm:rounded-3xl overflow-hidden transform hover:scale-105 transition-all duration-300">
+            <CardHeader className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white rounded-t-2xl sm:rounded-t-3xl pt-6 sm:pt-8">
+              <div className="text-center space-y-4 sm:space-y-6">
+                <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 bg-white/20 rounded-xl sm:rounded-2xl shadow-lg">
+                  <GraduationCap className="h-8 w-8 sm:h-10 sm:w-10" />
+                </div>
+                <div>
+                  <CardTitle className="text-2xl sm:text-3xl font-bold">Teacher Plan</CardTitle>
+                  <p className="text-white/80 mt-2 text-base sm:text-lg">Everything you need as a teacher</p>
+                </div>
+                <div className="text-center">
+                  <div className="text-4xl sm:text-5xl font-bold">$15</div>
+                  <p className="text-white/80 text-sm sm:text-base">per month</p>
+                </div>
+              </div>
+            </CardHeader>
+            
+            <CardContent className="p-6 sm:p-8 space-y-6 sm:space-y-8">
+              <div className="text-center">
+                <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">What's Included:</h3>
+              </div>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                {[
+                  'Unlimited student referrals',
+                  'AI-powered Tier 2 recommendations',
+                  'PDF report generation',
+                  'Email sharing with colleagues',
+                  'Follow-up implementation assistance',
+                  'Personal DeepSeek API key integration',
+                  'Professional documentation tools',
+                  'Meeting preparation features'
+                ].map((feature, index) => (
+                  <div key={index} className="flex items-start gap-3">
+                    <div className="w-5 h-5 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <div className="h-3 w-3 bg-white rounded-full" />
+                    </div>
+                    <span className="text-gray-700 text-sm sm:text-base leading-relaxed">{feature}</span>
+                  </div>
+                ))}
+              </div>
+              
+              <div className="space-y-3 sm:space-y-4">
+                <Button
+                  onClick={handleSubscriptionContact}
+                  className="w-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 text-white shadow-xl rounded-xl sm:rounded-2xl py-4 sm:py-6 text-base sm:text-lg font-semibold transition-all duration-200 transform hover:scale-105 active:scale-95 touch-manipulation"
+                >
+                  Get Started - Contact Us
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+                
+                <Button
+                  onClick={handleDemoRequest}
+                  variant="outline"
+                  className="w-full border-gray-300 text-gray-700 hover:bg-gray-50 rounded-xl sm:rounded-2xl py-3 sm:py-4 text-sm sm:text-base font-semibold touch-manipulation active:scale-95"
+                >
+                  <Sparkles className="mr-2 h-4 w-4" />
+                  Request Demo First
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Why Individual Subscriptions */}
+        <Alert className="max-w-4xl mx-auto mb-8 sm:mb-12 border-blue-200 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-2xl">
+          <Shield className="h-5 w-5 text-blue-600" />
+          <AlertDescription className="text-blue-800 text-sm sm:text-base">
+            <strong>Why Individual Teacher Subscriptions?</strong>
+            <br />
+            Each teacher gets their own secure account to protect student data privacy, ensure FERPA compliance, 
+            and provide personalized AI recommendations based on your specific teaching style and needs.
           </AlertDescription>
         </Alert>
 
@@ -188,7 +177,7 @@ Thank you!`);
                 Ready to Subscribe?
               </h3>
               <p className="text-gray-700 mb-4 sm:mb-6 leading-relaxed text-sm sm:text-base">
-                Contact our sales team to set up your subscription with secure payment options.
+                Contact us to set up your teacher subscription with secure payment options.
               </p>
               <Button
                 onClick={handleContactSales}
@@ -209,7 +198,7 @@ Thank you!`);
                 Want to See It First?
               </h3>
               <p className="text-gray-700 mb-4 sm:mb-6 leading-relaxed text-sm sm:text-base">
-                Schedule a personalized demo to see how Concern2Care can transform your student support process.
+                Schedule a personalized demo to see how Concern2Care can help you support your students.
               </p>
               <Button
                 onClick={handleDemoRequest}
@@ -222,57 +211,62 @@ Thank you!`);
           </Card>
         </div>
 
-        {/* Pricing Plans */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 mb-12 sm:mb-16">
-          {plans.map((plan) => {
-            const Icon = plan.icon;
-            return (
-              <Card 
-                key={plan.id} 
-                className="relative border-0 bg-gradient-to-br from-white/90 to-white/80 backdrop-blur-sm hover:shadow-2xl transition-all duration-300 hover:scale-105 transform rounded-2xl sm:rounded-3xl overflow-hidden touch-manipulation active:scale-95"
-              >
-                <CardHeader className={`bg-gradient-to-r ${plan.gradient} text-white rounded-t-2xl sm:rounded-t-3xl pt-4 sm:pt-6`}>
-                  <div className="text-center space-y-3 sm:space-y-4">
-                    <div className={`inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 bg-white/20 rounded-xl sm:rounded-2xl shadow-lg`}>
-                      <Icon className="h-6 w-6 sm:h-8 sm:w-8" />
-                    </div>
-                    <div>
-                      <CardTitle className="text-xl sm:text-2xl font-bold">{plan.name}</CardTitle>
-                      <p className="text-white/80 mt-2 text-sm sm:text-base">{plan.description}</p>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-3xl sm:text-4xl font-bold">{plan.price}</div>
-                      <p className="text-white/80 text-xs sm:text-sm">Per individual teacher</p>
-                    </div>
+        {/* What Schools Can Do */}
+        <Card className="max-w-4xl mx-auto border-0 bg-gradient-to-br from-purple-50 via-pink-50 to-rose-50 shadow-xl rounded-2xl sm:rounded-3xl overflow-hidden mb-12 sm:mb-16">
+          <CardHeader className="bg-gradient-to-r from-purple-500 via-pink-500 to-rose-500 text-white rounded-t-2xl sm:rounded-t-3xl">
+            <CardTitle className="flex items-center gap-3 text-xl sm:text-2xl">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/20 rounded-xl sm:rounded-2xl flex items-center justify-center">
+                <Users className="h-6 w-6 sm:h-7 sm:w-7" />
+              </div>
+              For Schools & Districts
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-6 sm:p-8">
+            <div className="space-y-4 sm:space-y-6">
+              <p className="text-gray-700 text-base sm:text-lg leading-relaxed">
+                While Concern2Care is designed for individual teachers, schools and districts can:
+              </p>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                <div className="space-y-3">
+                  <div className="flex items-start gap-3">
+                    <Heart className="h-5 w-5 text-purple-500 flex-shrink-0 mt-0.5" />
+                    <span className="text-gray-700 text-sm sm:text-base">Purchase subscriptions for their teachers</span>
                   </div>
-                </CardHeader>
-                
-                <CardContent className="p-4 sm:p-6 space-y-4 sm:space-y-6">
-                  <ul className="space-y-2 sm:space-y-3">
-                    {plan.features.map((feature, index) => (
-                      <li key={index} className="flex items-start gap-3">
-                        <div className={`w-4 h-4 sm:w-5 sm:h-5 bg-gradient-to-r ${plan.gradient} rounded-full flex items-center justify-center flex-shrink-0 mt-0.5`}>
-                          <div className="h-2 w-2 sm:h-3 sm:w-3 bg-white rounded-full" />
-                        </div>
-                        <span className="text-gray-700 text-xs sm:text-sm leading-relaxed">{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  
-                  <div className="space-y-2 sm:space-y-3">
-                    <Button
-                      onClick={() => handleSubscriptionContact(plan.id)}
-                      className={`w-full bg-gradient-to-r ${plan.gradient} hover:opacity-90 text-white shadow-lg rounded-xl sm:rounded-2xl py-4 sm:py-6 text-sm sm:text-lg font-semibold transition-all duration-200 transform hover:scale-105 active:scale-95 touch-manipulation`}
-                    >
-                      Contact for {plan.name}
-                      <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
-                    </Button>
+                  <div className="flex items-start gap-3">
+                    <Heart className="h-5 w-5 text-purple-500 flex-shrink-0 mt-0.5" />
+                    <span className="text-gray-700 text-sm sm:text-base">Coordinate bulk setup and training</span>
                   </div>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
+                  <div className="flex items-start gap-3">
+                    <Heart className="h-5 w-5 text-purple-500 flex-shrink-0 mt-0.5" />
+                    <span className="text-gray-700 text-sm sm:text-base">Receive volume discounts for multiple teachers</span>
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <div className="flex items-start gap-3">
+                    <Heart className="h-5 w-5 text-purple-500 flex-shrink-0 mt-0.5" />
+                    <span className="text-gray-700 text-sm sm:text-base">Get dedicated onboarding support</span>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <Heart className="h-5 w-5 text-purple-500 flex-shrink-0 mt-0.5" />
+                    <span className="text-gray-700 text-sm sm:text-base">Access priority customer support</span>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <Heart className="h-5 w-5 text-purple-500 flex-shrink-0 mt-0.5" />
+                    <span className="text-gray-700 text-sm sm:text-base">Schedule group training sessions</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-white/60 p-4 rounded-xl border border-purple-200">
+                <p className="text-purple-800 text-sm sm:text-base">
+                  <strong>Interested in setting up Concern2Care for your school?</strong> Contact us to discuss volume pricing, 
+                  training options, and how we can help your teachers get the most out of the platform.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Contact Information */}
         <Card className="max-w-4xl mx-auto border-0 bg-white/90 backdrop-blur-sm shadow-2xl rounded-2xl sm:rounded-3xl overflow-hidden mb-12 sm:mb-16">
@@ -287,7 +281,7 @@ Thank you!`);
           <CardContent className="p-6 sm:p-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
               <div className="space-y-4">
-                <h3 className="text-lg sm:text-xl font-bold text-gray-900">Sales & Subscriptions</h3>
+                <h3 className="text-lg sm:text-xl font-bold text-gray-900">Teacher Subscriptions</h3>
                 <div className="space-y-3">
                   <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl">
                     <Mail className="h-5 w-5 text-blue-600" />
@@ -307,7 +301,7 @@ Thank you!`);
               </div>
 
               <div className="space-y-4">
-                <h3 className="text-lg sm:text-xl font-bold text-gray-900">Demos & Support</h3>
+                <h3 className="text-lg sm:text-xl font-bold text-gray-900">Demos & Questions</h3>
                 <div className="space-y-3">
                   <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl">
                     <Sparkles className="h-5 w-5 text-amber-600" />
@@ -320,7 +314,7 @@ Thank you!`);
                   </div>
                   <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-4 rounded-xl border border-purple-200">
                     <p className="text-purple-800 text-sm">
-                      <strong>Demo Scheduling:</strong> Perfect for schools and districts evaluating the platform. We'll customize the demo to your needs.
+                      <strong>Perfect for:</strong> Individual teachers or schools wanting to see the platform in action before subscribing.
                     </p>
                   </div>
                 </div>
@@ -332,13 +326,13 @@ Thank you!`);
                 <h4 className="font-semibold text-gray-900 mb-2">What to Include in Your Email:</h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-gray-600">
                   <ul className="space-y-1">
-                    <li>• Your name and school/district</li>
-                    <li>• Preferred plan type</li>
-                    <li>• Number of teachers (if applicable)</li>
+                    <li>• Your name and school</li>
+                    <li>• Whether you're an individual teacher or representing a school</li>
+                    <li>• Number of teachers (if purchasing for a school)</li>
                   </ul>
                   <ul className="space-y-1">
-                    <li>• Timeline for implementation</li>
-                    <li>• Any specific questions</li>
+                    <li>• Timeline for getting started</li>
+                    <li>• Any specific questions about the platform</li>
                     <li>• Preferred contact method</li>
                   </ul>
                 </div>
@@ -350,10 +344,10 @@ Thank you!`);
         {/* Features Comparison */}
         <div className="text-center mb-8 sm:mb-12">
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-3 sm:mb-4">
-            Why Choose Concern2Care?
+            Why Teachers Love Concern2Care
           </h2>
           <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">
-            Streamline your student support process with AI-powered recommendations
+            Simple, powerful tools designed specifically for classroom teachers
           </p>
         </div>
 
@@ -369,14 +363,14 @@ Thank you!`);
             {
               icon: Shield,
               title: 'Secure & Private',
-              description: 'Individual accounts ensure data privacy compliance and prevent unauthorized access to student information.',
+              description: 'Your personal account ensures data privacy compliance and protects sensitive student information.',
               gradient: 'from-blue-500 to-cyan-500',
               bgGradient: 'from-blue-50 to-cyan-50'
             },
             {
-              icon: Building,
-              title: 'Scalable',
-              description: 'From individual teachers to entire districts, our platform grows with your organization while maintaining security.',
+              icon: Heart,
+              title: 'Teacher-Focused',
+              description: 'Built by educators, for educators. Every feature is designed with the classroom teacher in mind.',
               gradient: 'from-emerald-500 to-teal-500',
               bgGradient: 'from-emerald-50 to-teal-50'
             }
@@ -412,16 +406,12 @@ Thank you!`);
           <div className="max-w-3xl mx-auto space-y-4 sm:space-y-6">
             {[
               {
-                question: "How do I subscribe without automated payments?",
-                answer: "Simply contact our sales team at sales@remynd.com with your preferred plan. We'll provide secure payment options including bank transfer, check, or credit card processing through our secure portal."
+                question: "How do I subscribe as a teacher?",
+                answer: "Simply contact our sales team at sales@remynd.com. We'll provide secure payment options including bank transfer, check, or credit card processing through our secure portal."
               },
               {
-                question: "Why does each teacher need their own subscription?",
-                answer: "Individual subscriptions ensure data privacy compliance, prevent unauthorized access to student information, and provide personalized AI recommendations based on each teacher's specific needs and teaching style."
-              },
-              {
-                question: "Can schools purchase subscriptions for their teachers?",
-                answer: "Yes! Schools can purchase individual subscriptions for their teachers. School and District plans include bulk management features and administrative controls while maintaining individual account security."
+                question: "Can my school purchase subscriptions for multiple teachers?",
+                answer: "Yes! Schools can purchase individual subscriptions for their teachers. We offer volume discounts and can coordinate bulk setup and training for multiple teachers."
               },
               {
                 question: "What payment methods do you accept?",
@@ -433,15 +423,19 @@ Thank you!`);
               },
               {
                 question: "Is my student data secure?",
-                answer: "Absolutely. We follow FERPA guidelines and use enterprise-grade security to protect all student information. Individual accounts prevent data sharing between unauthorized users."
+                answer: "Absolutely. We follow FERPA guidelines and use enterprise-grade security to protect all student information. Your individual account ensures data privacy and prevents unauthorized access."
               },
               {
                 question: "Do you offer training and support?",
-                answer: "Yes! School and District plans include training sessions and priority support. Teacher plans have access to our help center and email support."
+                answer: "Yes! We provide email support, help documentation, and can arrange training sessions for schools purchasing multiple subscriptions."
               },
               {
                 question: "Can I see a demo before subscribing?",
-                answer: "Absolutely! Email c2c_demo@remynd.online to schedule a personalized demonstration of Concern2Care for your school or district."
+                answer: "Absolutely! Email c2c_demo@remynd.online to schedule a personalized demonstration of Concern2Care."
+              },
+              {
+                question: "What if I need help setting up my DeepSeek API key?",
+                answer: "We provide step-by-step instructions and support to help you set up your personal DeepSeek API key, which enables the AI-powered recommendations."
               }
             ].map((faq, index) => (
               <Card key={index} className="border-0 bg-white/80 backdrop-blur-sm shadow-lg rounded-xl sm:rounded-2xl text-left touch-manipulation active:scale-95 transition-transform">
@@ -462,7 +456,7 @@ Thank you!`);
                 Ready to Get Started?
               </h2>
               <p className="text-base sm:text-lg text-gray-600 mb-6 sm:mb-8 max-w-xl mx-auto">
-                Contact us today to set up your Concern2Care subscription and start transforming your student support process.
+                Join teachers who are already using AI-powered tools to better support their students.
               </p>
               <div className="flex flex-col gap-3 sm:flex-row sm:gap-4 justify-center">
                 <Button
@@ -470,7 +464,7 @@ Thank you!`);
                   className="w-full sm:w-auto bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 text-white shadow-xl rounded-xl sm:rounded-2xl py-4 sm:py-6 px-6 sm:px-8 text-base sm:text-lg font-semibold transition-all duration-200 transform hover:scale-105 active:scale-95 touch-manipulation"
                 >
                   <Mail className="mr-2 h-5 w-5" />
-                  Contact Sales Team
+                  Subscribe Now
                 </Button>
                 <Button
                   onClick={handleDemoRequest}
