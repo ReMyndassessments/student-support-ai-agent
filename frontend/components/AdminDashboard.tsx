@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Shield, Users, FileText, Sparkles, LogOut, User, Settings, CreditCard, TrendingUp, Calendar, AlertTriangle, Database, Download, Trash2, Plus } from 'lucide-react';
+import { Shield, Users, FileText, Sparkles, LogOut, User, Settings, CreditCard, TrendingUp, Calendar, AlertTriangle, Database, Download, Trash2, Plus, Edit3 } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { Link } from 'react-router-dom';
 import backend from '~backend/client';
@@ -221,7 +221,7 @@ export function AdminDashboard({ user, onLogout }: AdminDashboardProps) {
                     </Button>
                   </Link>
                   <Button variant="outline" className="w-full border-gray-300 text-gray-700 hover:bg-gray-50 rounded-xl py-4 text-base font-medium" disabled>
-                    <Database className="h-5 w-5 mr-3" />
+                    <Edit3 className="h-5 w-5 mr-3" />
                     Bulk Operations
                   </Button>
                   <Button variant="outline" className="w-full border-gray-300 text-gray-700 hover:bg-gray-50 rounded-xl py-4 text-base font-medium" disabled>
