@@ -2,7 +2,7 @@ import { ReactNode } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Lock, Crown, CreditCard, Sparkles, Mail } from 'lucide-react';
+import { Lock, Crown, Mail, Sparkles, AlertTriangle, Shield } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useSubscription } from '../hooks/useSubscription';
 
@@ -26,6 +26,22 @@ Please contact me to schedule a demonstration.
 Thank you!`);
     
     window.location.href = `mailto:c2c_demo@remynd.online?subject=${subject}&body=${body}`;
+  };
+
+  const handleContactSales = () => {
+    const subject = encodeURIComponent('Subscription Request for Concern2Care');
+    const body = encodeURIComponent(`Hello,
+
+I would like to subscribe to Concern2Care to access ${feature}.
+
+Please contact me with:
+- Available subscription options
+- Payment methods
+- Setup instructions
+
+Thank you!`);
+    
+    window.location.href = `mailto:sales@remynd.com?subject=${subject}&body=${body}`;
   };
 
   if (loading) {
@@ -73,6 +89,16 @@ Thank you!`);
               <br />
               Each teacher needs their own personal subscription to ensure secure access and personalized AI recommendations. 
               This prevents account sharing and ensures compliance with educational data privacy requirements.
+            </AlertDescription>
+          </Alert>
+
+          {/* Payment Notice */}
+          <Alert className="max-w-4xl mx-auto mb-8 border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl">
+            <AlertTriangle className="h-5 w-5 text-amber-600" />
+            <AlertDescription className="text-amber-800">
+              <strong>Direct Contact for Subscriptions</strong>
+              <br />
+              We're currently setting up automated payments. Contact us directly for secure payment options and quick setup!
             </AlertDescription>
           </Alert>
 
@@ -176,44 +202,69 @@ Thank you!`);
                   </div>
 
                   <div className="space-y-3">
-                    <Link to="/subscription/plans">
-                      <Button className="w-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 text-white shadow-xl rounded-2xl py-6 text-lg font-semibold transition-all duration-200 transform hover:scale-105">
-                        <CreditCard className="mr-2 h-5 w-5" />
-                        Get Your Personal Subscription
-                      </Button>
-                    </Link>
+                    <Button
+                      onClick={handleContactSales}
+                      className="w-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 text-white shadow-xl rounded-2xl py-6 text-lg font-semibold transition-all duration-200 transform hover:scale-105"
+                    >
+                      <Mail className="mr-2 h-5 w-5" />
+                      Contact Sales for Subscription
+                    </Button>
                     
                     <Button
                       onClick={handleDemoRequest}
                       variant="outline"
                       className="w-full border-amber-300 text-amber-700 hover:bg-amber-50 rounded-2xl py-3"
                     >
-                      <Mail className="mr-2 h-4 w-4" />
-                      Request Demo
+                      <Sparkles className="mr-2 h-4 w-4" />
+                      Request Demo First
                     </Button>
+
+                    <Link to="/subscription/plans">
+                      <Button
+                        variant="outline"
+                        className="w-full border-gray-300 text-gray-700 hover:bg-gray-50 rounded-2xl py-3"
+                      >
+                        View All Plans & Pricing
+                      </Button>
+                    </Link>
                   </div>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          {/* School/District Information */}
+          {/* Contact Information */}
           <Card className="border-0 bg-gradient-to-br from-emerald-50 to-teal-50 shadow-xl rounded-3xl overflow-hidden">
             <CardContent className="p-8">
-              <h3 className="text-xl font-bold text-emerald-900 mb-4">
-                For Schools & Districts
+              <h3 className="text-xl font-bold text-emerald-900 mb-4 text-center">
+                Ready to Get Started?
               </h3>
-              <p className="text-emerald-800 mb-4">
-                While each teacher needs their own subscription for security and personalization, 
-                School and District plans offer additional collaboration features and bulk pricing options.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Button variant="outline" className="border-emerald-300 text-emerald-700 hover:bg-emerald-100 rounded-xl">
-                  Learn About School Plans
-                </Button>
-                <Button variant="outline" className="border-emerald-300 text-emerald-700 hover:bg-emerald-100 rounded-xl">
-                  Contact for District Pricing
-                </Button>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="text-center">
+                  <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl shadow-lg mb-3">
+                    <Mail className="h-6 w-6 text-white" />
+                  </div>
+                  <h4 className="font-semibold text-emerald-900 mb-2">Sales & Subscriptions</h4>
+                  <p className="text-emerald-700 text-sm mb-3">Get pricing and payment options</p>
+                  <a href="mailto:sales@remynd.com" className="text-emerald-600 hover:text-emerald-700 font-medium">
+                    sales@remynd.com
+                  </a>
+                </div>
+                <div className="text-center">
+                  <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-r from-amber-500 to-orange-600 rounded-2xl shadow-lg mb-3">
+                    <Sparkles className="h-6 w-6 text-white" />
+                  </div>
+                  <h4 className="font-semibold text-emerald-900 mb-2">Demos & Questions</h4>
+                  <p className="text-emerald-700 text-sm mb-3">Schedule a personalized demo</p>
+                  <a href="mailto:c2c_demo@remynd.online" className="text-emerald-600 hover:text-emerald-700 font-medium">
+                    c2c_demo@remynd.online
+                  </a>
+                </div>
+              </div>
+              <div className="mt-6 text-center">
+                <p className="text-emerald-800 text-sm">
+                  <strong>Quick Setup:</strong> We typically respond within 24 hours and can activate your account within 1-2 business days.
+                </p>
               </div>
             </CardContent>
           </Card>
