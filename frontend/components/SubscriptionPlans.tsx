@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import { GraduationCap, Sparkles, Mail, AlertTriangle, Shield, Users, Copy, CheckCircle, Check, Star, ArrowRight, Calculator, CreditCard, Clock, Zap } from 'lucide-react';
+import { GraduationCap, Sparkles, Mail, AlertTriangle, Shield, Users, Copy, CheckCircle, Check, ArrowRight, Calculator, CreditCard, Clock, Zap } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 
 export function SubscriptionPlans() {
@@ -86,8 +86,7 @@ Thank you!`;
         "Basic onboarding support"
       ],
       gradient: "from-blue-500 to-cyan-500",
-      bgGradient: "from-blue-50 to-cyan-50",
-      popular: false
+      bgGradient: "from-blue-50 to-cyan-50"
     },
     {
       name: "Medium School",
@@ -103,8 +102,7 @@ Thank you!`;
         "Custom training sessions"
       ],
       gradient: "from-purple-500 to-pink-500",
-      bgGradient: "from-purple-50 to-pink-50",
-      popular: true
+      bgGradient: "from-purple-50 to-pink-50"
     },
     {
       name: "Large School",
@@ -120,8 +118,7 @@ Thank you!`;
         "24/7 priority support"
       ],
       gradient: "from-emerald-500 to-teal-500",
-      bgGradient: "from-emerald-50 to-teal-50",
-      popular: false
+      bgGradient: "from-emerald-50 to-teal-50"
     },
     {
       name: "Enterprise",
@@ -137,8 +134,7 @@ Thank you!`;
         "On-site training & support"
       ],
       gradient: "from-orange-500 to-red-500",
-      bgGradient: "from-orange-50 to-red-50",
-      popular: false
+      bgGradient: "from-orange-50 to-red-50"
     }
   ];
 
@@ -257,17 +253,8 @@ Thank you!`;
 
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6 sm:gap-8">
             {pricingTiers.map((tier, index) => (
-              <Card key={index} className={`border-0 bg-gradient-to-br ${tier.bgGradient} shadow-xl rounded-2xl sm:rounded-3xl overflow-hidden hover:shadow-2xl transition-all duration-300 hover:scale-105 relative ${tier.popular ? 'ring-2 ring-purple-500 ring-offset-2' : ''}`}>
-                {tier.popular && (
-                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
-                    <Badge className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-2 rounded-full shadow-lg text-sm font-semibold">
-                      <Star className="h-4 w-4 mr-1" />
-                      Most Popular
-                    </Badge>
-                  </div>
-                )}
-                
-                <CardHeader className={`bg-gradient-to-r ${tier.gradient} text-white rounded-t-2xl sm:rounded-t-3xl p-4 sm:p-6 ${tier.popular ? 'pt-8' : ''}`}>
+              <Card key={index} className={`border-0 bg-gradient-to-br ${tier.bgGradient} shadow-xl rounded-2xl sm:rounded-3xl overflow-hidden hover:shadow-2xl transition-all duration-300 hover:scale-105 relative`}>
+                <CardHeader className={`bg-gradient-to-r ${tier.gradient} text-white rounded-t-2xl sm:rounded-t-3xl p-4 sm:p-6`}>
                   <CardTitle className="text-center">
                     <h3 className="text-lg sm:text-xl font-bold mb-1">{tier.name}</h3>
                     <p className="text-sm opacity-90">{tier.range}</p>
