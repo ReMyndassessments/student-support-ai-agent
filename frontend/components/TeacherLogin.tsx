@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, User, Eye, EyeOff, GraduationCap, AlertTriangle } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
+import { Link } from 'react-router-dom';
 import backend from '~backend/client';
 
 interface TeacherLoginProps {
@@ -145,6 +146,15 @@ export function TeacherLogin({ onLoginSuccess }: TeacherLoginProps) {
                 )}
               </Button>
             </form>
+
+            <div className="mt-6 text-center">
+              <Link 
+                to="/forgot-password"
+                className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+              >
+                Forgot your password?
+              </Link>
+            </div>
 
             <Alert className="mt-6 border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl">
               <AlertTriangle className="h-4 w-4 text-amber-600" />

@@ -5,17 +5,20 @@ import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { Loader2, Users, Plus, MoreHorizontal, Edit, Trash2 } from 'lucide-react';
+import { Loader2, Users, Plus, MoreHorizontal, Edit, Trash2, Lock } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
+import { Link } from 'react-router-dom';
 import backend from '~backend/client';
 import type { UserProfile } from '~backend/users/get-profile';
 import { AddEditTeacherDialog } from './AddEditTeacherDialog';
+import { AdminResetPasswordDialog } from './AdminResetPasswordDialog';
 
 export function TeacherManagement() {
   const [teachers, setTeachers] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isResetPasswordDialogOpen, setIsResetPasswordDialogOpen] = useState(false);
   const [selectedTeacher, setSelectedTeacher] = useState<UserProfile | null>(null);
   const { toast } = useToast();
 
@@ -55,6 +58,11 @@ export function TeacherManagement() {
     setIsDeleteDialogOpen(true);
   };
 
+  const handleResetPasswordClick = (teacher: UserProfile) => {
+    setSelectedTeacher(teacher);
+    setIsResetPasswordDialogOpen(true);
+  };
+
   const handleDeleteConfirm = async () => {
     if (!selectedTeacher) return;
     try {
@@ -91,107 +99,125 @@ export function TeacherManagement() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-6 py-8 space-y-8">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Teacher Management</h1>
-          <p className="text-gray-600">Add, edit, or remove teacher accounts.</p>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
+      <div className="max-w-6xl mx-auto px-6 py-8 space-y-8">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Teacher Management</h1>
+            <p className="text-gray-600">Add, edit, or remove teacher accounts.</p>
+          </div>
+          <div className="flex items-center gap-4">
+            <Link to="/admin">
+              <Button variant="outline" className="border-gray-300 text-gray-700 hover:bg-gray-50 rounded-xl">
+                Back to Dashboard
+              </Button>
+            </Link>
+            <Button onClick={handleAddClick} className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-xl">
+              <Plus className="mr-2 h-4 w-4" /> Add Teacher
+            </Button>
+          </div>
         </div>
-        <Button onClick={handleAddClick}>
-          <Plus className="mr-2 h-4 w-4" /> Add Teacher
-        </Button>
+
+        <Card className="border-0 bg-white/90 backdrop-blur-sm shadow-xl rounded-3xl overflow-hidden">
+          <CardHeader className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white rounded-t-3xl">
+            <CardTitle className="flex items-center gap-3 text-xl">
+              <div className="w-10 h-10 bg-white/20 rounded-2xl flex items-center justify-center">
+                <Users className="h-6 w-6" />
+              </div>
+              All Teachers
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-0">
+            {loading ? (
+              <div className="flex items-center justify-center h-64">
+                <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+              </div>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Email</TableHead>
+                    <TableHead>School</TableHead>
+                    <TableHead>Subscription End</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {teachers.map((teacher) => {
+                    const isSubActive = teacher.subscriptionEndDate ? new Date(teacher.subscriptionEndDate) > new Date() : false;
+                    return (
+                      <TableRow key={teacher.id}>
+                        <TableCell className="font-medium">{teacher.name}</TableCell>
+                        <TableCell>{teacher.email}</TableCell>
+                        <TableCell>{teacher.schoolName || 'N/A'}</TableCell>
+                        <TableCell>{formatDate(teacher.subscriptionEndDate)}</TableCell>
+                        <TableCell>
+                          <Badge variant={isSubActive ? 'default' : 'destructive'} className={isSubActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}>
+                            {isSubActive ? 'Active' : 'Expired'}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" className="h-8 w-8 p-0">
+                                <span className="sr-only">Open menu</span>
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem onClick={() => handleEditClick(teacher)}>
+                                <Edit className="mr-2 h-4 w-4" /> Edit
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleResetPasswordClick(teacher)}>
+                                <Lock className="mr-2 h-4 w-4" /> Reset Password
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleDeleteClick(teacher)} className="text-red-600">
+                                <Trash2 className="mr-2 h-4 w-4" /> Delete
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            )}
+          </CardContent>
+        </Card>
+
+        <AddEditTeacherDialog
+          isOpen={isDialogOpen}
+          onClose={() => setIsDialogOpen(false)}
+          onSave={handleSave}
+          teacher={selectedTeacher}
+        />
+
+        <AdminResetPasswordDialog
+          isOpen={isResetPasswordDialogOpen}
+          onClose={() => setIsResetPasswordDialogOpen(false)}
+          teacher={selectedTeacher}
+        />
+
+        <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This action cannot be undone. This will permanently delete the teacher account for <strong>{selectedTeacher?.name}</strong> and all associated data.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={handleDeleteConfirm} className="bg-red-600 hover:bg-red-700">
+                Delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
-
-      <Card className="border-0 bg-white/90 backdrop-blur-sm shadow-xl rounded-3xl overflow-hidden">
-        <CardHeader className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white rounded-t-3xl">
-          <CardTitle className="flex items-center gap-3 text-xl">
-            <div className="w-10 h-10 bg-white/20 rounded-2xl flex items-center justify-center">
-              <Users className="h-6 w-6" />
-            </div>
-            All Teachers
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-0">
-          {loading ? (
-            <div className="flex items-center justify-center h-64">
-              <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
-            </div>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>School</TableHead>
-                  <TableHead>Subscription End</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {teachers.map((teacher) => {
-                  const isSubActive = teacher.subscriptionEndDate ? new Date(teacher.subscriptionEndDate) > new Date() : false;
-                  return (
-                    <TableRow key={teacher.id}>
-                      <TableCell className="font-medium">{teacher.name}</TableCell>
-                      <TableCell>{teacher.email}</TableCell>
-                      <TableCell>{teacher.schoolName || 'N/A'}</TableCell>
-                      <TableCell>{formatDate(teacher.subscriptionEndDate)}</TableCell>
-                      <TableCell>
-                        <Badge variant={isSubActive ? 'default' : 'destructive'} className={isSubActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}>
-                          {isSubActive ? 'Active' : 'Expired'}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="h-8 w-8 p-0">
-                              <span className="sr-only">Open menu</span>
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => handleEditClick(teacher)}>
-                              <Edit className="mr-2 h-4 w-4" /> Edit
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleDeleteClick(teacher)} className="text-red-600">
-                              <Trash2 className="mr-2 h-4 w-4" /> Delete
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          )}
-        </CardContent>
-      </Card>
-
-      <AddEditTeacherDialog
-        isOpen={isDialogOpen}
-        onClose={() => setIsDialogOpen(false)}
-        onSave={handleSave}
-        teacher={selectedTeacher}
-      />
-
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the teacher account for <strong>{selectedTeacher?.name}</strong> and all associated data.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteConfirm} className="bg-red-600 hover:bg-red-700">
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </div>
   );
 }

@@ -112,6 +112,7 @@ import {
     createDemoData as api_admin_demo_data_createDemoData
 } from "~backend/admin/demo-data";
 import { exportData as api_admin_export_data_exportData } from "~backend/admin/export-data";
+import { adminResetPassword as api_admin_reset_teacher_password_adminResetPassword } from "~backend/admin/reset-teacher-password";
 import {
     getSystemSettings as api_admin_system_settings_getSystemSettings,
     updateSystemSettings as api_admin_system_settings_updateSystemSettings
@@ -124,6 +125,7 @@ export namespace admin {
 
         constructor(baseClient: BaseClient) {
             this.baseClient = baseClient
+            this.adminResetPassword = this.adminResetPassword.bind(this)
             this.bulkDeleteTeachers = this.bulkDeleteTeachers.bind(this)
             this.bulkUpdateTeachers = this.bulkUpdateTeachers.bind(this)
             this.clearDemoData = this.clearDemoData.bind(this)
@@ -132,6 +134,20 @@ export namespace admin {
             this.getDashboardStats = this.getDashboardStats.bind(this)
             this.getSystemSettings = this.getSystemSettings.bind(this)
             this.updateSystemSettings = this.updateSystemSettings.bind(this)
+        }
+
+        /**
+         * Admin resets a teacher's password directly.
+         */
+        public async adminResetPassword(params: RequestType<typeof api_admin_reset_teacher_password_adminResetPassword>): Promise<ResponseType<typeof api_admin_reset_teacher_password_adminResetPassword>> {
+            // Construct the body with only the fields which we want encoded within the body (excluding query string or header fields)
+            const body: Record<string, any> = {
+                newPassword: params.newPassword,
+            }
+
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/admin/teachers/${encodeURIComponent(params.teacherId)}/reset-password`, {method: "POST", body: JSON.stringify(body)})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_admin_reset_teacher_password_adminResetPassword>
         }
 
         /**
@@ -250,6 +266,10 @@ export namespace ai {
  */
 import { adminLogin as api_auth_admin_login_adminLogin } from "~backend/auth/admin-login";
 import { adminLogout as api_auth_admin_logout_adminLogout } from "~backend/auth/admin-logout";
+import {
+    requestPasswordReset as api_auth_password_reset_requestPasswordReset,
+    resetPassword as api_auth_password_reset_resetPassword
+} from "~backend/auth/password-reset";
 import { teacherLogin as api_auth_teacher_login_teacherLogin } from "~backend/auth/teacher-login";
 import { teacherLogout as api_auth_teacher_logout_teacherLogout } from "~backend/auth/teacher-logout";
 
@@ -262,6 +282,8 @@ export namespace auth {
             this.baseClient = baseClient
             this.adminLogin = this.adminLogin.bind(this)
             this.adminLogout = this.adminLogout.bind(this)
+            this.requestPasswordReset = this.requestPasswordReset.bind(this)
+            this.resetPassword = this.resetPassword.bind(this)
             this.teacherLogin = this.teacherLogin.bind(this)
             this.teacherLogout = this.teacherLogout.bind(this)
         }
@@ -282,6 +304,24 @@ export namespace auth {
             // Now make the actual call to the API
             const resp = await this.baseClient.callTypedAPI(`/auth/admin/logout`, {method: "POST", body: undefined})
             return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_auth_admin_logout_adminLogout>
+        }
+
+        /**
+         * Request a password reset token for a teacher.
+         */
+        public async requestPasswordReset(params: RequestType<typeof api_auth_password_reset_requestPasswordReset>): Promise<ResponseType<typeof api_auth_password_reset_requestPasswordReset>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/auth/password-reset/request`, {method: "POST", body: JSON.stringify(params)})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_auth_password_reset_requestPasswordReset>
+        }
+
+        /**
+         * Reset password using a valid token.
+         */
+        public async resetPassword(params: RequestType<typeof api_auth_password_reset_resetPassword>): Promise<ResponseType<typeof api_auth_password_reset_resetPassword>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/auth/password-reset/confirm`, {method: "POST", body: JSON.stringify(params)})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_auth_password_reset_resetPassword>
         }
 
         /**

@@ -9,6 +9,8 @@ import { MeetingPreparation } from './components/MeetingPreparation';
 import { SubscriptionPlans } from './components/SubscriptionPlans';
 import { AdminLogin } from './components/AdminLogin';
 import { TeacherLogin } from './components/TeacherLogin';
+import { PasswordResetRequest } from './components/PasswordResetRequest';
+import { PasswordResetConfirm } from './components/PasswordResetConfirm';
 import { AdminDashboard } from './components/AdminDashboard';
 import { TeacherManagement } from './components/TeacherManagement';
 import { AdminSystemSettings } from './components/AdminSystemSettings';
@@ -140,6 +142,8 @@ function DemoApp() {
           <Route path="/" element={<LandingPage onAdminLogin={handleLogin} />} />
           <Route path="/admin-login" element={<AdminLogin onLoginSuccess={handleLogin} />} />
           <Route path="/teacher-login" element={<TeacherLogin onLoginSuccess={handleLogin} />} />
+          <Route path="/forgot-password" element={<PasswordResetRequest />} />
+          <Route path="/reset-password" element={<PasswordResetConfirm />} />
           <Route path="/subscription/plans" element={<SubscriptionPlans />} />
           <Route path="/new-referral" element={<ReferralForm />} />
           <Route path="/referrals" element={<ReferralList />} />
