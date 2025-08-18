@@ -122,7 +122,7 @@ Thank you!`);
                         <div className="w-6 h-6 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
                           <Sparkles className="h-4 w-4 text-white" />
                         </div>
-                        <span className="text-gray-700">Unlimited student referrals</span>
+                        <span className="text-gray-700">5 referrals per month included</span>
                       </li>
                       <li className="flex items-start gap-3">
                         <div className="w-6 h-6 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
