@@ -36,7 +36,7 @@ export function SubscriptionPlans() {
 
   const handleEmailContact = (type: 'sales' | 'demo') => {
     const emailData = type === 'sales' ? {
-      email: 'sales@remynd.com',
+      email: 'sales@remynd.online',
       subject: 'Teacher Subscription Request - Concern2Care',
       body: `Hello,
 
@@ -283,17 +283,17 @@ Thank you!`
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => copyToClipboard('sales@remynd.com', 'Sales email')}
+                            onClick={() => copyToClipboard('sales@remynd.online', 'Sales email')}
                             className="h-8 px-2 border-blue-300 text-blue-700 hover:bg-blue-100"
                           >
-                            {copiedEmail === 'sales@remynd.com' ? (
+                            {copiedEmail === 'sales@remynd.online' ? (
                               <CheckCircle className="h-3 w-3" />
                             ) : (
                               <Copy className="h-3 w-3" />
                             )}
                           </Button>
                         </div>
-                        <p className="text-blue-800 font-mono text-sm">sales@remynd.com</p>
+                        <p className="text-blue-800 font-mono text-sm">sales@remynd.online</p>
                       </div>
                       
                       <div className="bg-gradient-to-r from-emerald-50 to-teal-50 p-4 rounded-xl border border-emerald-200">
@@ -544,14 +544,14 @@ Thank you!`
                     <div className="flex-1">
                       <p className="font-medium text-gray-900">Email</p>
                       <div className="flex items-center gap-2">
-                        <span className="text-blue-600 text-sm font-mono">sales@remynd.com</span>
+                        <span className="text-blue-600 text-sm font-mono">sales@remynd.online</span>
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => copyToClipboard('sales@remynd.com', 'Sales email')}
+                          onClick={() => copyToClipboard('sales@remynd.online', 'Sales email')}
                           className="h-6 w-6 p-0 hover:bg-blue-100"
                         >
-                          {copiedEmail === 'sales@remynd.com' ? (
+                          {copiedEmail === 'sales@remynd.online' ? (
                             <CheckCircle className="h-3 w-3 text-green-600" />
                           ) : (
                             <Copy className="h-3 w-3 text-blue-600" />
@@ -687,7 +687,7 @@ Thank you!`
             {[
               {
                 question: "How do I subscribe as a teacher?",
-                answer: "Contact our sales team at sales@remynd.com for personalized setup. We accept bank transfers, checks, and credit card payments through our secure payment portal."
+                answer: "Contact our sales team at sales@remynd.online for personalized setup. We accept bank transfers, checks, and credit card payments through our secure payment portal."
               },
               {
                 question: "Can my school purchase subscriptions for multiple teachers?",

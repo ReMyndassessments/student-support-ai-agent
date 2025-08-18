@@ -54,16 +54,16 @@ Please contact me with:
 
 Thank you!`);
       
-      const mailtoUrl = `mailto:sales@remynd.com?subject=${subject}&body=${body}`;
+      const mailtoUrl = `mailto:sales@remynd.online?subject=${subject}&body=${body}`;
       console.log('Opening sales contact email:', mailtoUrl);
       window.open(mailtoUrl, '_blank');
     } catch (error) {
       console.error('Error opening email client:', error);
       // Fallback
-      navigator.clipboard?.writeText('sales@remynd.com').then(() => {
-        alert('Sales email address copied to clipboard: sales@remynd.com');
+      navigator.clipboard?.writeText('sales@remynd.online').then(() => {
+        alert('Sales email address copied to clipboard: sales@remynd.online');
       }).catch(() => {
-        alert('Please email sales@remynd.com for subscription information');
+        alert('Please email sales@remynd.online for subscription information');
       });
     }
   };
@@ -258,10 +258,10 @@ Thank you!`);
                   <h4 className="font-semibold text-emerald-900 mb-2">Teacher Subscriptions</h4>
                   <p className="text-emerald-700 text-sm mb-3">Get pricing and payment options</p>
                   <button 
-                    onClick={() => window.open('mailto:sales@remynd.com', '_blank')}
+                    onClick={() => window.open('mailto:sales@remynd.online', '_blank')}
                     className="text-emerald-600 hover:text-emerald-700 font-medium underline"
                   >
-                    sales@remynd.com
+                    sales@remynd.online
                   </button>
                 </div>
                 <div className="text-center">

@@ -62,7 +62,7 @@ export function LandingPage({ userEmail = "teacher@school.edu", onAdminLogin }: 
 
   const handleEmailContact = (type: 'sales' | 'demo') => {
     const emailData = type === 'sales' ? {
-      email: 'sales@remynd.com',
+      email: 'sales@remynd.online',
       subject: 'Subscription Inquiry for Concern2Care',
       body: `Hello,
 
@@ -192,17 +192,17 @@ Thank you!`
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => copyToClipboard('sales@remynd.com', 'Sales email')}
+                            onClick={() => copyToClipboard('sales@remynd.online', 'Sales email')}
                             className="h-8 px-2 border-blue-300 text-blue-700 hover:bg-blue-100"
                           >
-                            {copiedEmail === 'sales@remynd.com' ? (
+                            {copiedEmail === 'sales@remynd.online' ? (
                               <CheckCircle className="h-3 w-3" />
                             ) : (
                               <Copy className="h-3 w-3" />
                             )}
                           </Button>
                         </div>
-                        <p className="text-blue-800 font-mono text-sm">sales@remynd.com</p>
+                        <p className="text-blue-800 font-mono text-sm">sales@remynd.online</p>
                       </div>
                     </div>
                     <DialogFooter className="flex-col gap-2">
