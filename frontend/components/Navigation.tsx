@@ -148,11 +148,6 @@ export function Navigation({ userEmail, userName, isAdmin = false, onLogout, onA
                     TEACHER
                   </div>
                 )}
-                {!userEmail && (
-                  <div className="px-1.5 py-0.5 sm:px-2 sm:py-1 bg-gradient-to-r from-gray-100 to-slate-100 text-gray-800 text-xs font-medium rounded-md sm:rounded-lg">
-                    DEMO
-                  </div>
-                )}
               </div>
             </Link>
             
