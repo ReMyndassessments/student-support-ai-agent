@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, User, Eye, EyeOff, GraduationCap } from 'lucide-react';
+import { Loader2, User, Eye, EyeOff, GraduationCap, AlertTriangle } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import backend from '~backend/client';
 
@@ -44,9 +44,10 @@ export function TeacherLogin({ onLoginSuccess }: TeacherLoginProps) {
       }
     } catch (error) {
       console.error('Login error:', error);
+      const errorMessage = error instanceof Error ? error.message : "Invalid email or password.";
       toast({
         title: "Login Failed",
-        description: "Invalid email or password.",
+        description: errorMessage,
         variant: "destructive"
       });
     } finally {
@@ -145,31 +146,14 @@ export function TeacherLogin({ onLoginSuccess }: TeacherLoginProps) {
               </Button>
             </form>
 
-            <Alert className="mt-6 border-blue-200 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-2xl">
-              <User className="h-4 w-4 text-blue-600" />
-              <AlertDescription className="text-blue-800 text-sm">
-                <strong>Demo Environment</strong>
+            <Alert className="mt-6 border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl">
+              <AlertTriangle className="h-4 w-4 text-amber-600" />
+              <AlertDescription className="text-amber-800 text-sm">
+                <strong>Need an Account?</strong>
                 <br />
-                Use any email ending in ".demo" with password "demo" to test teacher login.
+                Contact your school administrator to create your teacher account and receive login credentials.
               </AlertDescription>
             </Alert>
-          </CardContent>
-        </Card>
-
-        {/* Demo Credentials */}
-        <Card className="mt-6 border-0 bg-gradient-to-br from-emerald-50 to-teal-50 shadow-xl rounded-3xl overflow-hidden">
-          <CardContent className="p-6">
-            <h3 className="font-semibold text-emerald-900 mb-3">Demo Teacher Accounts:</h3>
-            <div className="space-y-2 text-emerald-800 text-sm">
-              <div className="flex justify-between">
-                <span>Email:</span>
-                <span className="font-mono">teacher@school.demo</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Password:</span>
-                <span className="font-mono">demo</span>
-              </div>
-            </div>
           </CardContent>
         </Card>
       </div>

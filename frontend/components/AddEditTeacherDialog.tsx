@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Eye, EyeOff } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import backend from '~backend/client';
 import type { UserProfile } from '~backend/users/get-profile';
@@ -20,12 +20,14 @@ export function AddEditTeacherDialog({ isOpen, onClose, onSave, teacher }: AddEd
   const [formData, setFormData] = useState({
     email: '',
     name: '',
+    password: '',
     schoolName: '',
     schoolDistrict: '',
     teacherType: 'classroom',
     subscriptionEndDate: '',
     supportRequestsLimit: 20,
   });
+  const [showPassword, setShowPassword] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const { toast } = useToast();
 
@@ -34,6 +36,7 @@ export function AddEditTeacherDialog({ isOpen, onClose, onSave, teacher }: AddEd
       setFormData({
         email: teacher.email,
         name: teacher.name || '',
+        password: '', // Don't pre-fill password for security
         schoolName: teacher.schoolName || '',
         schoolDistrict: teacher.schoolDistrict || '',
         teacherType: teacher.teacherType || 'classroom',
@@ -47,6 +50,7 @@ export function AddEditTeacherDialog({ isOpen, onClose, onSave, teacher }: AddEd
       setFormData({
         email: '',
         name: '',
+        password: '',
         schoolName: '',
         schoolDistrict: '',
         teacherType: 'classroom',
@@ -66,21 +70,56 @@ export function AddEditTeacherDialog({ isOpen, onClose, onSave, teacher }: AddEd
       return;
     }
 
+    if (!teacher && !formData.password) {
+      toast({
+        title: "Missing Password",
+        description: "Password is required when creating a new teacher.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (formData.password && formData.password.length < 6) {
+      toast({
+        title: "Invalid Password",
+        description: "Password must be at least 6 characters long.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsSaving(true);
     try {
       let savedTeacher;
       if (teacher) {
         // Update existing teacher
-        savedTeacher = await backend.users.updateUserByAdmin({
+        const updateData: any = {
           id: teacher.id,
-          ...formData,
+          name: formData.name,
+          email: formData.email,
+          schoolName: formData.schoolName,
+          schoolDistrict: formData.schoolDistrict,
+          teacherType: formData.teacherType,
+          subscriptionEndDate: formData.subscriptionEndDate,
           supportRequestsLimit: Number(formData.supportRequestsLimit),
-        });
+        };
+        
+        // Only include password if it's provided
+        if (formData.password) {
+          updateData.password = formData.password;
+        }
+        
+        savedTeacher = await backend.users.updateUserByAdmin(updateData);
       } else {
         // Create new teacher
         savedTeacher = await backend.users.createUserByAdmin({
-          ...formData,
-          supportRequestsLimit: Number(formData.supportRequestsLimit),
+          email: formData.email,
+          name: formData.name,
+          password: formData.password,
+          schoolName: formData.schoolName,
+          schoolDistrict: formData.schoolDistrict,
+          teacherType: formData.teacherType,
+          subscriptionEndDate: formData.subscriptionEndDate,
         });
       }
       onSave(savedTeacher);
@@ -119,6 +158,30 @@ export function AddEditTeacherDialog({ isOpen, onClose, onSave, teacher }: AddEd
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="email" className="text-right">Email</Label>
             <Input id="email" type="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} className="col-span-3" />
+          </div>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="password" className="text-right">
+              {teacher ? 'New Password' : 'Password'}
+            </Label>
+            <div className="col-span-3 relative">
+              <Input 
+                id="password" 
+                type={showPassword ? "text" : "password"}
+                value={formData.password} 
+                onChange={(e) => setFormData({ ...formData, password: e.target.value })} 
+                placeholder={teacher ? "Leave blank to keep current password" : "Enter password"}
+                className="pr-10"
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0"
+              >
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </Button>
+            </div>
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="schoolName" className="text-right">School</Label>

@@ -3,10 +3,12 @@ import { userDB } from "./db";
 import { getAuthData } from "~encore/auth";
 import { APIError } from "encore.dev/api";
 import type { UserProfile } from "./get-profile";
+import * as bcrypt from "bcrypt";
 
 export interface CreateUserByAdminRequest {
   email: string;
   name: string;
+  password: string;
   schoolName?: string;
   schoolDistrict?: string;
   teacherType?: string;
@@ -31,16 +33,25 @@ export const createUserByAdmin = api<CreateUserByAdminRequest, UserProfile>(
       throw APIError.alreadyExists("A user with this email already exists.");
     }
 
+    // Validate password
+    if (!req.password || req.password.length < 6) {
+      throw APIError.invalidArgument("Password must be at least 6 characters long.");
+    }
+
+    // Hash the password
+    const saltRounds = 10;
+    const passwordHash = await bcrypt.hash(req.password, saltRounds);
+
     const subscriptionEndDate = req.subscriptionEndDate ? new Date(req.subscriptionEndDate) : new Date(Date.now() + 365 * 24 * 60 * 60 * 1000); // Default to 1 year from now
 
     const user = await userDB.queryRow<any>`
       INSERT INTO users (
-        email, name, school_name, school_district, teacher_type, 
+        email, name, password_hash, school_name, school_district, teacher_type, 
         subscription_start_date, subscription_end_date,
         created_at, updated_at
       )
       VALUES (
-        ${req.email}, ${req.name}, ${req.schoolName || null}, ${req.schoolDistrict || null}, ${req.teacherType || 'classroom'},
+        ${req.email}, ${req.name}, ${passwordHash}, ${req.schoolName || null}, ${req.schoolDistrict || null}, ${req.teacherType || 'classroom'},
         NOW(), ${subscriptionEndDate},
         NOW(), NOW()
       )

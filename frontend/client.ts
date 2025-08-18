@@ -285,7 +285,7 @@ export namespace auth {
         }
 
         /**
-         * Teacher login for demo purposes.
+         * Teacher login with email and password authentication.
          */
         public async teacherLogin(params: RequestType<typeof api_auth_teacher_login_teacherLogin>): Promise<ResponseType<typeof api_auth_teacher_login_teacherLogin>> {
             // Now make the actual call to the API
@@ -487,6 +487,7 @@ export namespace users {
             const body: Record<string, any> = {
                 email:                params.email,
                 name:                 params.name,
+                password:             params.password,
                 schoolDistrict:       params.schoolDistrict,
                 schoolName:           params.schoolName,
                 subscriptionEndDate:  params.subscriptionEndDate,

@@ -3,11 +3,13 @@ import { userDB } from "./db";
 import { getAuthData } from "~encore/auth";
 import { APIError } from "encore.dev/api";
 import type { UserProfile } from "./get-profile";
+import * as bcrypt from "bcrypt";
 
 export interface UpdateUserByAdminRequest {
   id: number; // from path
   name?: string;
   email?: string;
+  password?: string;
   schoolName?: string;
   schoolDistrict?: string;
   teacherType?: string;
@@ -28,12 +30,22 @@ export const updateUserByAdmin = api<UpdateUserByAdminRequest, UserProfile>(
     }
 
     const subscriptionEndDate = req.subscriptionEndDate ? new Date(req.subscriptionEndDate) : undefined;
+    
+    let passwordHash: string | undefined;
+    if (req.password) {
+      if (req.password.length < 6) {
+        throw APIError.invalidArgument("Password must be at least 6 characters long.");
+      }
+      const saltRounds = 10;
+      passwordHash = await bcrypt.hash(req.password, saltRounds);
+    }
 
     const user = await userDB.queryRow<any>`
       UPDATE users
       SET
         name = COALESCE(${req.name || null}, name),
         email = COALESCE(${req.email || null}, email),
+        password_hash = COALESCE(${passwordHash || null}, password_hash),
         school_name = COALESCE(${req.schoolName || null}, school_name),
         school_district = COALESCE(${req.schoolDistrict || null}, school_district),
         teacher_type = COALESCE(${req.teacherType || null}, teacher_type),
