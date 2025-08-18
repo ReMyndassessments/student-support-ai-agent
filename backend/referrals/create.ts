@@ -1,5 +1,8 @@
 import { api } from "encore.dev/api";
 import { referralDB } from "./db";
+import { users } from "~encore/clients";
+import { APIError } from "encore.dev/api";
+import { getAuthData } from "~encore/auth";
 
 export interface CreateReferralRequest {
   studentFirstName: string;
@@ -39,8 +42,21 @@ export interface Referral {
 
 // Creates a new student referral form.
 export const create = api<CreateReferralRequest, Referral>(
-  { expose: true, method: "POST", path: "/referrals" },
+  { expose: true, method: "POST", path: "/referrals", auth: true },
   async (req) => {
+    const auth = getAuthData()!;
+
+    // Check referral limit for authenticated users
+    if (auth.email !== 'admin@concern2care.demo') {
+      const limitCheck = await users.checkReferralLimit({ email: auth.email });
+      
+      if (!limitCheck.canCreateReferral) {
+        throw APIError.resourceExhausted(
+          `Referral limit reached: ${limitCheck.reason}. You have used ${limitCheck.referralsUsed} of ${limitCheck.totalLimit} referrals this month.`
+        );
+      }
+    }
+
     const row = await referralDB.queryRow<{
       id: number;
       student_first_name: string;
@@ -73,7 +89,8 @@ export const create = api<CreateReferralRequest, Referral>(
         severity_level,
         actions_taken,
         other_action_taken,
-        ai_recommendations
+        ai_recommendations,
+        created_by_email
       ) VALUES (
         ${req.studentFirstName},
         ${req.studentLastInitial},
@@ -88,13 +105,24 @@ export const create = api<CreateReferralRequest, Referral>(
         ${req.severityLevel},
         ${JSON.stringify(req.actionsTaken)},
         ${req.otherActionTaken || null},
-        ${req.aiRecommendations || null}
+        ${req.aiRecommendations || null},
+        ${auth.email}
       )
       RETURNING *
     `;
 
     if (!row) {
       throw new Error("Failed to create referral");
+    }
+
+    // Increment referral usage count for non-admin users
+    if (auth.email !== 'admin@concern2care.demo') {
+      try {
+        await users.incrementReferralUsage({ email: auth.email });
+      } catch (error) {
+        console.error('Failed to increment referral usage:', error);
+        // Don't fail the referral creation if usage tracking fails
+      }
     }
 
     return {

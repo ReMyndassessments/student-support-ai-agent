@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Checkbox } from '@/components/ui/checkbox';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Loader2, AlertTriangle, CheckCircle, ArrowLeft, Sparkles, HelpCircle, User, Calendar, MapPin, AlertCircle, Key, ChevronDown, ChevronUp } from 'lucide-react';
+import { Loader2, AlertTriangle, CheckCircle, ArrowLeft, Sparkles, HelpCircle, User, Calendar, MapPin, AlertCircle, Key, ChevronDown, ChevronUp, ShoppingCart } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { Link, useNavigate } from 'react-router-dom';
 import backend from '~backend/client';
@@ -62,6 +62,7 @@ export function ReferralForm() {
   const [hasGenerated, setHasGenerated] = useState(false);
   const [hasSaved, setHasSaved] = useState(false);
   const [savedReferralId, setSavedReferralId] = useState<number | null>(null);
+  const [referralLimitError, setReferralLimitError] = useState<string | null>(null);
   
   // Follow-up assistance state
   const [followUpQuestion, setFollowUpQuestion] = useState('');
@@ -93,6 +94,7 @@ export function ReferralForm() {
     setHasGenerated(false);
     setHasSaved(false);
     setHasFollowUpAssistance(false);
+    setReferralLimitError(null);
   };
 
   const handleConcernTypeChange = (concernType: string, checked: boolean) => {
@@ -132,9 +134,9 @@ export function ReferralForm() {
     }
 
     setIsGenerating(true);
+    setReferralLimitError(null);
     try {
       const request: GenerateRecommendationsRequest = {
-        userEmail,
         studentFirstName: formData.studentFirstName,
         studentLastInitial: formData.studentLastInitial,
         grade: formData.grade,
@@ -202,7 +204,6 @@ export function ReferralForm() {
     setIsGeneratingFollowUp(true);
     try {
       const request: FollowUpAssistanceRequest = {
-        userEmail,
         originalRecommendations: recommendations,
         specificQuestion: followUpQuestion,
         studentFirstName: formData.studentFirstName,
@@ -246,6 +247,7 @@ export function ReferralForm() {
     }
 
     setIsSaving(true);
+    setReferralLimitError(null);
     try {
       const finalRecommendations = hasFollowUpAssistance 
         ? `${recommendations}\n\n--- FOLLOW-UP ASSISTANCE ---\n\nTeacher's Question: ${followUpQuestion}\n\nAdditional Guidance:\n${followUpAssistance}`
@@ -276,9 +278,16 @@ export function ReferralForm() {
       });
     } catch (error) {
       console.error('Error saving referral:', error);
+      const errorMessage = error instanceof Error ? error.message : "Failed to save referral. Please try again.";
+      
+      // Check if it's a referral limit error
+      if (errorMessage.includes("Referral limit reached")) {
+        setReferralLimitError(errorMessage);
+      }
+      
       toast({
         title: "Error",
-        description: "Failed to save referral. Please try again.",
+        description: errorMessage,
         variant: "destructive"
       });
     } finally {
@@ -311,6 +320,7 @@ export function ReferralForm() {
     setFollowUpAssistance('');
     setFollowUpDisclaimer('');
     setHasFollowUpAssistance(false);
+    setReferralLimitError(null);
     
     // Reset expanded sections
     setExpandedSections({
@@ -357,6 +367,7 @@ export function ReferralForm() {
         );
       }
       
+      // Main headings
       if (trimmedLine.startsWith('##') || trimmedLine.startsWith('# ')) {
         return (
           <h3 key={index} className="text-lg font-semibold text-gray-900 mt-6 mb-3 first:mt-0">
@@ -365,6 +376,7 @@ export function ReferralForm() {
         );
       }
       
+      // Sub-headings
       if (trimmedLine.startsWith('**') && trimmedLine.endsWith('**')) {
         return (
           <h4 key={index} className="text-base font-medium text-gray-800 mt-4 mb-2">
@@ -373,6 +385,7 @@ export function ReferralForm() {
         );
       }
       
+      // Numbered lists
       if (/^\d+\./.test(trimmedLine)) {
         return (
           <div key={index} className="mb-2">
@@ -381,6 +394,7 @@ export function ReferralForm() {
         );
       }
       
+      // Bullet points
       if (trimmedLine.startsWith('- ') || trimmedLine.startsWith('• ')) {
         return (
           <div key={index} className="ml-4 mb-1 flex items-start">
@@ -390,6 +404,7 @@ export function ReferralForm() {
         );
       }
       
+      // Regular paragraphs
       return (
         <p key={index} className="text-gray-700 mb-3 leading-relaxed">
           {trimmedLine}
@@ -442,6 +457,28 @@ export function ReferralForm() {
             You are logged in as the demo administrator. All AI features are fully functional using the admin DeepSeek API key.
           </AlertDescription>
         </Alert>
+
+        {/* Referral Limit Error */}
+        {referralLimitError && (
+          <Alert className="border-red-200 bg-gradient-to-r from-red-50 to-pink-50 rounded-2xl">
+            <AlertTriangle className="h-4 w-4 text-red-600" />
+            <AlertDescription className="text-red-800 text-sm">
+              <div className="flex items-center justify-between">
+                <div>
+                  <strong>Monthly Limit Reached</strong>
+                  <br />
+                  {referralLimitError}
+                </div>
+                <Link to="/profile">
+                  <Button size="sm" className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white rounded-xl ml-4">
+                    <ShoppingCart className="h-4 w-4 mr-2" />
+                    Buy More Referrals
+                  </Button>
+                </Link>
+              </div>
+            </AlertDescription>
+          </Alert>
+        )}
 
         {/* Student Information */}
         <Card className="border-0 bg-white/80 backdrop-blur-sm shadow-xl rounded-2xl sm:rounded-3xl overflow-hidden">
