@@ -47,16 +47,6 @@ const auth = authHandler<AuthParams, AuthData>(
     if (data.authorization) {
       const token = data.authorization.replace("Bearer ", "");
       
-      // For demo purposes, accept a simple demo token
-      if (token === 'demo-admin-token') {
-        return {
-          userID: 'admin',
-          email: 'admin@concern2care.demo',
-          isAdmin: true,
-          name: 'Demo Administrator'
-        };
-      }
-
       // Verify Clerk JWT token
       try {
         const verifiedToken = await clerkClient.verifyToken(token, {

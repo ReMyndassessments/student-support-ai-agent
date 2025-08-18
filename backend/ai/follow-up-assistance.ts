@@ -2,6 +2,9 @@ import { api } from "encore.dev/api";
 import { users } from "~encore/clients";
 import { APIError } from "encore.dev/api";
 import { getAuthData } from "~encore/auth";
+import { secret } from "encore.dev/config";
+
+const adminDeepSeekApiKey = secret("AdminDeepSeekAPIKey");
 
 export interface FollowUpAssistanceRequest {
   originalRecommendations: string;
@@ -24,39 +27,40 @@ export const followUpAssistance = api<FollowUpAssistanceRequest, FollowUpAssista
   async (req) => {
     const auth = getAuthData()!;
     
-    // For demo admin, return mock assistance
-    if (auth.isAdmin) {
-      const mockAssistance = generateMockFollowUpAssistance(req);
-      const disclaimer = "⚠️ IMPORTANT DISCLAIMER: This AI-generated assistance is for informational purposes only and should not replace professional educational consultation. Please work with your school's student support department, special education team, or educational specialists for comprehensive guidance. All suggestions should be reviewed and approved by qualified educational professionals before implementation.";
-      
-      return {
-        assistance: mockAssistance,
-        disclaimer
-      };
-    }
-    
-    // Check user access to follow-up assistance feature
-    const accessCheck = await users.checkAccess({ 
-      email: auth.email, 
-      feature: 'follow_up_assistance' 
-    });
-    
-    if (!accessCheck.hasAccess) {
-      throw APIError.permissionDenied(`Access denied: ${accessCheck.reason}. Please upgrade to ${accessCheck.suggestedPlan} plan.`);
-    }
-
-    // Get user's personal DeepSeek API key
     let apiKey: string;
-    
-    try {
-      const userKeyResponse = await users.getDeepSeekKey({ email: auth.email });
-      if (userKeyResponse.hasKey && userKeyResponse.key) {
-        apiKey = userKeyResponse.key;
-      } else {
-        throw APIError.invalidArgument("No DeepSeek API key found. Please add your API key in your profile settings to use AI features.");
+
+    if (auth.isAdmin) {
+      const key = adminDeepSeekApiKey();
+      if (!key) {
+        console.log("AdminDeepSeekAPIKey not set, returning mock data for admin.");
+        const mockAssistance = generateMockFollowUpAssistance(req);
+        const disclaimer = "⚠️ IMPORTANT DISCLAIMER: This AI-generated assistance is for informational purposes only and should not replace professional educational consultation. Please work with your school's student support department, special education team, or educational specialists for comprehensive guidance. All suggestions should be reviewed and approved by qualified educational professionals before implementation. (Admin API key not set, returning mock data)";
+        return { assistance: mockAssistance, disclaimer };
       }
-    } catch (error) {
-      throw APIError.invalidArgument("No DeepSeek API key available. Please add your API key in your profile settings.");
+      apiKey = key;
+    } else {
+      // Check user access to follow-up assistance feature
+      const accessCheck = await users.checkAccess({ 
+        email: auth.email, 
+        feature: 'follow_up_assistance' 
+      });
+      
+      if (!accessCheck.hasAccess) {
+        throw APIError.permissionDenied(`Access denied: ${accessCheck.reason}. Please upgrade to ${accessCheck.suggestedPlan} plan.`);
+      }
+
+      // Get user's personal DeepSeek API key
+      try {
+        const userKeyResponse = await users.getDeepSeekKey({ email: auth.email });
+        if (userKeyResponse.hasKey && userKeyResponse.key) {
+          apiKey = userKeyResponse.key;
+        } else {
+          throw APIError.invalidArgument("No DeepSeek API key found. Please add your API key in your profile settings to use AI features.");
+        }
+      } catch (error) {
+        if (error instanceof APIError) throw error;
+        throw APIError.internal("Could not retrieve your API key. Please try again.");
+      }
     }
 
     const concernTypesText = req.concernTypes.length > 0 
