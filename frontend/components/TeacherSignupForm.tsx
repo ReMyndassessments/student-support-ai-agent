@@ -5,9 +5,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, GraduationCap, User } from 'lucide-react';
+import { Loader2, GraduationCap, User, ArrowLeft } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import backend from '~backend/client';
 
 interface TeacherSignupFormData {
@@ -86,7 +86,7 @@ export function TeacherSignupForm() {
 
     setIsSubmitting(true);
     try {
-      // Create the teacher account using admin endpoint
+      // Create the teacher account using admin endpoint (no auth required for self-signup)
       const response = await backend.users.createUserByAdmin({
         email: formData.email,
         name: formData.name,
@@ -106,10 +106,10 @@ export function TeacherSignupForm() {
 
       toast({
         title: "Account Created Successfully!",
-        description: "Your teacher account has been created. You can now sign in."
+        description: "Your teacher account has been created. You can now sign in with your email."
       });
 
-      // Redirect to sign in page or dashboard
+      // Redirect to home page
       navigate('/');
     } catch (error) {
       console.error('Error creating teacher account:', error);
@@ -126,8 +126,19 @@ export function TeacherSignupForm() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex items-center justify-center">
-      <div className="max-w-2xl w-full mx-6">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
+      <div className="max-w-2xl mx-auto px-6 py-8 space-y-8">
+        {/* Back Button */}
+        <div className="flex items-center">
+          <Link 
+            to="/" 
+            className="inline-flex items-center text-gray-600 hover:text-gray-900 font-medium transition-colors hover:bg-white/60 px-3 py-2 rounded-xl touch-manipulation active:scale-95"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Home
+          </Link>
+        </div>
+
         {/* Header */}
         <div className="text-center mb-8 relative">
           <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 rounded-3xl shadow-2xl mb-6">
@@ -256,7 +267,7 @@ export function TeacherSignupForm() {
               <AlertDescription className="text-blue-800 text-sm">
                 <strong>Account Setup</strong>
                 <br />
-                Your teacher account will be created with the specified subscription period and support request limit.
+                Your teacher account will be created with the specified subscription period and support request limit. You can sign in with your email after account creation.
               </AlertDescription>
             </Alert>
 
