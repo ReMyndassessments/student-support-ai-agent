@@ -33,6 +33,7 @@ const BROWSER = typeof globalThis === "object" && ("window" in globalThis);
  * Client is an API client for the  Encore application.
  */
 export class Client {
+    public readonly admin: admin.ServiceClient
     public readonly ai: ai.ServiceClient
     public readonly auth: auth.ServiceClient
     public readonly referrals: referrals.ServiceClient
@@ -51,6 +52,7 @@ export class Client {
         this.target = target
         this.options = options ?? {}
         const base = new BaseClient(this.target, this.options)
+        this.admin = new admin.ServiceClient(base)
         this.ai = new ai.ServiceClient(base)
         this.auth = new auth.ServiceClient(base)
         this.referrals = new referrals.ServiceClient(base)
@@ -95,6 +97,115 @@ export interface ClientOptions {
      * a function which returns a new object for each request.
      */
     auth?: RequestType<typeof auth_auth> | AuthDataGenerator
+}
+
+/**
+ * Import the endpoint handlers to derive the types for the client.
+ */
+import {
+    bulkDeleteTeachers as api_admin_bulk_operations_bulkDeleteTeachers,
+    bulkUpdateTeachers as api_admin_bulk_operations_bulkUpdateTeachers
+} from "~backend/admin/bulk-operations";
+import { getDashboardStats as api_admin_dashboard_stats_getDashboardStats } from "~backend/admin/dashboard-stats";
+import {
+    clearDemoData as api_admin_demo_data_clearDemoData,
+    createDemoData as api_admin_demo_data_createDemoData
+} from "~backend/admin/demo-data";
+import { exportData as api_admin_export_data_exportData } from "~backend/admin/export-data";
+import {
+    getSystemSettings as api_admin_system_settings_getSystemSettings,
+    updateSystemSettings as api_admin_system_settings_updateSystemSettings
+} from "~backend/admin/system-settings";
+
+export namespace admin {
+
+    export class ServiceClient {
+        private baseClient: BaseClient
+
+        constructor(baseClient: BaseClient) {
+            this.baseClient = baseClient
+            this.bulkDeleteTeachers = this.bulkDeleteTeachers.bind(this)
+            this.bulkUpdateTeachers = this.bulkUpdateTeachers.bind(this)
+            this.clearDemoData = this.clearDemoData.bind(this)
+            this.createDemoData = this.createDemoData.bind(this)
+            this.exportData = this.exportData.bind(this)
+            this.getDashboardStats = this.getDashboardStats.bind(this)
+            this.getSystemSettings = this.getSystemSettings.bind(this)
+            this.updateSystemSettings = this.updateSystemSettings.bind(this)
+        }
+
+        /**
+         * Bulk delete multiple teachers at once.
+         */
+        public async bulkDeleteTeachers(params: RequestType<typeof api_admin_bulk_operations_bulkDeleteTeachers>): Promise<ResponseType<typeof api_admin_bulk_operations_bulkDeleteTeachers>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/admin/teachers/bulk-delete`, {method: "POST", body: JSON.stringify(params)})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_admin_bulk_operations_bulkDeleteTeachers>
+        }
+
+        /**
+         * Bulk update multiple teachers at once.
+         */
+        public async bulkUpdateTeachers(params: RequestType<typeof api_admin_bulk_operations_bulkUpdateTeachers>): Promise<ResponseType<typeof api_admin_bulk_operations_bulkUpdateTeachers>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/admin/teachers/bulk-update`, {method: "POST", body: JSON.stringify(params)})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_admin_bulk_operations_bulkUpdateTeachers>
+        }
+
+        /**
+         * Clears all demo data from the system.
+         */
+        public async clearDemoData(): Promise<ResponseType<typeof api_admin_demo_data_clearDemoData>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/admin/demo/clear`, {method: "DELETE", body: undefined})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_admin_demo_data_clearDemoData>
+        }
+
+        /**
+         * Creates demo data for testing and demonstrations.
+         */
+        public async createDemoData(params: RequestType<typeof api_admin_demo_data_createDemoData>): Promise<ResponseType<typeof api_admin_demo_data_createDemoData>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/admin/demo/create`, {method: "POST", body: JSON.stringify(params)})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_admin_demo_data_createDemoData>
+        }
+
+        /**
+         * Exports system data for admin analysis.
+         */
+        public async exportData(params: RequestType<typeof api_admin_export_data_exportData>): Promise<ResponseType<typeof api_admin_export_data_exportData>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/admin/export`, {method: "POST", body: JSON.stringify(params)})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_admin_export_data_exportData>
+        }
+
+        /**
+         * Gets comprehensive dashboard statistics for admin overview.
+         */
+        public async getDashboardStats(): Promise<ResponseType<typeof api_admin_dashboard_stats_getDashboardStats>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/admin/dashboard/stats`, {method: "GET", body: undefined})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_admin_dashboard_stats_getDashboardStats>
+        }
+
+        /**
+         * Gets current system settings.
+         */
+        public async getSystemSettings(): Promise<ResponseType<typeof api_admin_system_settings_getSystemSettings>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/admin/system/settings`, {method: "GET", body: undefined})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_admin_system_settings_getSystemSettings>
+        }
+
+        /**
+         * Updates system settings.
+         */
+        public async updateSystemSettings(params: RequestType<typeof api_admin_system_settings_updateSystemSettings>): Promise<ResponseType<typeof api_admin_system_settings_updateSystemSettings>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/admin/system/settings`, {method: "PUT", body: JSON.stringify(params)})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_admin_system_settings_updateSystemSettings>
+        }
+    }
 }
 
 /**
