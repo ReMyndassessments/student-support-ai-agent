@@ -204,7 +204,7 @@ function DemoApp() {
             <Route path="/new-referral" element={<ReferralForm />} />
             <Route path="/referrals" element={<ReferralList />} />
             <Route path="/meeting/:referralId" element={<MeetingPreparation />} />
-            <Route path="/subscription/plans" element={<SubscriptionPlans />} />
+            <Route path="*" element={<LandingPage onAdminLogin={handleAdminLogin} />} />
           </Routes>
         </main>
         <Toaster />

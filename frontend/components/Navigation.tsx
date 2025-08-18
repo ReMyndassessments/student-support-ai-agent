@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Home, Menu, X, GraduationCap, FileText, Users, LogOut, CreditCard, User, Wifi, WifiOff } from 'lucide-react';
+import { Home, Menu, X, GraduationCap, FileText, Users, LogOut, CreditCard, User, Wifi, WifiOff, Shield, Settings, Database } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { SignInButton, UserButton, useAuth } from '@clerk/clerk-react';
@@ -61,13 +61,33 @@ export function Navigation({ userEmail, userName, isAdmin = false, onLogout, onA
       label: 'Home'
     },
     {
+      to: '/admin',
+      icon: Shield,
+      label: 'Admin Dashboard'
+    },
+    {
+      to: '/admin/teachers',
+      icon: Users,
+      label: 'Teacher Management'
+    },
+    {
+      to: '/admin/system-settings',
+      icon: Settings,
+      label: 'System Settings'
+    },
+    {
+      to: '/admin/demo-data',
+      icon: Database,
+      label: 'Demo Data'
+    },
+    {
       to: '/new-referral',
       icon: FileText,
       label: 'New Support Request'
     },
     {
       to: '/referrals',
-      icon: Users,
+      icon: FileText,
       label: 'All Support Requests'
     }
   ];
@@ -150,7 +170,7 @@ export function Navigation({ userEmail, userName, isAdmin = false, onLogout, onA
                 </div>
                 {isAdmin && (
                   <div className="px-1.5 py-0.5 sm:px-2 sm:py-1 bg-gradient-to-r from-emerald-100 to-teal-100 text-emerald-800 text-xs font-medium rounded-md sm:rounded-lg">
-                    DEMO
+                    ADMIN
                   </div>
                 )}
                 {!clerkPublishableKey && !isAdmin && (
@@ -280,7 +300,9 @@ export function Navigation({ userEmail, userName, isAdmin = false, onLogout, onA
                   <div className="w-8 h-8 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg">
                     <GraduationCap className="h-5 w-5 text-white" />
                   </div>
-                  <span className="font-bold text-gray-900">Menu</span>
+                  <span className="font-bold text-gray-900">
+                    {isAdmin ? 'Admin Menu' : 'Menu'}
+                  </span>
                 </div>
                 <Button
                   variant="ghost"

@@ -219,18 +219,14 @@ export function AdminDashboard({ user, onLogout }: AdminDashboardProps) {
                     System Settings
                   </Button>
                 </Link>
-                <Link to="/admin/bulk-operations">
-                  <Button variant="outline" className="w-full border-gray-300 text-gray-700 hover:bg-gray-50 rounded-xl">
-                    <Database className="h-4 w-4 mr-2" />
-                    Bulk Operations
-                  </Button>
-                </Link>
-                <Link to="/admin/export">
-                  <Button variant="outline" className="w-full border-gray-300 text-gray-700 hover:bg-gray-50 rounded-xl">
-                    <Download className="h-4 w-4 mr-2" />
-                    Export Data
-                  </Button>
-                </Link>
+                <Button variant="outline" className="w-full border-gray-300 text-gray-700 hover:bg-gray-50 rounded-xl" disabled>
+                  <Database className="h-4 w-4 mr-2" />
+                  Bulk Operations
+                </Button>
+                <Button variant="outline" className="w-full border-gray-300 text-gray-700 hover:bg-gray-50 rounded-xl" disabled>
+                  <Download className="h-4 w-4 mr-2" />
+                  Export Data
+                </Button>
               </div>
             </CardContent>
           </Card>
