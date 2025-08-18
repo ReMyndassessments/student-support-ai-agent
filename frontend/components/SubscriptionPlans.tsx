@@ -259,15 +259,15 @@ Thank you!`;
             {pricingTiers.map((tier, index) => (
               <Card key={index} className={`border-0 bg-gradient-to-br ${tier.bgGradient} shadow-xl rounded-2xl sm:rounded-3xl overflow-hidden hover:shadow-2xl transition-all duration-300 hover:scale-105 relative ${tier.popular ? 'ring-2 ring-purple-500 ring-offset-2' : ''}`}>
                 {tier.popular && (
-                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                    <Badge className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-1 rounded-full shadow-lg">
-                      <Star className="h-3 w-3 mr-1" />
+                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
+                    <Badge className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-2 rounded-full shadow-lg text-sm font-semibold">
+                      <Star className="h-4 w-4 mr-1" />
                       Most Popular
                     </Badge>
                   </div>
                 )}
                 
-                <CardHeader className={`bg-gradient-to-r ${tier.gradient} text-white rounded-t-2xl sm:rounded-t-3xl p-4 sm:p-6`}>
+                <CardHeader className={`bg-gradient-to-r ${tier.gradient} text-white rounded-t-2xl sm:rounded-t-3xl p-4 sm:p-6 ${tier.popular ? 'pt-8' : ''}`}>
                   <CardTitle className="text-center">
                     <h3 className="text-lg sm:text-xl font-bold mb-1">{tier.name}</h3>
                     <p className="text-sm opacity-90">{tier.range}</p>
