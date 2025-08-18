@@ -34,7 +34,6 @@ export function UserProfile() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [purchasing, setPurchasing] = useState(false);
   const [showApiKey, setShowApiKey] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -49,7 +48,6 @@ export function UserProfile() {
     schoolYear: '',
     deepSeekApiKey: ''
   });
-  const [packagesToPurchase, setPackagesToPurchase] = useState(1);
   const { toast } = useToast();
   const { getToken, user } = useAuth();
 
@@ -143,36 +141,6 @@ export function UserProfile() {
     }
   };
 
-  const handlePurchasePackages = async () => {
-    setPurchasing(true);
-    try {
-      const token = await getToken();
-      const response = await backend.with({ 
-        auth: async () => ({ authorization: `Bearer ${token}` })
-      }).users.purchaseSupportRequestPackage({
-        packages: packagesToPurchase
-      });
-      
-      if (response.success) {
-        await loadProfile(); // Refresh profile to show new limits
-        toast({
-          title: "Packages Purchased",
-          description: `Successfully purchased ${packagesToPurchase} support request package(s). Your new limit is ${response.newTotalLimit} support requests per month.`
-        });
-        setPackagesToPurchase(1);
-      }
-    } catch (error) {
-      console.error('Error purchasing packages:', error);
-      toast({
-        title: "Error",
-        description: "Failed to purchase support request packages. Please try again.",
-        variant: "destructive"
-      });
-    } finally {
-      setPurchasing(false);
-    }
-  };
-
   const handleAdditionalGradeChange = (grade: string, checked: boolean) => {
     setFormData(prev => ({
       ...prev,
@@ -199,13 +167,6 @@ export function UserProfile() {
     });
   };
 
-  const getSupportRequestUsageColor = (used: number, total: number) => {
-    const percentage = (used / total) * 100;
-    if (percentage >= 90) return 'text-red-600 bg-red-50';
-    if (percentage >= 75) return 'text-orange-600 bg-orange-50';
-    return 'text-green-600 bg-green-50';
-  };
-
   if (loading) {
     return (
       <Card className="border-0 bg-white/80 backdrop-blur-sm shadow-xl rounded-3xl overflow-hidden">
@@ -221,94 +182,6 @@ export function UserProfile() {
 
   return (
     <div className="space-y-8">
-      {/* Support Request Usage Status */}
-      {profile && (
-        <Card className="border-0 bg-white/90 backdrop-blur-sm shadow-xl rounded-3xl overflow-hidden">
-          <CardHeader className="bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 text-white rounded-t-3xl">
-            <CardTitle className="flex items-center gap-3 text-xl">
-              <div className="w-10 h-10 bg-white/20 rounded-2xl flex items-center justify-center">
-                <GraduationCap className="h-6 w-6" />
-              </div>
-              Monthly Support Request Usage
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-4">
-                <div className={`p-4 rounded-2xl ${getSupportRequestUsageColor(profile.supportRequestsUsedThisMonth, profile.supportRequestsLimit + (profile.additionalSupportRequestPackages * 10))}`}>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="font-medium">Support Requests Used</span>
-                    <Badge variant="outline" className="bg-white/60">
-                      {profile.supportRequestsUsedThisMonth} / {profile.supportRequestsLimit + (profile.additionalSupportRequestPackages * 10)}
-                    </Badge>
-                  </div>
-                  <div className="w-full bg-white/40 rounded-full h-2">
-                    <div 
-                      className="bg-current h-2 rounded-full transition-all duration-300"
-                      style={{ 
-                        width: `${Math.min((profile.supportRequestsUsedThisMonth / (profile.supportRequestsLimit + (profile.additionalSupportRequestPackages * 10))) * 100, 100)}%` 
-                      }}
-                    ></div>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div className="bg-blue-50 p-3 rounded-xl">
-                    <span className="font-medium text-blue-900">Base Limit:</span>
-                    <p className="text-blue-700">{profile.supportRequestsLimit} support requests</p>
-                  </div>
-                  <div className="bg-purple-50 p-3 rounded-xl">
-                    <span className="font-medium text-purple-900">Extra Packages:</span>
-                    <p className="text-purple-700">{profile.additionalSupportRequestPackages} packages</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <h4 className="font-semibold text-gray-900">Need More Support Requests?</h4>
-                <p className="text-gray-600 text-sm">
-                  Purchase additional packages of 10 support requests each for $5 per package.
-                </p>
-                
-                <div className="flex items-center gap-3">
-                  <Select value={packagesToPurchase.toString()} onValueChange={(value) => setPackagesToPurchase(parseInt(value))}>
-                    <SelectTrigger className="w-24 rounded-xl">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {[1, 2, 3, 4, 5].map(num => (
-                        <SelectItem key={num} value={num.toString()}>{num}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <span className="text-sm text-gray-600">
-                    package{packagesToPurchase > 1 ? 's' : ''} (${packagesToPurchase * 5})
-                  </span>
-                </div>
-
-                <Button
-                  onClick={handlePurchasePackages}
-                  disabled={purchasing}
-                  className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white shadow-lg rounded-xl"
-                >
-                  {purchasing ? (
-                    <>
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Purchasing...
-                    </>
-                  ) : (
-                    <>
-                      <ShoppingCart className="h-4 w-4 mr-2" />
-                      Purchase Packages
-                    </>
-                  )}
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
       {/* Basic Information */}
       <Card className="border-0 bg-white/90 backdrop-blur-sm shadow-xl rounded-3xl overflow-hidden">
         <CardHeader className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white rounded-t-3xl">

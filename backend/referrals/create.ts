@@ -1,6 +1,5 @@
 import { api } from "encore.dev/api";
 import { referralDB } from "./db";
-import { users } from "~encore/clients";
 import { APIError } from "encore.dev/api";
 import { getAuthData } from "~encore/auth";
 
@@ -45,15 +44,6 @@ export const create = api<CreateSupportRequestRequest, SupportRequest>(
   { expose: true, method: "POST", path: "/referrals", auth: true },
   async (req) => {
     const auth = getAuthData()!;
-
-    // Check support request limit for all users (including admin for demo purposes)
-    const limitCheck = await users.checkSupportRequestLimit({ email: auth.email });
-    
-    if (!limitCheck.canCreateSupportRequest) {
-      throw APIError.resourceExhausted(
-        `Monthly support request limit reached: ${limitCheck.reason}. You have used ${limitCheck.supportRequestsUsed} of ${limitCheck.totalLimit} support requests this month. Please purchase additional packages or wait until next month.`
-      );
-    }
 
     const row = await referralDB.queryRow<{
       id: number;
@@ -111,14 +101,6 @@ export const create = api<CreateSupportRequestRequest, SupportRequest>(
 
     if (!row) {
       throw new Error("Failed to create support request");
-    }
-
-    // Increment support request usage count for all users
-    try {
-      await users.incrementSupportRequestUsage({ email: auth.email });
-    } catch (error) {
-      console.error('Failed to increment support request usage:', error);
-      // Don't fail the support request creation if usage tracking fails
     }
 
     return {
