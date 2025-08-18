@@ -86,7 +86,7 @@ export function TeacherSignupForm() {
 
     setIsSubmitting(true);
     try {
-      // Create the teacher account
+      // Create the teacher account using admin endpoint
       const response = await backend.users.createUserByAdmin({
         email: formData.email,
         name: formData.name,
@@ -96,11 +96,13 @@ export function TeacherSignupForm() {
         subscriptionEndDate: formData.subscriptionEndDate
       });
 
-      // Update with support request limit
-      await backend.users.updateUserByAdmin({
-        id: response.id,
-        supportRequestsLimit: formData.supportRequestsLimit
-      });
+      // Update with support request limit if different from default
+      if (formData.supportRequestsLimit !== 20) {
+        await backend.users.updateUserByAdmin({
+          id: response.id,
+          supportRequestsLimit: formData.supportRequestsLimit
+        });
+      }
 
       toast({
         title: "Account Created Successfully!",
