@@ -1,8 +1,11 @@
 import { Link } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Sparkles, Users, Brain, Shield, CreditCard, Mail } from 'lucide-react';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { ArrowRight, Sparkles, Users, Brain, Shield, CreditCard, Mail, Copy, CheckCircle } from 'lucide-react';
 import { AdminLoginFooter } from './AdminLoginFooter';
+import { useToast } from '@/components/ui/use-toast';
+import { useState } from 'react';
 
 interface LandingPageProps {
   userEmail?: string;
@@ -10,6 +13,11 @@ interface LandingPageProps {
 }
 
 export function LandingPage({ userEmail = "teacher@school.edu", onAdminLogin }: LandingPageProps) {
+  const [isContactDialogOpen, setIsContactDialogOpen] = useState(false);
+  const [isDemoDialogOpen, setIsDemoDialogOpen] = useState(false);
+  const [copiedEmail, setCopiedEmail] = useState<string | null>(null);
+  const { toast } = useToast();
+
   const features = [
     {
       icon: Brain,
@@ -34,35 +42,29 @@ export function LandingPage({ userEmail = "teacher@school.edu", onAdminLogin }: 
     }
   ];
 
-  const handleDemoRequest = () => {
+  const copyToClipboard = async (text: string, label: string) => {
     try {
-      const subject = encodeURIComponent('Demo Request for Concern2Care');
-      const body = encodeURIComponent(`Hello,
-
-I would like to request a demo of Concern2Care for my school/district.
-
-Please contact me to schedule a demonstration.
-
-Thank you!`);
-      
-      const mailtoUrl = `mailto:c2c_demo@remynd.online?subject=${subject}&body=${body}`;
-      console.log('Opening demo request email:', mailtoUrl);
-      window.open(mailtoUrl, '_blank');
+      await navigator.clipboard.writeText(text);
+      setCopiedEmail(text);
+      setTimeout(() => setCopiedEmail(null), 2000);
+      toast({
+        title: "Copied!",
+        description: `${label} copied to clipboard.`
+      });
     } catch (error) {
-      console.error('Error opening email client:', error);
-      // Fallback: copy email to clipboard or show email address
-      navigator.clipboard?.writeText('c2c_demo@remynd.online').then(() => {
-        alert('Demo email address copied to clipboard: c2c_demo@remynd.online');
-      }).catch(() => {
-        alert('Please email c2c_demo@remynd.online for a demo request');
+      toast({
+        title: "Copy Failed",
+        description: `Please manually copy: ${text}`,
+        variant: "destructive"
       });
     }
   };
 
-  const handleContactSales = () => {
-    try {
-      const subject = encodeURIComponent('Subscription Inquiry for Concern2Care');
-      const body = encodeURIComponent(`Hello,
+  const handleEmailContact = (type: 'sales' | 'demo') => {
+    const emailData = type === 'sales' ? {
+      email: 'sales@remynd.com',
+      subject: 'Subscription Inquiry for Concern2Care',
+      body: `Hello,
 
 I'm interested in subscribing to Concern2Care. Please contact me with:
 
@@ -70,20 +72,61 @@ I'm interested in subscribing to Concern2Care. Please contact me with:
 - Payment methods
 - Setup instructions
 
-Thank you!`);
+Thank you!`
+    } : {
+      email: 'c2c_demo@remynd.online',
+      subject: 'Demo Request for Concern2Care',
+      body: `Hello,
+
+I would like to request a demo of Concern2Care for my school/district.
+
+Please contact me to schedule a demonstration.
+
+Thank you!`
+    };
+
+    const subject = encodeURIComponent(emailData.subject);
+    const body = encodeURIComponent(emailData.body);
+    const mailtoUrl = `mailto:${emailData.email}?subject=${subject}&body=${body}`;
+    
+    // Try to open email client
+    try {
+      const link = document.createElement('a');
+      link.href = mailtoUrl;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
       
-      const mailtoUrl = `mailto:sales@remynd.com?subject=${subject}&body=${body}`;
-      console.log('Opening sales contact email:', mailtoUrl);
-      window.open(mailtoUrl, '_blank');
+      // Show success message
+      toast({
+        title: "Opening Email Client",
+        description: "Your email client should open with a pre-filled message."
+      });
+      
+      // Close dialog after a short delay
+      setTimeout(() => {
+        if (type === 'sales') setIsContactDialogOpen(false);
+        if (type === 'demo') setIsDemoDialogOpen(false);
+      }, 1000);
+      
     } catch (error) {
       console.error('Error opening email client:', error);
-      // Fallback: copy email to clipboard or show email address
-      navigator.clipboard?.writeText('sales@remynd.com').then(() => {
-        alert('Sales email address copied to clipboard: sales@remynd.com');
-      }).catch(() => {
-        alert('Please email sales@remynd.com for subscription information');
+      toast({
+        title: "Email Client Error",
+        description: "Please use the copy button to get the email address.",
+        variant: "destructive"
       });
     }
+  };
+
+  const handleDemoRequest = () => {
+    setIsDemoDialogOpen(true);
+  };
+
+  const handleContactSales = () => {
+    setIsContactDialogOpen(true);
   };
 
   return (
@@ -125,21 +168,113 @@ Thank you!`);
                 Plus professional reports and streamlined communication with your school's support team. With Concern2Care, you can quickly capture a concern and receive research-based, ready-to-use interventions that help your students succeed.
               </p>
               <div className="flex flex-col gap-3 sm:flex-row sm:gap-4 justify-center">
-                <Button 
-                  onClick={handleContactSales}
-                  className="w-full sm:w-auto bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 text-white shadow-xl rounded-xl sm:rounded-2xl py-4 sm:py-6 px-6 sm:px-8 text-base sm:text-lg font-semibold transition-all duration-200 transform hover:scale-105 active:scale-95 touch-manipulation"
-                >
-                  <Mail className="mr-2 h-5 w-5" />
-                  Contact Sales
-                </Button>
-                <Button 
-                  onClick={handleDemoRequest}
-                  variant="outline" 
-                  className="w-full sm:w-auto border-gray-300 text-gray-700 hover:bg-white/80 rounded-xl sm:rounded-2xl py-4 sm:py-6 px-6 sm:px-8 text-base sm:text-lg font-semibold touch-manipulation active:scale-95"
-                >
-                  <Mail className="mr-2 h-5 w-5" />
-                  Request Demo
-                </Button>
+                <Dialog open={isContactDialogOpen} onOpenChange={setIsContactDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button className="w-full sm:w-auto bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 text-white shadow-xl rounded-xl sm:rounded-2xl py-4 sm:py-6 px-6 sm:px-8 text-base sm:text-lg font-semibold transition-all duration-200 transform hover:scale-105 active:scale-95 touch-manipulation">
+                      <Mail className="mr-2 h-5 w-5" />
+                      Contact Sales
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-md rounded-3xl mx-4">
+                    <DialogHeader>
+                      <DialogTitle className="flex items-center gap-2">
+                        <Mail className="h-5 w-5 text-blue-600" />
+                        Contact Sales
+                      </DialogTitle>
+                      <DialogDescription>
+                        Get in touch with our sales team for subscription information and pricing.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                      <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-4 rounded-xl border border-blue-200">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="font-medium text-blue-900">Email Address:</span>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => copyToClipboard('sales@remynd.com', 'Sales email')}
+                            className="h-8 px-2 border-blue-300 text-blue-700 hover:bg-blue-100"
+                          >
+                            {copiedEmail === 'sales@remynd.com' ? (
+                              <CheckCircle className="h-3 w-3" />
+                            ) : (
+                              <Copy className="h-3 w-3" />
+                            )}
+                          </Button>
+                        </div>
+                        <p className="text-blue-800 font-mono text-sm">sales@remynd.com</p>
+                      </div>
+                    </div>
+                    <DialogFooter className="flex-col gap-2">
+                      <Button
+                        onClick={() => handleEmailContact('sales')}
+                        className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-xl"
+                      >
+                        <Mail className="mr-2 h-4 w-4" />
+                        Open Email Client
+                      </Button>
+                      <p className="text-xs text-gray-500 text-center">
+                        If your email client doesn't open, use the copy button above
+                      </p>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+
+                <Dialog open={isDemoDialogOpen} onOpenChange={setIsDemoDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button 
+                      variant="outline" 
+                      className="w-full sm:w-auto border-gray-300 text-gray-700 hover:bg-white/80 rounded-xl sm:rounded-2xl py-4 sm:py-6 px-6 sm:px-8 text-base sm:text-lg font-semibold touch-manipulation active:scale-95"
+                    >
+                      <Mail className="mr-2 h-5 w-5" />
+                      Request Demo
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-md rounded-3xl mx-4">
+                    <DialogHeader>
+                      <DialogTitle className="flex items-center gap-2">
+                        <Sparkles className="h-5 w-5 text-amber-600" />
+                        Request Demo
+                      </DialogTitle>
+                      <DialogDescription>
+                        Schedule a personalized demonstration of Concern2Care.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                      <div className="bg-gradient-to-r from-amber-50 to-orange-50 p-4 rounded-xl border border-amber-200">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="font-medium text-amber-900">Email Address:</span>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => copyToClipboard('c2c_demo@remynd.online', 'Demo email')}
+                            className="h-8 px-2 border-amber-300 text-amber-700 hover:bg-amber-100"
+                          >
+                            {copiedEmail === 'c2c_demo@remynd.online' ? (
+                              <CheckCircle className="h-3 w-3" />
+                            ) : (
+                              <Copy className="h-3 w-3" />
+                            )}
+                          </Button>
+                        </div>
+                        <p className="text-amber-800 font-mono text-sm">c2c_demo@remynd.online</p>
+                      </div>
+                    </div>
+                    <DialogFooter className="flex-col gap-2">
+                      <Button
+                        onClick={() => handleEmailContact('demo')}
+                        className="w-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white rounded-xl"
+                      >
+                        <Mail className="mr-2 h-4 w-4" />
+                        Open Email Client
+                      </Button>
+                      <p className="text-xs text-gray-500 text-center">
+                        If your email client doesn't open, use the copy button above
+                      </p>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+
                 <Link to="/subscription/plans">
                   <Button variant="outline" className="w-full sm:w-auto border-gray-300 text-gray-700 hover:bg-white/80 rounded-xl sm:rounded-2xl py-4 sm:py-6 px-6 sm:px-8 text-base sm:text-lg font-semibold touch-manipulation active:scale-95">
                     View Plans & Pricing
