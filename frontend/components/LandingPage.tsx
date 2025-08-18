@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { ArrowRight, Sparkles, Users, Brain, Shield, CreditCard, Mail, Copy, CheckCircle, UserPlus } from 'lucide-react';
+import { ArrowRight, Sparkles, Users, Brain, Shield, CreditCard, Mail, Copy, CheckCircle } from 'lucide-react';
 import { AdminLoginFooter } from './AdminLoginFooter';
 import { useToast } from '@/components/ui/use-toast';
 import { useState } from 'react';
@@ -140,7 +140,7 @@ Thank you!`
           <div className="hidden sm:block absolute -top-5 right-1/4 w-12 h-12 bg-gradient-to-br from-green-400 to-cyan-500 rounded-full opacity-20 animate-pulse delay-500"></div>
           
           <div className="relative">
-            <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 rounded-2xl sm:rounded-3xl shadow-2xl mb-4 sm:mb-6 transform hover:scale-110 transition-transform duration-300">
+            <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 rounded-2xl sm:rounded-3xl shadow-2xl mb-6 transform hover:scale-110 transition-transform duration-300">
               <Sparkles className="h-8 w-8 sm:h-10 sm:w-10 text-white" />
             </div>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-3 sm:mb-4">
@@ -283,13 +283,6 @@ Thank you!`
                   <Button variant="outline" className="w-full sm:w-auto border-gray-300 text-gray-700 hover:bg-white/80 rounded-xl sm:rounded-2xl py-4 sm:py-6 px-6 sm:px-8 text-base sm:text-lg font-semibold touch-manipulation active:scale-95">
                     View Plans & Pricing
                     <ArrowRight className="ml-2 h-5 w-5" />
-                  </Button>
-                </Link>
-
-                <Link to="/signup">
-                  <Button variant="outline" className="w-full sm:w-auto border-emerald-300 text-emerald-700 hover:bg-emerald-50 rounded-xl sm:rounded-2xl py-4 sm:py-6 px-6 sm:px-8 text-base sm:text-lg font-semibold touch-manipulation active:scale-95">
-                    <UserPlus className="mr-2 h-5 w-5" />
-                    Sign Up as Teacher
                   </Button>
                 </Link>
               </div>
@@ -453,12 +446,6 @@ Thank you!`
                 <Link to="/subscription/plans">
                   <Button variant="outline" className="w-full sm:w-auto border-gray-300 text-gray-700 hover:bg-white/80 rounded-xl sm:rounded-2xl py-4 sm:py-6 px-6 sm:px-8 text-base sm:text-lg font-semibold touch-manipulation active:scale-95">
                     View Plans
-                  </Button>
-                </Link>
-                <Link to="/signup">
-                  <Button variant="outline" className="w-full sm:w-auto border-emerald-300 text-emerald-700 hover:bg-emerald-50 rounded-xl sm:rounded-2xl py-4 sm:py-6 px-6 sm:px-8 text-base sm:text-lg font-semibold touch-manipulation active:scale-95">
-                    <UserPlus className="mr-2 h-5 w-5" />
-                    Sign Up
                   </Button>
                 </Link>
               </div>

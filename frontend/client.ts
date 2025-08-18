@@ -250,6 +250,8 @@ export namespace ai {
  */
 import { adminLogin as api_auth_admin_login_adminLogin } from "~backend/auth/admin-login";
 import { adminLogout as api_auth_admin_logout_adminLogout } from "~backend/auth/admin-logout";
+import { teacherLogin as api_auth_teacher_login_teacherLogin } from "~backend/auth/teacher-login";
+import { teacherLogout as api_auth_teacher_logout_teacherLogout } from "~backend/auth/teacher-logout";
 
 export namespace auth {
 
@@ -260,6 +262,8 @@ export namespace auth {
             this.baseClient = baseClient
             this.adminLogin = this.adminLogin.bind(this)
             this.adminLogout = this.adminLogout.bind(this)
+            this.teacherLogin = this.teacherLogin.bind(this)
+            this.teacherLogout = this.teacherLogout.bind(this)
         }
 
         /**
@@ -278,6 +282,24 @@ export namespace auth {
             // Now make the actual call to the API
             const resp = await this.baseClient.callTypedAPI(`/auth/admin/logout`, {method: "POST", body: undefined})
             return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_auth_admin_logout_adminLogout>
+        }
+
+        /**
+         * Teacher login for demo purposes.
+         */
+        public async teacherLogin(params: RequestType<typeof api_auth_teacher_login_teacherLogin>): Promise<ResponseType<typeof api_auth_teacher_login_teacherLogin>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/auth/teacher/login`, {method: "POST", body: JSON.stringify(params)})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_auth_teacher_login_teacherLogin>
+        }
+
+        /**
+         * Teacher logout for demo purposes.
+         */
+        public async teacherLogout(): Promise<ResponseType<typeof api_auth_teacher_logout_teacherLogout>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/auth/teacher/logout`, {method: "POST", body: undefined})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_auth_teacher_logout_teacherLogout>
         }
     }
 }
