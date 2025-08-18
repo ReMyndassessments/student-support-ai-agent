@@ -8,7 +8,6 @@ import { ReferralForm } from './components/ReferralForm';
 import { ReferralList } from './components/ReferralList';
 import { MeetingPreparation } from './components/MeetingPreparation';
 import { SubscriptionPlans } from './components/SubscriptionPlans';
-import { SubscriptionSuccess } from './components/SubscriptionSuccess';
 import { UserProfile } from './components/UserProfile';
 import { SubscriptionGate } from './components/SubscriptionGate';
 import { AdminLogin } from './components/AdminLogin';
@@ -95,7 +94,6 @@ function AppContent() {
             <Route path="/referrals" element={<ReferralList />} />
             <Route path="/meeting/:referralId" element={<MeetingPreparation />} />
             <Route path="/subscription/plans" element={<SubscriptionPlans />} />
-            <Route path="/subscription/success" element={<SubscriptionSuccess />} />
           </Routes>
         </main>
         <Toaster />
@@ -112,7 +110,6 @@ function AppContent() {
             <Route path="/" element={<LandingPage onAdminLogin={handleAdminLogin} />} />
             <Route path="/admin-login" element={<AdminLogin onLoginSuccess={handleAdminLogin} />} />
             <Route path="/subscription/plans" element={<SubscriptionPlans />} />
-            <Route path="/subscription/success" element={<SubscriptionSuccess />} />
             <Route path="*" element={<LandingPage onAdminLogin={handleAdminLogin} />} />
           </Routes>
         </main>
@@ -199,7 +196,6 @@ function DemoApp() {
             <Route path="/referrals" element={<ReferralList />} />
             <Route path="/meeting/:referralId" element={<MeetingPreparation />} />
             <Route path="/subscription/plans" element={<SubscriptionPlans />} />
-            <Route path="/subscription/success" element={<SubscriptionSuccess />} />
           </Routes>
         </main>
         <Toaster />
@@ -215,7 +211,6 @@ function DemoApp() {
           <Route path="/" element={<LandingPage onAdminLogin={handleAdminLogin} />} />
           <Route path="/admin-login" element={<AdminLogin onLoginSuccess={handleAdminLogin} />} />
           <Route path="/subscription/plans" element={<SubscriptionPlans />} />
-          <Route path="/subscription/success" element={<SubscriptionSuccess />} />
           <Route path="/new-referral" element={<ReferralForm />} />
           <Route path="/referrals" element={<ReferralList />} />
           <Route path="/meeting/:referralId" element={<MeetingPreparation />} />

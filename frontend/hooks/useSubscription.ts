@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@clerk/clerk-react';
 import backend from '~backend/client';
-import type { SubscriptionStatus } from '~backend/polar/check-subscription';
+import type { AccessResponse } from '~backend/users/check-access';
 
-export function useSubscription(userEmail?: string) {
-  const [status, setStatus] = useState<SubscriptionStatus | null>(null);
+export function useSubscription() {
+  const [status, setStatus] = useState<AccessResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { getToken, isSignedIn } = useAuth();
@@ -14,7 +14,7 @@ export function useSubscription(userEmail?: string) {
       checkSubscription();
     } else {
       setLoading(false);
-      setStatus({ hasActiveSubscription: false });
+      setStatus({ hasAccess: false });
     }
   }, [isSignedIn]);
 
@@ -26,13 +26,13 @@ export function useSubscription(userEmail?: string) {
       const token = await getToken();
       const response = await backend.with({ 
         auth: async () => ({ authorization: `Bearer ${token}` })
-      }).polar.checkSubscription();
+      }).users.checkAccess();
       
       setStatus(response);
     } catch (err) {
       console.error('Error checking subscription:', err);
       setError('Failed to check subscription status');
-      setStatus({ hasActiveSubscription: false });
+      setStatus({ hasAccess: false });
     } finally {
       setLoading(false);
     }
@@ -49,7 +49,7 @@ export function useSubscription(userEmail?: string) {
     loading,
     error,
     refresh,
-    hasActiveSubscription: status?.hasActiveSubscription || false,
+    hasActiveSubscription: status?.hasAccess || false,
     planType: status?.planType
   };
 }

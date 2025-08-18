@@ -7,66 +7,12 @@ import { Link } from 'react-router-dom';
 import { useSubscription } from '../hooks/useSubscription';
 
 interface SubscriptionGateProps {
-  userEmail: string;
   children: ReactNode;
   feature?: string;
 }
 
-export function SubscriptionGate({ userEmail, children, feature = "this feature" }: SubscriptionGateProps) {
-  const { hasActiveSubscription, loading } = useSubscription(userEmail);
-
-  const handleDemoRequest = () => {
-    try {
-      const subject = encodeURIComponent('Demo Request for Concern2Care');
-      const body = encodeURIComponent(`Hello,
-
-I would like to request a demo of Concern2Care.
-
-Please contact me to schedule a demonstration.
-
-Thank you!`);
-      
-      const mailtoUrl = `mailto:c2c_demo@remynd.online?subject=${subject}&body=${body}`;
-      console.log('Opening demo request email:', mailtoUrl);
-      window.open(mailtoUrl, '_blank');
-    } catch (error) {
-      console.error('Error opening email client:', error);
-      // Fallback
-      navigator.clipboard?.writeText('c2c_demo@remynd.online').then(() => {
-        alert('Demo email address copied to clipboard: c2c_demo@remynd.online');
-      }).catch(() => {
-        alert('Please email c2c_demo@remynd.online for a demo request');
-      });
-    }
-  };
-
-  const handleContactSales = () => {
-    try {
-      const subject = encodeURIComponent('Teacher Subscription Request for Concern2Care');
-      const body = encodeURIComponent(`Hello,
-
-I would like to subscribe to Concern2Care as a teacher to access ${feature}.
-
-Please contact me with:
-- Subscription details and pricing
-- Payment methods
-- Setup instructions
-
-Thank you!`);
-      
-      const mailtoUrl = `mailto:sales@remynd.online?subject=${subject}&body=${body}`;
-      console.log('Opening sales contact email:', mailtoUrl);
-      window.open(mailtoUrl, '_blank');
-    } catch (error) {
-      console.error('Error opening email client:', error);
-      // Fallback
-      navigator.clipboard?.writeText('sales@remynd.online').then(() => {
-        alert('Sales email address copied to clipboard: sales@remynd.online');
-      }).catch(() => {
-        alert('Please email sales@remynd.online for subscription information');
-      });
-    }
-  };
+export function SubscriptionGate({ children, feature = "this feature" }: SubscriptionGateProps) {
+  const { hasActiveSubscription, loading } = useSubscription();
 
   if (loading) {
     return (
@@ -113,16 +59,6 @@ Thank you!`);
               <br />
               Concern2Care is designed for individual teachers. Your personal subscription ensures secure access, 
               data privacy compliance, and AI recommendations tailored to your specific teaching style.
-            </AlertDescription>
-          </Alert>
-
-          {/* Payment Notice */}
-          <Alert className="max-w-4xl mx-auto mb-8 border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl">
-            <AlertTriangle className="h-5 w-5 text-amber-600" />
-            <AlertDescription className="text-amber-800">
-              <strong>Direct Contact for Subscriptions</strong>
-              <br />
-              We're currently setting up automated payments. Contact us directly for secure payment options and quick setup!
             </AlertDescription>
           </Alert>
 
@@ -180,21 +116,6 @@ Thank you!`);
                       </li>
                     </ul>
                   </div>
-
-                  <Alert className="border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl">
-                    <Lock className="h-4 w-4 text-amber-600" />
-                    <AlertDescription className="text-amber-800 text-sm">
-                      <strong>Why a Personal Subscription?</strong>
-                      <br />
-                      • Protects student data privacy and ensures FERPA compliance
-                      <br />
-                      • Provides AI recommendations tailored to your teaching style
-                      <br />
-                      • Prevents unauthorized access to sensitive information
-                      <br />
-                      • Gives you full control over your professional tools
-                    </AlertDescription>
-                  </Alert>
                 </div>
 
                 <div className="space-y-6">
@@ -213,75 +134,16 @@ Thank you!`);
                   </div>
 
                   <div className="space-y-3">
-                    <Button
-                      onClick={handleContactSales}
-                      className="w-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 text-white shadow-xl rounded-2xl py-6 text-lg font-semibold transition-all duration-200 transform hover:scale-105"
-                    >
-                      <Mail className="mr-2 h-5 w-5" />
-                      Contact Sales for Subscription
-                    </Button>
-                    
-                    <Button
-                      onClick={handleDemoRequest}
-                      variant="outline"
-                      className="w-full border-amber-300 text-amber-700 hover:bg-amber-50 rounded-2xl py-3"
-                    >
-                      <Sparkles className="mr-2 h-4 w-4" />
-                      Request Demo First
-                    </Button>
-
                     <Link to="/subscription/plans">
                       <Button
-                        variant="outline"
-                        className="w-full border-gray-300 text-gray-700 hover:bg-gray-50 rounded-2xl py-3"
+                        className="w-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 text-white shadow-xl rounded-2xl py-6 text-lg font-semibold transition-all duration-200 transform hover:scale-105"
                       >
-                        View Pricing Details
+                        <Mail className="mr-2 h-5 w-5" />
+                        View Subscription Options
                       </Button>
                     </Link>
                   </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Contact Information */}
-          <Card className="border-0 bg-gradient-to-br from-emerald-50 to-teal-50 shadow-xl rounded-3xl overflow-hidden">
-            <CardContent className="p-8">
-              <h3 className="text-xl font-bold text-emerald-900 mb-4 text-center">
-                Ready to Get Started?
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="text-center">
-                  <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl shadow-lg mb-3">
-                    <Mail className="h-6 w-6 text-white" />
-                  </div>
-                  <h4 className="font-semibold text-emerald-900 mb-2">Teacher Subscriptions</h4>
-                  <p className="text-emerald-700 text-sm mb-3">Get pricing and payment options</p>
-                  <button 
-                    onClick={() => window.open('mailto:sales@remynd.online', '_blank')}
-                    className="text-emerald-600 hover:text-emerald-700 font-medium underline"
-                  >
-                    sales@remynd.online
-                  </button>
-                </div>
-                <div className="text-center">
-                  <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-r from-amber-500 to-orange-600 rounded-2xl shadow-lg mb-3">
-                    <Sparkles className="h-6 w-6 text-white" />
-                  </div>
-                  <h4 className="font-semibold text-emerald-900 mb-2">Demos & Questions</h4>
-                  <p className="text-emerald-700 text-sm mb-3">See the platform in action</p>
-                  <button 
-                    onClick={() => window.open('mailto:c2c_demo@remynd.online', '_blank')}
-                    className="text-emerald-600 hover:text-emerald-700 font-medium underline"
-                  >
-                    c2c_demo@remynd.online
-                  </button>
-                </div>
-              </div>
-              <div className="mt-6 text-center">
-                <p className="text-emerald-800 text-sm">
-                  <strong>Quick Setup:</strong> We typically respond within 24 hours and can activate your account within 1-2 business days.
-                </p>
               </div>
             </CardContent>
           </Card>

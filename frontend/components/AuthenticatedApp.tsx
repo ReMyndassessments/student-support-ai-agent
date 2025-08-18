@@ -5,7 +5,6 @@ import { ReferralForm } from './ReferralForm';
 import { ReferralList } from './ReferralList';
 import { MeetingPreparation } from './MeetingPreparation';
 import { SubscriptionPlans } from './SubscriptionPlans';
-import { SubscriptionSuccess } from './SubscriptionSuccess';
 import { UserProfile } from './UserProfile';
 import { SubscriptionGate } from './SubscriptionGate';
 import { useAuth } from '@clerk/clerk-react';
@@ -39,19 +38,19 @@ export function AuthenticatedApp({ user }: AuthenticatedAppProps) {
           <Route path="/" element={<LandingPage userEmail={userEmail} />} />
           
           <Route path="/new-referral" element={
-            <SubscriptionGate userEmail={userEmail} feature="referral creation">
+            <SubscriptionGate feature="referral creation">
               <ReferralForm />
             </SubscriptionGate>
           } />
           
           <Route path="/referrals" element={
-            <SubscriptionGate userEmail={userEmail} feature="referral management">
+            <SubscriptionGate feature="referral management">
               <ReferralList />
             </SubscriptionGate>
           } />
           
           <Route path="/meeting/:referralId" element={
-            <SubscriptionGate userEmail={userEmail} feature="meeting preparation">
+            <SubscriptionGate feature="meeting preparation">
               <MeetingPreparation />
             </SubscriptionGate>
           } />
@@ -71,7 +70,6 @@ export function AuthenticatedApp({ user }: AuthenticatedAppProps) {
           } />
           
           <Route path="/subscription/plans" element={<SubscriptionPlans />} />
-          <Route path="/subscription/success" element={<SubscriptionSuccess />} />
         </Routes>
       </main>
     </>
