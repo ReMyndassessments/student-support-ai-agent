@@ -495,6 +495,46 @@ export function UserProfile() {
         </CardContent>
       </Card>
 
+      {/* Subscription & Usage */}
+      {profile && (
+        <Card className="border-0 bg-white/90 backdrop-blur-sm shadow-xl rounded-3xl overflow-hidden">
+          <CardHeader className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white rounded-t-3xl">
+            <CardTitle className="flex items-center gap-3 text-xl">
+              <div className="w-10 h-10 bg-white/20 rounded-2xl flex items-center justify-center">
+                <ShoppingCart className="h-6 w-6" />
+              </div>
+              Subscription & Usage
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-6 space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-4">
+                <h4 className="font-medium text-gray-700">Current Plan</h4>
+                <Badge className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-800 border-blue-200 rounded-xl px-4 py-2 text-base">
+                  <GraduationCap className="h-4 w-4 mr-2" />
+                  School-Wide Plan
+                </Badge>
+                <p className="text-xs text-gray-500">
+                  Your school's subscription provides access for all teachers.
+                </p>
+              </div>
+              <div className="space-y-4">
+                <h4 className="font-medium text-gray-700">Monthly Usage</h4>
+                <div className="w-full bg-gray-200 rounded-full h-2.5">
+                  <div 
+                    className="bg-gradient-to-r from-blue-500 to-purple-600 h-2.5 rounded-full" 
+                    style={{ width: `${(profile.supportRequestsUsedThisMonth / (profile.supportRequestsLimit + (profile.additionalSupportRequestPackages * 10))) * 100}%` }}
+                  ></div>
+                </div>
+                <p className="text-sm text-gray-600">
+                  {profile.supportRequestsUsedThisMonth} of {profile.supportRequestsLimit + (profile.additionalSupportRequestPackages * 10)} support requests used this month.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Account Information */}
       {profile && (
         <Card className="border-0 bg-white/90 backdrop-blur-sm shadow-xl rounded-3xl overflow-hidden">
