@@ -46,10 +46,7 @@ export const generateRecommendations = api<GenerateRecommendationsRequest, Gener
       apiKey = key;
     } else {
       // Check user access to AI recommendations feature
-      const accessCheck = await users.checkAccess({ 
-        email: auth.email, 
-        feature: 'ai_recommendations' 
-      });
+      const accessCheck = await users.checkAccess();
       
       if (!accessCheck.hasAccess) {
         throw APIError.permissionDenied(`Access denied: ${accessCheck.reason}. Please upgrade to ${accessCheck.suggestedPlan} plan.`);

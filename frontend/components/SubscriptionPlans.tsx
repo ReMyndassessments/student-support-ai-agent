@@ -72,9 +72,9 @@ Thank you!`;
   };
 
   const samplePricing = [
-    { teachers: 25, monthly: 375, annual: 4050 },
-    { teachers: 75, monthly: 1125, annual: 12150 },
-    { teachers: 150, monthly: 2250, annual: 24300 },
+    { teachers: 25, monthly: 250, annual: 2700, requests: 500 },
+    { teachers: 75, monthly: 750, annual: 8100, requests: 1500 },
+    { teachers: 150, monthly: 1500, annual: 16200, requests: 3000 },
   ];
 
   return (
@@ -92,7 +92,7 @@ Thank you!`;
               </span>
             </h1>
             <p className="text-lg sm:text-xl lg:text-2xl text-gray-700 mb-2 font-medium">
-              Pricing at $15 per Teacher per Month
+              Pricing at $10 per Teacher per Month
             </p>
             <p className="text-base sm:text-lg text-gray-600 max-w-3xl mx-auto">
               Empower your teaching staff with scalable, affordable AI support through Concern2Care, designed to enhance student engagement, streamline workflows, and provide instant assistance.
@@ -110,7 +110,7 @@ Thank you!`;
               Subscription Tiers & Pricing
             </CardTitle>
           </CardHeader>
-          <CardContent className="p-0">
+          <CardContent className="p-0 overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -123,9 +123,9 @@ Thank you!`;
               <TableBody>
                 <TableRow>
                   <TableCell>1 - 20</TableCell>
-                  <TableCell>$15 x number of teachers</TableCell>
-                  <TableCell>$15 x teachers x 12 x 0.9</TableCell>
-                  <TableCell>Full access, unlimited support requests, all features</TableCell>
+                  <TableCell>$10 x number of teachers</TableCell>
+                  <TableCell>$10 x teachers x 12 x 0.9</TableCell>
+                  <TableCell>Full access; 20 support requests per teacher per month; all features included</TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell>21 - 50</TableCell>
@@ -160,13 +160,14 @@ Thank you!`;
               Sample Pricing
             </CardTitle>
           </CardHeader>
-          <CardContent className="p-0">
+          <CardContent className="p-0 overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead className="font-semibold text-gray-700">School Size</TableHead>
                   <TableHead className="font-semibold text-gray-700">Monthly Cost</TableHead>
                   <TableHead className="font-semibold text-gray-700">Annual Cost (10% Discount)</TableHead>
+                  <TableHead className="font-semibold text-gray-700">Total Support Requests (per month)</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -175,6 +176,7 @@ Thank you!`;
                     <TableCell>{item.teachers} Teachers</TableCell>
                     <TableCell>${item.monthly.toLocaleString()}</TableCell>
                     <TableCell>${item.annual.toLocaleString()}</TableCell>
+                    <TableCell>{item.requests.toLocaleString()} requests</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -203,6 +205,7 @@ Thank you!`;
             <CardContent>
               <ul className="list-disc list-inside space-y-2 text-gray-700">
                 <li>Billing cycles: Monthly or annual (with 10% discount for annual)</li>
+                <li>Each subscription includes up to 20 support requests per teacher per month</li>
                 <li>Cancel anytime with prorated billing</li>
                 <li>Flexible seat adjustments anytime</li>
               </ul>
