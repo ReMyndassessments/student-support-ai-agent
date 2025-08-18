@@ -2,11 +2,15 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { GraduationCap, ArrowRight, Sparkles, Mail, AlertTriangle, Shield, Phone, Users, Heart } from 'lucide-react';
+import { GraduationCap, ArrowRight, Sparkles, Mail, AlertTriangle, Shield, Phone, Users, Heart, Loader2, CreditCard } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
+import { useAuth } from '@clerk/clerk-react';
+import backend from '~backend/client';
 
 export function SubscriptionPlans() {
+  const [isCreatingCheckout, setIsCreatingCheckout] = useState(false);
   const { toast } = useToast();
+  const { getToken, isSignedIn } = useAuth();
 
   const handleDemoRequest = () => {
     const subject = encodeURIComponent('Demo Request for Concern2Care');
@@ -50,6 +54,41 @@ Thank you!`);
     window.location.href = `mailto:sales@remynd.com?subject=${subject}&body=${body}`;
   };
 
+  const handlePolarCheckout = async (planType: 'teacher' | 'school' | 'district') => {
+    if (!isSignedIn) {
+      toast({
+        title: "Sign In Required",
+        description: "Please sign in to subscribe to a plan.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsCreatingCheckout(true);
+    try {
+      const token = await getToken();
+      const response = await backend.with({ 
+        auth: async () => ({ authorization: `Bearer ${token}` })
+      }).polar.createCheckout({
+        planType,
+        successUrl: `${window.location.origin}/subscription/success`,
+        cancelUrl: `${window.location.origin}/subscription/plans`
+      });
+
+      // Redirect to Polar checkout
+      window.location.href = response.checkoutUrl;
+    } catch (error) {
+      console.error('Error creating checkout:', error);
+      toast({
+        title: "Checkout Error",
+        description: "Failed to create checkout session. Please try again or contact support.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsCreatingCheckout(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
@@ -78,14 +117,13 @@ Thank you!`);
           </div>
         </div>
 
-        {/* Payment System Notice */}
-        <Alert className="max-w-4xl mx-auto mb-8 sm:mb-12 border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl">
-          <AlertTriangle className="h-5 w-5 text-amber-600" />
-          <AlertDescription className="text-amber-800 text-sm sm:text-base">
-            <strong>Direct Contact for Subscriptions</strong>
+        {/* Payment Options Notice */}
+        <Alert className="max-w-4xl mx-auto mb-8 sm:mb-12 border-blue-200 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-2xl">
+          <CreditCard className="h-5 w-5 text-blue-600" />
+          <AlertDescription className="text-blue-800 text-sm sm:text-base">
+            <strong>Multiple Payment Options Available</strong>
             <br />
-            We're currently setting up automated payments. In the meantime, please contact us directly to set up your subscription. 
-            We'll provide secure payment options and get you started quickly!
+            Choose between secure online checkout or direct contact for personalized setup and payment options.
           </AlertDescription>
         </Alert>
 
@@ -134,12 +172,41 @@ Thank you!`);
               </div>
               
               <div className="space-y-3 sm:space-y-4">
+                {isSignedIn ? (
+                  <Button
+                    onClick={() => handlePolarCheckout('teacher')}
+                    disabled={isCreatingCheckout}
+                    className="w-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 text-white shadow-xl rounded-xl sm:rounded-2xl py-4 sm:py-6 text-base sm:text-lg font-semibold transition-all duration-200 transform hover:scale-105 active:scale-95 touch-manipulation"
+                  >
+                    {isCreatingCheckout ? (
+                      <>
+                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                        Creating Checkout...
+                      </>
+                    ) : (
+                      <>
+                        <CreditCard className="mr-2 h-5 w-5" />
+                        Subscribe Now - Secure Checkout
+                      </>
+                    )}
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={handleSubscriptionContact}
+                    className="w-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 text-white shadow-xl rounded-xl sm:rounded-2xl py-4 sm:py-6 text-base sm:text-lg font-semibold transition-all duration-200 transform hover:scale-105 active:scale-95 touch-manipulation"
+                  >
+                    Get Started - Contact Us
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Button>
+                )}
+                
                 <Button
                   onClick={handleSubscriptionContact}
-                  className="w-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 text-white shadow-xl rounded-xl sm:rounded-2xl py-4 sm:py-6 text-base sm:text-lg font-semibold transition-all duration-200 transform hover:scale-105 active:scale-95 touch-manipulation"
+                  variant="outline"
+                  className="w-full border-gray-300 text-gray-700 hover:bg-gray-50 rounded-xl sm:rounded-2xl py-3 sm:py-4 text-sm sm:text-base font-semibold touch-manipulation active:scale-95"
                 >
-                  Get Started - Contact Us
-                  <ArrowRight className="ml-2 h-5 w-5" />
+                  <Mail className="mr-2 h-4 w-4" />
+                  Contact Sales Instead
                 </Button>
                 
                 <Button
@@ -407,7 +474,7 @@ Thank you!`);
             {[
               {
                 question: "How do I subscribe as a teacher?",
-                answer: "Simply contact our sales team at sales@remynd.com. We'll provide secure payment options including bank transfer, check, or credit card processing through our secure portal."
+                answer: "You can either use our secure online checkout or contact our sales team at sales@remynd.com. We accept bank transfers, checks, and credit card payments through our secure payment portal."
               },
               {
                 question: "Can my school purchase subscriptions for multiple teachers?",
@@ -415,11 +482,11 @@ Thank you!`);
               },
               {
                 question: "What payment methods do you accept?",
-                answer: "We accept bank transfers, checks, and credit card payments through our secure payment portal. Our sales team will provide detailed payment instructions based on your preference."
+                answer: "We accept credit cards through our secure online checkout, as well as bank transfers and checks for direct contact subscriptions. Our sales team will provide detailed payment instructions based on your preference."
               },
               {
                 question: "How quickly can I get started?",
-                answer: "Once payment is processed, we can activate your account within 24 hours. We'll provide setup instructions and help you get started with your first referrals."
+                answer: "With online checkout, your account is activated immediately. For direct contact subscriptions, we can activate your account within 24 hours after payment is processed."
               },
               {
                 question: "Is my student data secure?",
@@ -459,13 +526,33 @@ Thank you!`);
                 Join teachers who are already using AI-powered tools to better support their students.
               </p>
               <div className="flex flex-col gap-3 sm:flex-row sm:gap-4 justify-center">
-                <Button
-                  onClick={handleContactSales}
-                  className="w-full sm:w-auto bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 text-white shadow-xl rounded-xl sm:rounded-2xl py-4 sm:py-6 px-6 sm:px-8 text-base sm:text-lg font-semibold transition-all duration-200 transform hover:scale-105 active:scale-95 touch-manipulation"
-                >
-                  <Mail className="mr-2 h-5 w-5" />
-                  Subscribe Now
-                </Button>
+                {isSignedIn ? (
+                  <Button
+                    onClick={() => handlePolarCheckout('teacher')}
+                    disabled={isCreatingCheckout}
+                    className="w-full sm:w-auto bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 text-white shadow-xl rounded-xl sm:rounded-2xl py-4 sm:py-6 px-6 sm:px-8 text-base sm:text-lg font-semibold transition-all duration-200 transform hover:scale-105 active:scale-95 touch-manipulation"
+                  >
+                    {isCreatingCheckout ? (
+                      <>
+                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                        Creating Checkout...
+                      </>
+                    ) : (
+                      <>
+                        <CreditCard className="mr-2 h-5 w-5" />
+                        Subscribe Now
+                      </>
+                    )}
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={handleContactSales}
+                    className="w-full sm:w-auto bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 text-white shadow-xl rounded-xl sm:rounded-2xl py-4 sm:py-6 px-6 sm:px-8 text-base sm:text-lg font-semibold transition-all duration-200 transform hover:scale-105 active:scale-95 touch-manipulation"
+                  >
+                    <Mail className="mr-2 h-5 w-5" />
+                    Subscribe Now
+                  </Button>
+                )}
                 <Button
                   onClick={handleDemoRequest}
                   variant="outline"

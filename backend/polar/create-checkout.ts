@@ -29,12 +29,12 @@ export const createCheckout = api<CreateCheckoutRequest, CreateCheckoutResponse>
   async (req) => {
     const auth = getAuthData()!;
     const apiKey = polarApiKey();
-    const productId = PRODUCT_IDS[req.planType]();
     
     if (!apiKey) {
       throw APIError.invalidArgument("Polar API key not configured. Please contact support.");
     }
     
+    const productId = PRODUCT_IDS[req.planType]();
     if (!productId) {
       throw APIError.invalidArgument(`Product ID not configured for ${req.planType} plan. Please contact support.`);
     }
