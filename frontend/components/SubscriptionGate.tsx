@@ -43,10 +43,10 @@ export function SubscriptionGate({ children, feature = "this feature" }: Subscri
                 <Lock className="h-10 w-10 text-white" />
               </div>
               <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
-                Teacher Subscription Required
+                School-Wide Subscription Required
               </h1>
               <p className="text-gray-600 text-lg">
-                Unlock {feature} with your personal Concern2Care subscription
+                Unlock {feature} with a Concern2Care school-wide subscription
               </p>
             </div>
           </div>
@@ -55,10 +55,10 @@ export function SubscriptionGate({ children, feature = "this feature" }: Subscri
           <Alert className="max-w-4xl mx-auto mb-8 border-blue-200 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-2xl">
             <GraduationCap className="h-5 w-5 text-blue-600" />
             <AlertDescription className="text-blue-800">
-              <strong>Personal Teacher Account</strong>
+              <strong>School-Wide Plan</strong>
               <br />
-              Concern2Care is designed for individual teachers. Your personal subscription ensures secure access, 
-              data privacy compliance, and AI recommendations tailored to your specific teaching style.
+              Concern2Care is designed for schools and districts. A school-wide plan ensures secure access for all teachers, 
+              data privacy compliance, and powerful AI tools to support every student.
             </AlertDescription>
           </Alert>
 
@@ -69,7 +69,7 @@ export function SubscriptionGate({ children, feature = "this feature" }: Subscri
                 <div className="w-10 h-10 bg-white/20 rounded-2xl flex items-center justify-center">
                   <GraduationCap className="h-6 w-6" />
                 </div>
-                Teacher Plan - $15/month
+                School-Wide Plan - $15/teacher/month
               </CardTitle>
             </CardHeader>
             <CardContent className="p-8">
@@ -120,16 +120,16 @@ export function SubscriptionGate({ children, feature = "this feature" }: Subscri
 
                 <div className="space-y-6">
                   <div className="bg-gradient-to-br from-purple-50 via-pink-50 to-rose-50 p-6 rounded-2xl border border-purple-200">
-                    <h4 className="font-semibold text-purple-900 mb-3">Simple Teacher Pricing</h4>
+                    <h4 className="font-semibold text-purple-900 mb-3">Simple School Pricing</h4>
                     <div className="bg-white/60 p-4 rounded-xl border-2 border-blue-300">
                       <div className="text-center">
                         <div className="text-3xl font-bold text-blue-600 mb-1">$15</div>
-                        <p className="text-gray-600 text-sm">per month</p>
-                        <p className="text-gray-600 text-xs mt-1">Everything included</p>
+                        <p className="text-gray-600 text-sm">per teacher / month</p>
+                        <p className="text-gray-600 text-xs mt-1">Billed annually with 10% discount</p>
                       </div>
                     </div>
                     <p className="text-purple-700 text-sm mt-3">
-                      No complicated tiers or hidden fees. One simple plan with everything you need as a teacher.
+                      No complicated tiers or hidden fees. One simple plan for your entire school.
                     </p>
                   </div>
 

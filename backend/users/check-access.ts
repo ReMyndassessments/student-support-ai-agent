@@ -41,7 +41,7 @@ export const checkAccess = api<void, AccessResponse>(
         hasAccess: false,
         reason: "No active subscription found. Please subscribe to access this feature.",
         requiresUpgrade: true,
-        suggestedPlan: "teacher"
+        suggestedPlan: "school-wide"
       };
     }
 
