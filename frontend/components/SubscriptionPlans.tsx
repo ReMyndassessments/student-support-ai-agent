@@ -175,24 +175,24 @@ Thank you!`);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
-      <div className="max-w-7xl mx-auto px-6 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
         {/* Header */}
-        <div className="text-center mb-16 relative">
-          {/* Decorative elements */}
-          <div className="absolute top-0 left-1/4 w-20 h-20 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full opacity-20 animate-pulse"></div>
-          <div className="absolute top-10 right-1/3 w-16 h-16 bg-gradient-to-br from-pink-400 to-orange-500 rounded-full opacity-20 animate-pulse delay-1000"></div>
-          <div className="absolute -top-5 right-1/4 w-12 h-12 bg-gradient-to-br from-green-400 to-cyan-500 rounded-full opacity-20 animate-pulse delay-500"></div>
+        <div className="text-center mb-12 sm:mb-16 relative">
+          {/* Decorative elements - hidden on mobile */}
+          <div className="hidden sm:block absolute top-0 left-1/4 w-20 h-20 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full opacity-20 animate-pulse"></div>
+          <div className="hidden sm:block absolute top-10 right-1/3 w-16 h-16 bg-gradient-to-br from-pink-400 to-orange-500 rounded-full opacity-20 animate-pulse delay-1000"></div>
+          <div className="hidden sm:block absolute -top-5 right-1/4 w-12 h-12 bg-gradient-to-br from-green-400 to-cyan-500 rounded-full opacity-20 animate-pulse delay-500"></div>
           
           <div className="relative">
-            <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 rounded-3xl shadow-2xl mb-6 transform hover:scale-110 transition-transform duration-300">
-              <Sparkles className="h-10 w-10 text-white" />
+            <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 rounded-2xl sm:rounded-3xl shadow-2xl mb-4 sm:mb-6 transform hover:scale-110 transition-transform duration-300">
+              <Sparkles className="h-8 w-8 sm:h-10 sm:w-10 text-white" />
             </div>
-            <h1 className="text-5xl sm:text-6xl font-bold mb-4">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-3 sm:mb-4">
               <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
                 Choose Your Plan
               </span>
             </h1>
-            <p className="text-xl sm:text-2xl text-gray-700 mb-2 font-medium">
+            <p className="text-lg sm:text-xl lg:text-2xl text-gray-700 mb-2 font-medium">
               Unlock the full power of AI-driven student support
             </p>
             <p className="text-sm text-gray-500 font-medium">
@@ -202,9 +202,9 @@ Thank you!`);
         </div>
 
         {/* Individual Account Notice */}
-        <Alert className="max-w-4xl mx-auto mb-12 border-blue-200 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-2xl">
+        <Alert className="max-w-4xl mx-auto mb-8 sm:mb-12 border-blue-200 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-2xl">
           <Shield className="h-5 w-5 text-blue-600" />
-          <AlertDescription className="text-blue-800">
+          <AlertDescription className="text-blue-800 text-sm sm:text-base">
             <strong>Individual Account Required</strong>
             <br />
             Each teacher needs their own personal subscription to ensure secure access, data privacy compliance, 
@@ -214,9 +214,9 @@ Thank you!`);
 
         {/* Configuration Error Alert */}
         {configurationError && (
-          <Alert className="max-w-4xl mx-auto mb-12 border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl">
+          <Alert className="max-w-4xl mx-auto mb-8 sm:mb-12 border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl">
             <AlertTriangle className="h-5 w-5 text-amber-600" />
-            <AlertDescription className="text-amber-800">
+            <AlertDescription className="text-amber-800 text-sm sm:text-base">
               <strong>Payment System Configuration</strong>
               <br />
               Our payment system is currently being set up. In the meantime, please contact us directly to set up your subscription. 
@@ -226,20 +226,20 @@ Thank you!`);
         )}
 
         {/* Demo Request Option */}
-        <Card className="max-w-2xl mx-auto mb-12 border-0 bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 shadow-xl rounded-3xl overflow-hidden">
-          <CardContent className="p-8 text-center">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-amber-500 to-orange-600 rounded-3xl shadow-lg mb-4">
-              <Mail className="h-8 w-8 text-white" />
+        <Card className="max-w-2xl mx-auto mb-8 sm:mb-12 border-0 bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 shadow-xl rounded-2xl sm:rounded-3xl overflow-hidden">
+          <CardContent className="p-6 sm:p-8 text-center">
+            <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl sm:rounded-3xl shadow-lg mb-3 sm:mb-4">
+              <Mail className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
             </div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-3">
+            <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2 sm:mb-3">
               Want to See It in Action?
             </h3>
-            <p className="text-gray-700 mb-6 leading-relaxed">
+            <p className="text-gray-700 mb-4 sm:mb-6 leading-relaxed text-sm sm:text-base">
               Schedule a personalized demo to see how Concern2Care can transform your student support process. Perfect for schools and districts evaluating the platform.
             </p>
             <Button
               onClick={handleDemoRequest}
-              className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white shadow-lg rounded-2xl py-3 px-8 text-lg font-semibold transition-all duration-200 transform hover:scale-105"
+              className="w-full sm:w-auto bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white shadow-lg rounded-xl sm:rounded-2xl py-3 px-6 sm:px-8 text-base sm:text-lg font-semibold transition-all duration-200 transform hover:scale-105 active:scale-95 touch-manipulation"
             >
               <Mail className="mr-2 h-5 w-5" />
               Request Demo
@@ -249,9 +249,9 @@ Thank you!`);
 
         {/* Authentication Notice */}
         {!isSignedIn && (
-          <Alert className="max-w-4xl mx-auto mb-12 border-purple-200 bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl">
+          <Alert className="max-w-4xl mx-auto mb-8 sm:mb-12 border-purple-200 bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl">
             <Shield className="h-5 w-5 text-purple-600" />
-            <AlertDescription className="text-purple-800">
+            <AlertDescription className="text-purple-800 text-sm sm:text-base">
               <strong>Sign In Required</strong>
               <br />
               Please sign in to subscribe to a plan. This ensures your subscription is tied to your personal account for security and data privacy.
@@ -260,62 +260,62 @@ Thank you!`);
         )}
 
         {/* Pricing Plans */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 mb-12 sm:mb-16">
           {plans.map((plan) => {
             const Icon = plan.icon;
             return (
               <Card 
                 key={plan.id} 
-                className="relative border-0 bg-gradient-to-br from-white/90 to-white/80 backdrop-blur-sm hover:shadow-2xl transition-all duration-300 hover:scale-105 transform rounded-3xl overflow-hidden"
+                className="relative border-0 bg-gradient-to-br from-white/90 to-white/80 backdrop-blur-sm hover:shadow-2xl transition-all duration-300 hover:scale-105 transform rounded-2xl sm:rounded-3xl overflow-hidden touch-manipulation active:scale-95"
               >
-                <CardHeader className={`bg-gradient-to-r ${plan.gradient} text-white rounded-t-3xl pt-6`}>
-                  <div className="text-center space-y-4">
-                    <div className={`inline-flex items-center justify-center w-16 h-16 bg-white/20 rounded-2xl shadow-lg`}>
-                      <Icon className="h-8 w-8" />
+                <CardHeader className={`bg-gradient-to-r ${plan.gradient} text-white rounded-t-2xl sm:rounded-t-3xl pt-4 sm:pt-6`}>
+                  <div className="text-center space-y-3 sm:space-y-4">
+                    <div className={`inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 bg-white/20 rounded-xl sm:rounded-2xl shadow-lg`}>
+                      <Icon className="h-6 w-6 sm:h-8 sm:w-8" />
                     </div>
                     <div>
-                      <CardTitle className="text-2xl font-bold">{plan.name}</CardTitle>
-                      <p className="text-white/80 mt-2">{plan.description}</p>
+                      <CardTitle className="text-xl sm:text-2xl font-bold">{plan.name}</CardTitle>
+                      <p className="text-white/80 mt-2 text-sm sm:text-base">{plan.description}</p>
                     </div>
                     <div className="text-center">
-                      <div className="text-4xl font-bold">{plan.price}</div>
-                      <p className="text-white/80 text-sm">Per individual teacher</p>
+                      <div className="text-3xl sm:text-4xl font-bold">{plan.price}</div>
+                      <p className="text-white/80 text-xs sm:text-sm">Per individual teacher</p>
                     </div>
                   </div>
                 </CardHeader>
                 
-                <CardContent className="p-6 space-y-6">
-                  <ul className="space-y-3">
+                <CardContent className="p-4 sm:p-6 space-y-4 sm:space-y-6">
+                  <ul className="space-y-2 sm:space-y-3">
                     {plan.features.map((feature, index) => (
                       <li key={index} className="flex items-start gap-3">
-                        <div className={`w-5 h-5 bg-gradient-to-r ${plan.gradient} rounded-full flex items-center justify-center flex-shrink-0 mt-0.5`}>
-                          <Check className="h-3 w-3 text-white" />
+                        <div className={`w-4 h-4 sm:w-5 sm:h-5 bg-gradient-to-r ${plan.gradient} rounded-full flex items-center justify-center flex-shrink-0 mt-0.5`}>
+                          <Check className="h-2 w-2 sm:h-3 sm:w-3 text-white" />
                         </div>
-                        <span className="text-gray-700 text-sm leading-relaxed">{feature}</span>
+                        <span className="text-gray-700 text-xs sm:text-sm leading-relaxed">{feature}</span>
                       </li>
                     ))}
                   </ul>
                   
-                  <div className="space-y-3">
+                  <div className="space-y-2 sm:space-y-3">
                     <Button
                       onClick={() => handleSubscribe(plan.id)}
                       disabled={isCreatingCheckout || !isSignedIn}
-                      className={`w-full bg-gradient-to-r ${plan.gradient} hover:opacity-90 text-white shadow-lg rounded-2xl py-6 text-lg font-semibold transition-all duration-200 transform hover:scale-105`}
+                      className={`w-full bg-gradient-to-r ${plan.gradient} hover:opacity-90 text-white shadow-lg rounded-xl sm:rounded-2xl py-4 sm:py-6 text-sm sm:text-lg font-semibold transition-all duration-200 transform hover:scale-105 active:scale-95 touch-manipulation`}
                     >
                       {isCreatingCheckout ? (
                         <>
-                          <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                          <Loader2 className="mr-2 h-4 w-4 sm:h-5 sm:w-5 animate-spin" />
                           Creating Checkout...
                         </>
                       ) : !isSignedIn ? (
                         <>
                           Sign In to Subscribe
-                          <ArrowRight className="ml-2 h-5 w-5" />
+                          <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
                         </>
                       ) : (
                         <>
                           Subscribe Now
-                          <ArrowRight className="ml-2 h-5 w-5" />
+                          <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
                         </>
                       )}
                     </Button>
@@ -324,9 +324,9 @@ Thank you!`);
                       <Button
                         onClick={() => handleDirectContact(plan.id)}
                         variant="outline"
-                        className="w-full border-gray-300 text-gray-700 hover:bg-gray-50 rounded-2xl py-3"
+                        className="w-full border-gray-300 text-gray-700 hover:bg-gray-50 rounded-xl sm:rounded-2xl py-2 sm:py-3 text-sm touch-manipulation active:scale-95"
                       >
-                        <Mail className="mr-2 h-4 w-4" />
+                        <Mail className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
                         Contact for Subscription
                       </Button>
                     )}
@@ -338,16 +338,16 @@ Thank you!`);
         </div>
 
         {/* Features Comparison */}
-        <div className="text-center mb-12">
-          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+        <div className="text-center mb-8 sm:mb-12">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-3 sm:mb-4">
             Why Choose Concern2Care?
           </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">
             Streamline your student support process with AI-powered recommendations
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 mb-12 sm:mb-16">
           {[
             {
               icon: Sparkles,
@@ -373,19 +373,19 @@ Thank you!`);
           ].map((feature, index) => {
             const Icon = feature.icon;
             return (
-              <Card key={index} className={`border-0 bg-gradient-to-br ${feature.bgGradient} hover:shadow-xl transition-all duration-300 hover:scale-105 transform rounded-3xl overflow-hidden`}>
-                <CardContent className="p-8 text-center relative">
+              <Card key={index} className={`border-0 bg-gradient-to-br ${feature.bgGradient} hover:shadow-xl transition-all duration-300 hover:scale-105 transform rounded-2xl sm:rounded-3xl overflow-hidden touch-manipulation active:scale-95`}>
+                <CardContent className="p-6 sm:p-8 text-center relative">
                   <div className="absolute inset-0 opacity-5">
                     <div className={`w-full h-full bg-gradient-to-br ${feature.gradient}`}></div>
                   </div>
                   
-                  <div className={`inline-flex items-center justify-center w-14 h-14 bg-gradient-to-br ${feature.gradient} rounded-2xl shadow-lg mb-4 relative z-10`}>
-                    <Icon className="h-7 w-7 text-white" />
+                  <div className={`inline-flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br ${feature.gradient} rounded-xl sm:rounded-2xl shadow-lg mb-3 sm:mb-4 relative z-10`}>
+                    <Icon className="h-6 w-6 sm:h-7 sm:w-7 text-white" />
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-2 relative z-10">
+                  <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 relative z-10">
                     {feature.title}
                   </h3>
-                  <p className="text-gray-600 leading-relaxed relative z-10">
+                  <p className="text-gray-600 leading-relaxed relative z-10 text-sm sm:text-base">
                     {feature.description}
                   </p>
                 </CardContent>
@@ -396,10 +396,10 @@ Thank you!`);
 
         {/* FAQ */}
         <div className="text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-8">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-6 sm:mb-8">
             Frequently Asked Questions
           </h2>
-          <div className="max-w-3xl mx-auto space-y-6">
+          <div className="max-w-3xl mx-auto space-y-4 sm:space-y-6">
             {[
               {
                 question: "Why does each teacher need their own subscription?",
@@ -430,10 +430,10 @@ Thank you!`);
                 answer: "Absolutely! Click the 'Request Demo' button to schedule a personalized demonstration of Concern2Care for your school or district."
               }
             ].map((faq, index) => (
-              <Card key={index} className="border-0 bg-white/80 backdrop-blur-sm shadow-lg rounded-2xl text-left">
-                <CardContent className="p-6">
-                  <h3 className="font-semibold text-gray-900 mb-2">{faq.question}</h3>
-                  <p className="text-gray-600">{faq.answer}</p>
+              <Card key={index} className="border-0 bg-white/80 backdrop-blur-sm shadow-lg rounded-xl sm:rounded-2xl text-left touch-manipulation active:scale-95 transition-transform">
+                <CardContent className="p-4 sm:p-6">
+                  <h3 className="font-semibold text-gray-900 mb-2 text-sm sm:text-base">{faq.question}</h3>
+                  <p className="text-gray-600 text-xs sm:text-sm leading-relaxed">{faq.answer}</p>
                 </CardContent>
               </Card>
             ))}
@@ -441,9 +441,9 @@ Thank you!`);
         </div>
 
         {/* Contact */}
-        <div className="text-center mt-16">
+        <div className="text-center mt-12 sm:mt-16">
           <Alert className="max-w-2xl mx-auto border-blue-200 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-2xl">
-            <AlertDescription className="text-blue-800">
+            <AlertDescription className="text-blue-800 text-sm sm:text-base">
               <strong>Need a custom solution?</strong> Contact us for enterprise pricing and custom integrations for large districts.
               <br />
               <a href="mailto:sales@remynd.com" className="text-blue-600 hover:text-blue-700 font-medium">

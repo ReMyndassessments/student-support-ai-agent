@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
-import { Loader2, AlertTriangle, Search, ArrowLeft, FileText, Share2, Mail, Download, Users, Printer, Calendar, MapPin, User } from 'lucide-react';
+import { Loader2, AlertTriangle, Search, ArrowLeft, FileText, Share2, Mail, Download, Users, Printer, Calendar, MapPin, User, ChevronDown, ChevronUp, Wifi, WifiOff } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { Link } from 'react-router-dom';
 import backend from '~backend/client';
@@ -15,6 +15,7 @@ import type { Referral } from '~backend/referrals/list';
 
 export function ReferralList() {
   const [referrals, setReferrals] = useState<Referral[]>([]);
+  const [cachedReferrals, setCachedReferrals] = useState<Referral[]>([]);
   const [loading, setLoading] = useState(true);
   const [teacherFilter, setTeacherFilter] = useState('');
   const [selectedReferral, setSelectedReferral] = useState<Referral | null>(null);
@@ -26,13 +27,70 @@ export function ReferralList() {
   });
   const [isSharing, setIsSharing] = useState(false);
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+  const [expandedReferrals, setExpandedReferrals] = useState<Set<number>>(new Set());
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
   const { toast } = useToast();
+
+  // Monitor online/offline status
+  useEffect(() => {
+    const handleOnline = () => {
+      setIsOnline(true);
+      // Reload data when coming back online
+      if (cachedReferrals.length === 0) {
+        loadReferrals();
+      }
+    };
+    const handleOffline = () => setIsOnline(false);
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, [cachedReferrals.length]);
 
   useEffect(() => {
     loadReferrals();
   }, [teacherFilter]);
 
+  // Cache referrals in localStorage
+  useEffect(() => {
+    if (referrals.length > 0) {
+      localStorage.setItem('cachedReferrals', JSON.stringify(referrals));
+      setCachedReferrals(referrals);
+    }
+  }, [referrals]);
+
+  // Load cached referrals on mount
+  useEffect(() => {
+    const cached = localStorage.getItem('cachedReferrals');
+    if (cached) {
+      try {
+        const parsedCached = JSON.parse(cached);
+        setCachedReferrals(parsedCached);
+        if (!isOnline) {
+          setReferrals(parsedCached);
+          setLoading(false);
+        }
+      } catch (error) {
+        console.error('Error parsing cached referrals:', error);
+      }
+    }
+  }, [isOnline]);
+
   const loadReferrals = async () => {
+    if (!isOnline) {
+      // Use cached data when offline
+      const filtered = cachedReferrals.filter(referral => 
+        !teacherFilter || referral.teacher.toLowerCase().includes(teacherFilter.toLowerCase())
+      );
+      setReferrals(filtered);
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
       const response = await backend.referrals.list({
@@ -42,17 +100,52 @@ export function ReferralList() {
       setReferrals(response.referrals);
     } catch (error) {
       console.error('Error loading referrals:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load referrals. Please try again.",
-        variant: "destructive"
-      });
+      
+      // Fall back to cached data if available
+      if (cachedReferrals.length > 0) {
+        const filtered = cachedReferrals.filter(referral => 
+          !teacherFilter || referral.teacher.toLowerCase().includes(teacherFilter.toLowerCase())
+        );
+        setReferrals(filtered);
+        toast({
+          title: "Using Offline Data",
+          description: "Showing cached referrals. Connect to internet for latest data.",
+          variant: "destructive"
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to load referrals. Please try again.",
+          variant: "destructive"
+        });
+      }
     } finally {
       setLoading(false);
     }
   };
 
+  const toggleReferralExpansion = (referralId: number) => {
+    setExpandedReferrals(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(referralId)) {
+        newSet.delete(referralId);
+      } else {
+        newSet.add(referralId);
+      }
+      return newSet;
+    });
+  };
+
   const handleEmailShare = async () => {
+    if (!isOnline) {
+      toast({
+        title: "Offline Mode",
+        description: "Email sharing requires an internet connection.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     if (!selectedReferral || !emailForm.recipientEmail || !emailForm.senderName) {
       toast({
         title: "Missing Information",
@@ -98,6 +191,15 @@ export function ReferralList() {
   };
 
   const handleGeneratePDF = async (referral: Referral) => {
+    if (!isOnline) {
+      toast({
+        title: "Offline Mode",
+        description: "PDF generation requires an internet connection.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsGeneratingPDF(true);
     try {
       const response = await backend.referrals.generatePDF({
@@ -374,12 +476,12 @@ export function ReferralList() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
-      <div className="max-w-6xl mx-auto px-6 py-8 space-y-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 sm:py-8 space-y-4 sm:space-y-8">
         {/* Back Button */}
         <div className="flex items-center">
           <Link 
             to="/" 
-            className="inline-flex items-center text-gray-600 hover:text-gray-900 font-medium transition-colors hover:bg-white/60 px-3 py-2 rounded-xl"
+            className="inline-flex items-center text-gray-600 hover:text-gray-900 font-medium transition-colors hover:bg-white/60 px-3 py-2 rounded-xl touch-manipulation active:scale-95"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Home
@@ -388,34 +490,52 @@ export function ReferralList() {
 
         {/* Header */}
         <div className="text-center relative">
-          {/* Decorative elements */}
-          <div className="absolute top-0 left-1/4 w-16 h-16 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full opacity-20 animate-pulse"></div>
-          <div className="absolute top-5 right-1/3 w-12 h-12 bg-gradient-to-br from-pink-400 to-rose-500 rounded-full opacity-20 animate-pulse delay-1000"></div>
+          {/* Decorative elements - hidden on mobile */}
+          <div className="hidden sm:block absolute top-0 left-1/4 w-16 h-16 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full opacity-20 animate-pulse"></div>
+          <div className="hidden sm:block absolute top-5 right-1/3 w-12 h-12 bg-gradient-to-br from-pink-400 to-rose-500 rounded-full opacity-20 animate-pulse delay-1000"></div>
           
           <div className="relative">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-500 rounded-3xl shadow-xl mb-4">
-              <FileText className="h-8 w-8 text-white" />
+            <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-500 rounded-2xl sm:rounded-3xl shadow-xl mb-3 sm:mb-4">
+              <FileText className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
             </div>
-            <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2">
               Student Referrals
             </h1>
-            <p className="text-gray-600">
+            <p className="text-gray-600 text-sm sm:text-base">
               View and manage submitted student support referrals
             </p>
           </div>
         </div>
 
+        {/* Offline Notice */}
+        {!isOnline && (
+          <Alert className="border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl">
+            <WifiOff className="h-4 w-4 text-amber-600" />
+            <AlertDescription className="text-amber-800 text-sm">
+              <strong>Offline Mode</strong>
+              <br />
+              You're viewing cached referrals. Some features like PDF generation and email sharing are unavailable offline.
+            </AlertDescription>
+          </Alert>
+        )}
+
         {/* Filter */}
-        <Card className="border-0 bg-white/80 backdrop-blur-sm shadow-xl rounded-3xl overflow-hidden">
-          <CardHeader className="bg-gradient-to-r from-gray-600 via-slate-600 to-gray-700 text-white rounded-t-3xl">
-            <CardTitle className="flex items-center gap-3 text-xl">
-              <div className="w-10 h-10 bg-white/20 rounded-2xl flex items-center justify-center">
-                <Search className="h-6 w-6" />
+        <Card className="border-0 bg-white/80 backdrop-blur-sm shadow-xl rounded-2xl sm:rounded-3xl overflow-hidden">
+          <CardHeader className="bg-gradient-to-r from-gray-600 via-slate-600 to-gray-700 text-white rounded-t-2xl sm:rounded-t-3xl">
+            <CardTitle className="flex items-center gap-3 text-lg sm:text-xl">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-white/20 rounded-xl sm:rounded-2xl flex items-center justify-center">
+                <Search className="h-5 w-5 sm:h-6 sm:w-6" />
               </div>
               Filter Referrals
+              {!isOnline && (
+                <div className="ml-auto flex items-center text-amber-200 text-sm">
+                  <WifiOff className="h-4 w-4 mr-1" />
+                  Offline
+                </div>
+              )}
             </CardTitle>
           </CardHeader>
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-6">
             <div className="max-w-md">
               <Label htmlFor="teacherFilter" className="text-sm font-medium text-gray-700">
                 Filter by Teacher
@@ -425,7 +545,7 @@ export function ReferralList() {
                 value={teacherFilter}
                 onChange={(e) => setTeacherFilter(e.target.value)}
                 placeholder="Enter teacher name to filter..."
-                className="mt-2 border-gray-200 rounded-xl focus:border-gray-500 focus:ring-gray-500"
+                className="mt-2 border-gray-200 rounded-xl focus:border-gray-500 focus:ring-gray-500 text-base touch-manipulation"
               />
             </div>
           </CardContent>
@@ -435,19 +555,19 @@ export function ReferralList() {
         {loading ? (
           <div className="flex items-center justify-center py-16">
             <div className="text-center space-y-4">
-              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-3xl flex items-center justify-center animate-pulse">
-                <Loader2 className="h-8 w-8 animate-spin text-white" />
+              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl sm:rounded-3xl flex items-center justify-center animate-pulse">
+                <Loader2 className="h-6 w-6 sm:h-8 sm:w-8 animate-spin text-white" />
               </div>
-              <p className="text-gray-600 font-medium">Loading referrals...</p>
+              <p className="text-gray-600 font-medium text-sm sm:text-base">Loading referrals...</p>
             </div>
           </div>
         ) : referrals.length === 0 ? (
-          <Card className="border-0 bg-white/80 backdrop-blur-sm shadow-xl rounded-3xl">
-            <CardContent className="text-center py-16">
-              <div className="w-16 h-16 bg-gradient-to-br from-gray-400 to-gray-500 rounded-3xl flex items-center justify-center mx-auto mb-4">
-                <FileText className="h-8 w-8 text-white" />
+          <Card className="border-0 bg-white/80 backdrop-blur-sm shadow-xl rounded-2xl sm:rounded-3xl">
+            <CardContent className="text-center py-12 sm:py-16">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-gray-400 to-gray-500 rounded-2xl sm:rounded-3xl flex items-center justify-center mx-auto mb-4">
+                <FileText className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
               </div>
-              <p className="text-gray-500 text-lg">
+              <p className="text-gray-500 text-base sm:text-lg">
                 {teacherFilter 
                   ? `No referrals found for teacher "${teacherFilter}"`
                   : "No referrals have been submitted yet."
@@ -457,245 +577,276 @@ export function ReferralList() {
           </Card>
         ) : (
           /* Referrals List */
-          <div className="space-y-6">
-            {referrals.map((referral) => (
-              <Card key={referral.id} className="border-0 bg-white/90 backdrop-blur-sm shadow-xl rounded-3xl overflow-hidden hover:shadow-2xl transition-all duration-300">
-                <CardHeader className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white rounded-t-3xl">
-                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-                    <div className="space-y-3">
-                      <CardTitle className="flex items-center gap-3 text-xl">
-                        <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center">
-                          <User className="h-6 w-6" />
+          <div className="space-y-4 sm:space-y-6">
+            {referrals.map((referral) => {
+              const isExpanded = expandedReferrals.has(referral.id);
+              return (
+                <Card key={referral.id} className="border-0 bg-white/90 backdrop-blur-sm shadow-xl rounded-2xl sm:rounded-3xl overflow-hidden hover:shadow-2xl transition-all duration-300">
+                  <CardHeader 
+                    className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white rounded-t-2xl sm:rounded-t-3xl cursor-pointer touch-manipulation active:scale-[0.99] transition-transform"
+                    onClick={() => toggleReferralExpansion(referral.id)}
+                  >
+                    <div className="flex flex-col gap-4">
+                      <div className="flex items-start justify-between">
+                        <div className="space-y-3 flex-1">
+                          <CardTitle className="flex items-center gap-3 text-lg sm:text-xl">
+                            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/20 rounded-xl sm:rounded-2xl flex items-center justify-center">
+                              <User className="h-5 w-5 sm:h-6 sm:w-6" />
+                            </div>
+                            <div className="flex-1">
+                              <div>{referral.studentFirstName} {referral.studentLastInitial}.</div>
+                              <div className="text-sm text-blue-100 font-normal">
+                                Grade {referral.grade} • ID: {referral.id}
+                              </div>
+                            </div>
+                          </CardTitle>
+                          <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm text-blue-100">
+                            <div className="flex items-center gap-1 bg-white/10 px-2 py-1 rounded-lg">
+                              <User className="h-3 w-3" />
+                              <span>{referral.teacher}</span>
+                            </div>
+                            <div className="flex items-center gap-1 bg-white/10 px-2 py-1 rounded-lg">
+                              <Calendar className="h-3 w-3" />
+                              <span>{formatDate(referral.createdAt)}</span>
+                            </div>
+                          </div>
                         </div>
-                        {referral.studentFirstName} {referral.studentLastInitial}.
-                      </CardTitle>
-                      <div className="flex flex-wrap items-center gap-4 text-sm text-blue-100">
-                        <div className="flex items-center gap-2 bg-white/10 px-3 py-1 rounded-xl">
-                          <span>Grade: {referral.grade}</span>
-                        </div>
-                        <div className="flex items-center gap-2 bg-white/10 px-3 py-1 rounded-xl">
-                          <span>{referral.teacher} ({referral.teacherPosition})</span>
-                        </div>
-                        <div className="flex items-center gap-2 bg-white/10 px-3 py-1 rounded-xl">
-                          <Calendar className="h-4 w-4" />
-                          <span>Submitted: {formatDate(referral.createdAt)}</span>
+                        <div className="flex flex-col items-end gap-2">
+                          <Badge className={`${getSeverityBadgeColor(referral.severityLevel)} rounded-xl px-2 py-1 font-medium text-xs`}>
+                            {referral.severityLevel.charAt(0).toUpperCase() + referral.severityLevel.slice(1)}
+                          </Badge>
+                          <div className="flex items-center">
+                            {isExpanded ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                    <div className="flex flex-col sm:items-end gap-3">
-                      <Badge variant="secondary" className="bg-white/20 text-white border-white/30 self-start sm:self-end rounded-xl px-3 py-1">
-                        ID: {referral.id}
-                      </Badge>
-                      <Badge className={`${getSeverityBadgeColor(referral.severityLevel)} rounded-xl px-3 py-1 font-medium`}>
-                        {referral.severityLevel.charAt(0).toUpperCase() + referral.severityLevel.slice(1)}
-                      </Badge>
-                    </div>
-                  </div>
 
-                  {/* Meeting Preparation Actions */}
-                  <div className="mt-6 pt-4 border-t border-white/20">
-                    <div className="flex items-center gap-2 mb-3">
-                      <div className="w-8 h-8 bg-white/20 rounded-xl flex items-center justify-center">
-                        <Users className="h-5 w-5" />
-                      </div>
-                      <span className="text-sm font-medium">Meeting Preparation</span>
-                    </div>
-                    <div className="flex flex-wrap gap-3">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleGeneratePDF(referral)}
-                        disabled={isGeneratingPDF}
-                        className="text-xs bg-white/10 border-white/30 text-white hover:bg-white/20 rounded-xl"
-                      >
-                        {isGeneratingPDF ? (
-                          <Loader2 className="h-3 w-3 mr-1 animate-spin" />
-                        ) : (
-                          <Download className="h-3 w-3 mr-1" />
-                        )}
-                        Download PDF
-                      </Button>
-                      
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handlePrintView(referral)}
-                        className="text-xs bg-white/10 border-white/30 text-white hover:bg-white/20 rounded-xl"
-                      >
-                        <Printer className="h-3 w-3 mr-1" />
-                        Print View
-                      </Button>
-                      
-                      <Dialog open={isEmailDialogOpen} onOpenChange={setIsEmailDialogOpen}>
-                        <DialogTrigger asChild>
+                      {/* Meeting Preparation Actions - Always visible */}
+                      <div className="pt-3 border-t border-white/20">
+                        <div className="flex items-center gap-2 mb-3">
+                          <div className="w-6 h-6 bg-white/20 rounded-lg flex items-center justify-center">
+                            <Users className="h-4 w-4" />
+                          </div>
+                          <span className="text-sm font-medium">Meeting Preparation</span>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => setSelectedReferral(referral)}
-                            className="text-xs bg-white/10 border-white/30 text-white hover:bg-white/20 rounded-xl"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleGeneratePDF(referral);
+                            }}
+                            disabled={isGeneratingPDF || !isOnline}
+                            className="text-xs bg-white/10 border-white/30 text-white hover:bg-white/20 rounded-xl touch-manipulation active:scale-95"
                           >
-                            <Mail className="h-3 w-3 mr-1" />
-                            Email Share
+                            {isGeneratingPDF ? (
+                              <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                            ) : (
+                              <Download className="h-3 w-3 mr-1" />
+                            )}
+                            PDF
                           </Button>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-md rounded-3xl">
-                          <DialogHeader>
-                            <DialogTitle>Share Referral via Email</DialogTitle>
-                            <DialogDescription>
-                              Send this referral to colleagues for the student support meeting.
-                            </DialogDescription>
-                          </DialogHeader>
-                          <div className="space-y-4">
-                            <div className="space-y-2">
-                              <Label htmlFor="recipientEmail">Recipient Email *</Label>
-                              <Input
-                                id="recipientEmail"
-                                type="email"
-                                value={emailForm.recipientEmail}
-                                onChange={(e) => setEmailForm(prev => ({ ...prev, recipientEmail: e.target.value }))}
-                                placeholder="colleague@school.edu"
-                                className="rounded-xl"
-                              />
-                            </div>
-                            <div className="space-y-2">
-                              <Label htmlFor="senderName">Your Name *</Label>
-                              <Input
-                                id="senderName"
-                                value={emailForm.senderName}
-                                onChange={(e) => setEmailForm(prev => ({ ...prev, senderName: e.target.value }))}
-                                placeholder="Your full name"
-                                className="rounded-xl"
-                              />
-                            </div>
-                            <div className="space-y-2">
-                              <Label htmlFor="message">Message (optional)</Label>
-                              <Textarea
-                                id="message"
-                                value={emailForm.message}
-                                onChange={(e) => setEmailForm(prev => ({ ...prev, message: e.target.value }))}
-                                placeholder="Additional context for the meeting..."
-                                rows={3}
-                                className="rounded-xl resize-none"
-                              />
-                            </div>
+                          
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handlePrintView(referral);
+                            }}
+                            className="text-xs bg-white/10 border-white/30 text-white hover:bg-white/20 rounded-xl touch-manipulation active:scale-95"
+                          >
+                            <Printer className="h-3 w-3 mr-1" />
+                            Print
+                          </Button>
+                          
+                          <Dialog open={isEmailDialogOpen} onOpenChange={setIsEmailDialogOpen}>
+                            <DialogTrigger asChild>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  if (!isOnline) {
+                                    toast({
+                                      title: "Offline Mode",
+                                      description: "Email sharing requires an internet connection.",
+                                      variant: "destructive"
+                                    });
+                                    return;
+                                  }
+                                  setSelectedReferral(referral);
+                                }}
+                                disabled={!isOnline}
+                                className="text-xs bg-white/10 border-white/30 text-white hover:bg-white/20 rounded-xl touch-manipulation active:scale-95"
+                              >
+                                <Mail className="h-3 w-3 mr-1" />
+                                Email
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent className="sm:max-w-md rounded-3xl mx-4">
+                              <DialogHeader>
+                                <DialogTitle>Share Referral via Email</DialogTitle>
+                                <DialogDescription>
+                                  Send this referral to colleagues for the student support meeting.
+                                </DialogDescription>
+                              </DialogHeader>
+                              <div className="space-y-4">
+                                <div className="space-y-2">
+                                  <Label htmlFor="recipientEmail">Recipient Email *</Label>
+                                  <Input
+                                    id="recipientEmail"
+                                    type="email"
+                                    value={emailForm.recipientEmail}
+                                    onChange={(e) => setEmailForm(prev => ({ ...prev, recipientEmail: e.target.value }))}
+                                    placeholder="colleague@school.edu"
+                                    className="rounded-xl text-base touch-manipulation"
+                                  />
+                                </div>
+                                <div className="space-y-2">
+                                  <Label htmlFor="senderName">Your Name *</Label>
+                                  <Input
+                                    id="senderName"
+                                    value={emailForm.senderName}
+                                    onChange={(e) => setEmailForm(prev => ({ ...prev, senderName: e.target.value }))}
+                                    placeholder="Your full name"
+                                    className="rounded-xl text-base touch-manipulation"
+                                  />
+                                </div>
+                                <div className="space-y-2">
+                                  <Label htmlFor="message">Message (optional)</Label>
+                                  <Textarea
+                                    id="message"
+                                    value={emailForm.message}
+                                    onChange={(e) => setEmailForm(prev => ({ ...prev, message: e.target.value }))}
+                                    placeholder="Additional context for the meeting..."
+                                    rows={3}
+                                    className="rounded-xl resize-none text-base touch-manipulation"
+                                  />
+                                </div>
+                              </div>
+                              <DialogFooter>
+                                <Button
+                                  onClick={handleEmailShare}
+                                  disabled={isSharing}
+                                  className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-xl touch-manipulation active:scale-95"
+                                >
+                                  {isSharing ? (
+                                    <>
+                                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                      Sending...
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Mail className="h-4 w-4 mr-2" />
+                                      Send Email
+                                    </>
+                                  )}
+                                </Button>
+                              </DialogFooter>
+                            </DialogContent>
+                          </Dialog>
+                        </div>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  
+                  {isExpanded && (
+                    <CardContent className="p-4 sm:p-6 space-y-4 sm:space-y-6">
+                      {/* Incident Details */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                        <div className="space-y-2">
+                          <h4 className="font-medium text-gray-900 flex items-center gap-2 text-sm sm:text-base">
+                            <Calendar className="h-4 w-4 text-blue-500" />
+                            Incident Date
+                          </h4>
+                          <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-3 rounded-xl">
+                            <p className="text-sm text-gray-700">{formatIncidentDate(referral.incidentDate)}</p>
                           </div>
-                          <DialogFooter>
-                            <Button
-                              onClick={handleEmailShare}
-                              disabled={isSharing}
-                              className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-xl"
-                            >
-                              {isSharing ? (
-                                <>
-                                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                                  Sending...
-                                </>
-                              ) : (
-                                <>
-                                  <Mail className="h-4 w-4 mr-2" />
-                                  Send Email
-                                </>
-                              )}
-                            </Button>
-                          </DialogFooter>
-                        </DialogContent>
-                      </Dialog>
-                    </div>
-                  </div>
-                </CardHeader>
-                
-                <CardContent className="p-6 space-y-6">
-                  {/* Incident Details */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <h4 className="font-medium text-gray-900 flex items-center gap-2">
-                        <Calendar className="h-4 w-4 text-blue-500" />
-                        Incident Date
-                      </h4>
-                      <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-3 rounded-xl">
-                        <p className="text-sm text-gray-700">{formatIncidentDate(referral.incidentDate)}</p>
+                        </div>
+                        <div className="space-y-2">
+                          <h4 className="font-medium text-gray-900 flex items-center gap-2 text-sm sm:text-base">
+                            <MapPin className="h-4 w-4 text-green-500" />
+                            Location
+                          </h4>
+                          <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-3 rounded-xl">
+                            <p className="text-sm text-gray-700">{referral.location}</p>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                    <div className="space-y-2">
-                      <h4 className="font-medium text-gray-900 flex items-center gap-2">
-                        <MapPin className="h-4 w-4 text-green-500" />
-                        Location
-                      </h4>
-                      <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-3 rounded-xl">
-                        <p className="text-sm text-gray-700">{referral.location}</p>
-                      </div>
-                    </div>
-                  </div>
 
-                  {/* Concern Types */}
-                  <div className="space-y-3">
-                    <h4 className="font-medium text-gray-900">Concern Types</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {referral.concernTypes.map((type, index) => (
-                        <Badge key={index} variant="outline" className="bg-gradient-to-r from-purple-50 to-pink-50 text-purple-700 border-purple-200 rounded-xl px-3 py-1">
-                          {type}
-                        </Badge>
-                      ))}
-                      {referral.otherConcernType && (
-                        <Badge variant="outline" className="bg-gradient-to-r from-purple-50 to-pink-50 text-purple-700 border-purple-200 rounded-xl px-3 py-1">
-                          {referral.otherConcernType}
-                        </Badge>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Concern Description */}
-                  <div className="space-y-3">
-                    <h4 className="font-medium text-gray-900">Concern Description</h4>
-                    <div className="bg-gradient-to-r from-amber-50 to-orange-50 p-4 rounded-2xl border border-amber-200">
-                      <p className="text-gray-700 text-sm leading-relaxed">
-                        {referral.concernDescription}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Actions Taken */}
-                  {referral.actionsTaken.length > 0 && (
-                    <div className="space-y-3">
-                      <h4 className="font-medium text-gray-900">Actions Already Taken</h4>
-                      <div className="bg-gradient-to-r from-indigo-50 to-blue-50 p-4 rounded-2xl border border-indigo-200">
+                      {/* Concern Types */}
+                      <div className="space-y-3">
+                        <h4 className="font-medium text-gray-900 text-sm sm:text-base">Concern Types</h4>
                         <div className="flex flex-wrap gap-2">
-                          {referral.actionsTaken.map((action, index) => (
-                            <Badge key={index} variant="outline" className="bg-gradient-to-r from-indigo-100 to-blue-100 text-indigo-700 border-indigo-300 rounded-xl px-3 py-1">
-                              {action}
+                          {referral.concernTypes.map((type, index) => (
+                            <Badge key={index} variant="outline" className="bg-gradient-to-r from-purple-50 to-pink-50 text-purple-700 border-purple-200 rounded-xl px-2 py-1 text-xs">
+                              {type}
                             </Badge>
                           ))}
-                          {referral.otherActionTaken && (
-                            <Badge variant="outline" className="bg-gradient-to-r from-indigo-100 to-blue-100 text-indigo-700 border-indigo-300 rounded-xl px-3 py-1">
-                              {referral.otherActionTaken}
+                          {referral.otherConcernType && (
+                            <Badge variant="outline" className="bg-gradient-to-r from-purple-50 to-pink-50 text-purple-700 border-purple-200 rounded-xl px-2 py-1 text-xs">
+                              {referral.otherConcernType}
                             </Badge>
                           )}
                         </div>
                       </div>
-                    </div>
-                  )}
 
-                  {/* AI Recommendations */}
-                  {referral.aiRecommendations && (
-                    <div className="space-y-4">
-                      <h4 className="font-medium text-gray-900">AI-Generated Recommendations</h4>
-                      <div className="bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 p-6 rounded-2xl border border-emerald-200">
-                        <div className="prose max-w-none">
-                          {formatRecommendations(referral.aiRecommendations)}
+                      {/* Concern Description */}
+                      <div className="space-y-3">
+                        <h4 className="font-medium text-gray-900 text-sm sm:text-base">Concern Description</h4>
+                        <div className="bg-gradient-to-r from-amber-50 to-orange-50 p-4 rounded-2xl border border-amber-200">
+                          <p className="text-gray-700 text-sm leading-relaxed">
+                            {referral.concernDescription}
+                          </p>
                         </div>
                       </div>
-                      
-                      <Alert className="border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl">
-                        <AlertTriangle className="h-4 w-4 text-amber-600" />
-                        <AlertDescription className="text-xs text-amber-800 leading-relaxed">
-                          ⚠️ IMPORTANT DISCLAIMER: These AI-generated recommendations are for informational purposes only and should not replace professional educational assessment. Please refer this student to your school's student support department for proper evaluation and vetting. All AI-generated suggestions must be reviewed and approved by qualified educational professionals before implementation.
-                        </AlertDescription>
-                      </Alert>
-                    </div>
+
+                      {/* Actions Taken */}
+                      {referral.actionsTaken.length > 0 && (
+                        <div className="space-y-3">
+                          <h4 className="font-medium text-gray-900 text-sm sm:text-base">Actions Already Taken</h4>
+                          <div className="bg-gradient-to-r from-indigo-50 to-blue-50 p-4 rounded-2xl border border-indigo-200">
+                            <div className="flex flex-wrap gap-2">
+                              {referral.actionsTaken.map((action, index) => (
+                                <Badge key={index} variant="outline" className="bg-gradient-to-r from-indigo-100 to-blue-100 text-indigo-700 border-indigo-300 rounded-xl px-2 py-1 text-xs">
+                                  {action}
+                                </Badge>
+                              ))}
+                              {referral.otherActionTaken && (
+                                <Badge variant="outline" className="bg-gradient-to-r from-indigo-100 to-blue-100 text-indigo-700 border-indigo-300 rounded-xl px-2 py-1 text-xs">
+                                  {referral.otherActionTaken}
+                                </Badge>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* AI Recommendations */}
+                      {referral.aiRecommendations && (
+                        <div className="space-y-4">
+                          <h4 className="font-medium text-gray-900 text-sm sm:text-base">AI-Generated Recommendations</h4>
+                          <div className="bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 p-4 sm:p-6 rounded-2xl border border-emerald-200">
+                            <div className="prose max-w-none text-sm">
+                              {formatRecommendations(referral.aiRecommendations)}
+                            </div>
+                          </div>
+                          
+                          <Alert className="border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl">
+                            <AlertTriangle className="h-4 w-4 text-amber-600" />
+                            <AlertDescription className="text-xs text-amber-800 leading-relaxed">
+                              ⚠️ IMPORTANT DISCLAIMER: These AI-generated recommendations are for informational purposes only and should not replace professional educational assessment. Please refer this student to your school's student support department for proper evaluation and vetting. All AI-generated suggestions must be reviewed and approved by qualified educational professionals before implementation.
+                            </AlertDescription>
+                          </Alert>
+                        </div>
+                      )}
+                    </CardContent>
                   )}
-                </CardContent>
-              </Card>
-            ))}
+                </Card>
+              );
+            })}
           </div>
         )}
       </div>
