@@ -37,8 +37,6 @@ const ACTIONS_TAKEN = [
 
 export function ReferralForm() {
   const navigate = useNavigate();
-  // For demo purposes, use admin email
-  const [userEmail, setUserEmail] = useState('admin@concern2care.demo');
   const [formData, setFormData] = useState({
     studentFirstName: '',
     studentLastInitial: '',
@@ -110,15 +108,6 @@ export function ReferralForm() {
   };
 
   const generateRecommendations = async () => {
-    if (!userEmail) {
-      toast({
-        title: "Email Required",
-        description: "Please enter your email address to generate recommendations.",
-        variant: "destructive"
-      });
-      return;
-    }
-
     if (!formData.studentFirstName || !formData.studentLastInitial || !formData.grade || 
         !formData.teacher || !formData.teacherPosition || !formData.incidentDate ||
         !formData.location || formData.concernTypes.length === 0 || !formData.concernDescription ||
@@ -180,15 +169,6 @@ export function ReferralForm() {
   };
 
   const generateFollowUpAssistance = async () => {
-    if (!userEmail) {
-      toast({
-        title: "Email Required",
-        description: "Please enter your email address.",
-        variant: "destructive"
-      });
-      return;
-    }
-
     if (!followUpQuestion.trim()) {
       toast({
         title: "Missing Question",
@@ -437,16 +417,6 @@ export function ReferralForm() {
             </p>
           </div>
         </div>
-
-        {/* Demo Notice */}
-        <Alert className="border-emerald-200 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-2xl">
-          <Key className="h-4 w-4 text-emerald-600" />
-          <AlertDescription className="text-emerald-800 text-sm">
-            <strong>Demo Mode Active</strong>
-            <br />
-            You are logged in as the demo administrator. All AI features are fully functional using the admin DeepSeek API key.
-          </AlertDescription>
-        </Alert>
 
         {/* Student Information */}
         <Card className="border-0 bg-white/80 backdrop-blur-sm shadow-xl rounded-2xl sm:rounded-3xl overflow-hidden">
@@ -723,7 +693,7 @@ export function ReferralForm() {
         <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
           <Button 
             onClick={generateRecommendations}
-            disabled={isGenerating || !userEmail}
+            disabled={isGenerating}
             className="flex-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 text-white shadow-xl rounded-2xl py-4 sm:py-6 text-base sm:text-lg font-semibold transition-all duration-200 transform hover:scale-105 active:scale-95 touch-manipulation disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
           >
             {isGenerating ? (
@@ -886,7 +856,7 @@ export function ReferralForm() {
                 
                 <Button 
                   onClick={generateFollowUpAssistance}
-                  disabled={isGeneratingFollowUp || !followUpQuestion.trim() || !userEmail}
+                  disabled={isGeneratingFollowUp || !followUpQuestion.trim()}
                   className="bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 text-white shadow-lg rounded-2xl py-3 px-6 transform hover:scale-105 transition-all duration-200 touch-manipulation active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                 >
                   {isGeneratingFollowUp ? (

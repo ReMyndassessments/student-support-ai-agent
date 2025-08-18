@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { ArrowRight, Sparkles, Users, Brain, Shield, CreditCard, Mail, Copy, CheckCircle } from 'lucide-react';
+import { ArrowRight, Sparkles, Users, Brain, Shield, CreditCard, Mail, Copy, CheckCircle, User, GraduationCap } from 'lucide-react';
 import { AdminLoginFooter } from './AdminLoginFooter';
 import { useToast } from '@/components/ui/use-toast';
 import { useState } from 'react';
@@ -168,9 +168,19 @@ Thank you!`
                 Plus professional reports and streamlined communication with your school's support team. With Concern2Care, you can quickly capture a concern and receive research-based, ready-to-use interventions that help your students succeed.
               </p>
               <div className="flex flex-col gap-3 sm:flex-row sm:gap-4 justify-center">
+                <Link to="/teacher-login">
+                  <Button className="w-full sm:w-auto bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 text-white shadow-xl rounded-xl sm:rounded-2xl py-4 sm:py-6 px-6 sm:px-8 text-base sm:text-lg font-semibold transition-all duration-200 transform hover:scale-105 active:scale-95 touch-manipulation">
+                    <User className="mr-2 h-5 w-5" />
+                    Teacher Login
+                  </Button>
+                </Link>
+
                 <Dialog open={isContactDialogOpen} onOpenChange={setIsContactDialogOpen}>
                   <DialogTrigger asChild>
-                    <Button className="w-full sm:w-auto bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 text-white shadow-xl rounded-xl sm:rounded-2xl py-4 sm:py-6 px-6 sm:px-8 text-base sm:text-lg font-semibold transition-all duration-200 transform hover:scale-105 active:scale-95 touch-manipulation">
+                    <Button 
+                      variant="outline" 
+                      className="w-full sm:w-auto border-gray-300 text-gray-700 hover:bg-white/80 rounded-xl sm:rounded-2xl py-4 sm:py-6 px-6 sm:px-8 text-base sm:text-lg font-semibold touch-manipulation active:scale-95"
+                    >
                       <Mail className="mr-2 h-5 w-5" />
                       Contact Sales
                     </Button>
@@ -228,7 +238,7 @@ Thank you!`
                       variant="outline" 
                       className="w-full sm:w-auto border-gray-300 text-gray-700 hover:bg-white/80 rounded-xl sm:rounded-2xl py-4 sm:py-6 px-6 sm:px-8 text-base sm:text-lg font-semibold touch-manipulation active:scale-95"
                     >
-                      <Mail className="mr-2 h-5 w-5" />
+                      <GraduationCap className="mr-2 h-5 w-5" />
                       Request Demo
                     </Button>
                   </DialogTrigger>
@@ -428,9 +438,16 @@ Thank you!`
                 Join thousands of educators using AI-powered tools to better support their students.
               </p>
               <div className="flex flex-col gap-3 sm:flex-row sm:gap-4 justify-center">
+                <Link to="/teacher-login">
+                  <Button className="w-full sm:w-auto bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 text-white shadow-xl rounded-xl sm:rounded-2xl py-4 sm:py-6 px-6 sm:px-8 text-base sm:text-lg font-semibold transition-all duration-200 transform hover:scale-105 active:scale-95 touch-manipulation">
+                    <User className="mr-2 h-5 w-5" />
+                    Get Started
+                  </Button>
+                </Link>
                 <Button 
                   onClick={handleContactSales}
-                  className="w-full sm:w-auto bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 text-white shadow-xl rounded-xl sm:rounded-2xl py-4 sm:py-6 px-6 sm:px-8 text-base sm:text-lg font-semibold transition-all duration-200 transform hover:scale-105 active:scale-95 touch-manipulation"
+                  variant="outline" 
+                  className="w-full sm:w-auto border-gray-300 text-gray-700 hover:bg-white/80 rounded-xl sm:rounded-2xl py-4 sm:py-6 px-6 sm:px-8 text-base sm:text-lg font-semibold touch-manipulation active:scale-95"
                 >
                   <Mail className="mr-2 h-5 w-5" />
                   Contact Sales
@@ -440,7 +457,7 @@ Thank you!`
                   variant="outline" 
                   className="w-full sm:w-auto border-gray-300 text-gray-700 hover:bg-white/80 rounded-xl sm:rounded-2xl py-4 sm:py-6 px-6 sm:px-8 text-base sm:text-lg font-semibold touch-manipulation active:scale-95"
                 >
-                  <Mail className="mr-2 h-5 w-5" />
+                  <GraduationCap className="mr-2 h-5 w-5" />
                   Request Demo
                 </Button>
                 <Link to="/subscription/plans">

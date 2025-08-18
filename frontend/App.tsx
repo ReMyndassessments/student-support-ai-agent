@@ -8,6 +8,7 @@ import { ReferralList } from './components/ReferralList';
 import { MeetingPreparation } from './components/MeetingPreparation';
 import { SubscriptionPlans } from './components/SubscriptionPlans';
 import { AdminLogin } from './components/AdminLogin';
+import { TeacherLogin } from './components/TeacherLogin';
 import { AdminDashboard } from './components/AdminDashboard';
 import { TeacherManagement } from './components/TeacherManagement';
 import { AdminSystemSettings } from './components/AdminSystemSettings';
@@ -20,44 +21,69 @@ interface User {
 }
 
 function DemoApp() {
-  const [adminUser, setAdminUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
   useEffect(() => {
-    // Check if user is already logged in as admin (check for admin session cookie)
+    // Check if user is already logged in (check for session cookies)
     const checkAuth = () => {
       const cookies = document.cookie.split(';');
-      const adminSession = cookies.find(cookie => cookie.trim().startsWith('admin_session='));
       
+      // Check for admin session
+      const adminSession = cookies.find(cookie => cookie.trim().startsWith('admin_session='));
       if (adminSession) {
         try {
           const sessionValue = adminSession.split('=')[1];
           const sessionData = JSON.parse(atob(sessionValue));
           if (sessionData.isAdmin && sessionData.email === 'admin@concern2care.demo') {
-            setAdminUser({
+            setUser({
               email: 'admin@concern2care.demo',
               name: 'Demo Administrator',
               isAdmin: true
             });
+            setIsCheckingAuth(false);
+            return;
           }
         } catch (error) {
-          // Invalid session, ignore
+          // Invalid session, continue checking
         }
       }
+
+      // Check for teacher session
+      const teacherSession = cookies.find(cookie => cookie.trim().startsWith('teacher_session='));
+      if (teacherSession) {
+        try {
+          const sessionValue = teacherSession.split('=')[1];
+          const sessionData = JSON.parse(atob(sessionValue));
+          if (sessionData.email && !sessionData.isAdmin) {
+            setUser({
+              email: sessionData.email,
+              name: sessionData.name || 'Teacher',
+              isAdmin: false
+            });
+            setIsCheckingAuth(false);
+            return;
+          }
+        } catch (error) {
+          // Invalid session, continue
+        }
+      }
+
       setIsCheckingAuth(false);
     };
 
     checkAuth();
   }, []);
 
-  const handleAdminLogin = (userData: User) => {
-    setAdminUser(userData);
+  const handleLogin = (userData: User) => {
+    setUser(userData);
   };
 
-  const handleAdminLogout = () => {
-    setAdminUser(null);
-    // Clear the admin session cookie
+  const handleLogout = () => {
+    setUser(null);
+    // Clear session cookies
     document.cookie = 'admin_session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    document.cookie = 'teacher_session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
   };
 
   if (isCheckingAuth) {
@@ -73,28 +99,32 @@ function DemoApp() {
     );
   }
 
-  // If admin is logged in, show admin interface
-  if (adminUser?.isAdmin) {
+  // If user is logged in, show appropriate interface
+  if (user) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
         <Navigation 
-          userEmail={adminUser.email} 
-          userName={adminUser.name}
-          isAdmin={adminUser.isAdmin} 
-          onLogout={handleAdminLogout} 
+          userEmail={user.email} 
+          userName={user.name}
+          isAdmin={user.isAdmin} 
+          onLogout={handleLogout} 
         />
         <main>
           <Routes>
-            <Route path="/" element={<LandingPage userEmail={adminUser.email} onAdminLogin={handleAdminLogin} />} />
-            <Route path="/admin" element={<AdminDashboard user={adminUser} onLogout={handleAdminLogout} />} />
-            <Route path="/admin/teachers" element={<TeacherManagement />} />
-            <Route path="/admin/system-settings" element={<AdminSystemSettings />} />
-            <Route path="/admin/demo-data" element={<AdminDemoData />} />
+            <Route path="/" element={<LandingPage userEmail={user.email} onAdminLogin={handleLogin} />} />
+            {user.isAdmin && (
+              <>
+                <Route path="/admin" element={<AdminDashboard user={user} onLogout={handleLogout} />} />
+                <Route path="/admin/teachers" element={<TeacherManagement />} />
+                <Route path="/admin/system-settings" element={<AdminSystemSettings />} />
+                <Route path="/admin/demo-data" element={<AdminDemoData />} />
+              </>
+            )}
             <Route path="/new-referral" element={<ReferralForm />} />
             <Route path="/referrals" element={<ReferralList />} />
             <Route path="/meeting/:referralId" element={<MeetingPreparation />} />
             <Route path="/subscription/plans" element={<SubscriptionPlans />} />
-            <Route path="*" element={<LandingPage onAdminLogin={handleAdminLogin} />} />
+            <Route path="*" element={<LandingPage onAdminLogin={handleLogin} />} />
           </Routes>
         </main>
         <Toaster />
@@ -104,16 +134,17 @@ function DemoApp() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
-      <Navigation onAdminLogin={handleAdminLogin} />
+      <Navigation onAdminLogin={handleLogin} />
       <main>
         <Routes>
-          <Route path="/" element={<LandingPage onAdminLogin={handleAdminLogin} />} />
-          <Route path="/admin-login" element={<AdminLogin onLoginSuccess={handleAdminLogin} />} />
+          <Route path="/" element={<LandingPage onAdminLogin={handleLogin} />} />
+          <Route path="/admin-login" element={<AdminLogin onLoginSuccess={handleLogin} />} />
+          <Route path="/teacher-login" element={<TeacherLogin onLoginSuccess={handleLogin} />} />
           <Route path="/subscription/plans" element={<SubscriptionPlans />} />
           <Route path="/new-referral" element={<ReferralForm />} />
           <Route path="/referrals" element={<ReferralList />} />
           <Route path="/meeting/:referralId" element={<MeetingPreparation />} />
-          <Route path="*" element={<LandingPage onAdminLogin={handleAdminLogin} />} />
+          <Route path="*" element={<LandingPage onAdminLogin={handleLogin} />} />
         </Routes>
       </main>
       <Toaster />

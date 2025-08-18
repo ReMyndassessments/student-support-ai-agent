@@ -1,14 +1,11 @@
 import { Header, Cookie, APIError, Gateway } from "encore.dev/api";
 import { authHandler } from "encore.dev/auth";
-import { createClerkClient, verifyToken } from "@clerk/backend";
-import { secret } from "encore.dev/config";
-
-const clerkSecretKey = secret("ClerkSecretKey");
-const clerkClient = createClerkClient({ secretKey: clerkSecretKey() });
+import { userDB } from "../users/db";
 
 interface AuthParams {
   authorization?: Header<"Authorization">;
   session?: Cookie<"admin_session">;
+  teacherSession?: Cookie<"teacher_session">;
 }
 
 export interface AuthData {
@@ -17,12 +14,6 @@ export interface AuthData {
   isAdmin: boolean;
   name: string;
 }
-
-// Configure the authorized parties.
-// TODO: Configure this for your own domain when deploying to production.
-const AUTHORIZED_PARTIES = [
-  "https://*.lp.dev",
-];
 
 const auth = authHandler<AuthParams, AuthData>(
   async (data) => {
@@ -43,28 +34,31 @@ const auth = authHandler<AuthParams, AuthData>(
       }
     }
 
-    // Check for authorization header (Clerk JWT token)
-    if (data.authorization) {
-      const token = data.authorization.replace("Bearer ", "");
-      
-      // Verify Clerk JWT token
+    // Check for teacher session cookie
+    if (data.teacherSession?.value) {
       try {
-        const verifiedToken = await clerkClient.verifyToken(token, {
-          authorizedParties: AUTHORIZED_PARTIES,
-          secretKey: clerkSecretKey(),
-        });
+        const sessionData = JSON.parse(Buffer.from(data.teacherSession.value, 'base64').toString());
+        if (sessionData.email && sessionData.userId) {
+          // Verify user still exists in database
+          const user = await userDB.queryRow<{
+            id: number;
+            email: string;
+            name: string | null;
+          }>`
+            SELECT id, email, name FROM users WHERE id = ${sessionData.userId}
+          `;
 
-        const user = await clerkClient.users.getUser(verifiedToken.sub);
-        
-        return {
-          userID: user.id,
-          email: user.emailAddresses[0]?.emailAddress || '',
-          isAdmin: false,
-          name: user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : user.emailAddresses[0]?.emailAddress || 'User'
-        };
-      } catch (err) {
-        console.error('Error verifying Clerk token:', err);
-        throw APIError.unauthenticated("Invalid authentication token");
+          if (user) {
+            return {
+              userID: user.id.toString(),
+              email: user.email,
+              isAdmin: false,
+              name: user.name || 'Teacher'
+            };
+          }
+        }
+      } catch (error) {
+        // Invalid session, continue to other auth methods
       }
     }
 

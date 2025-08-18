@@ -86,7 +86,7 @@ export function Navigation({ userEmail, userName, isAdmin = false, onLogout, onA
     }
   ];
 
-  const demoNavItems = [
+  const teacherNavItems = [
     {
       to: '/',
       icon: Home,
@@ -95,12 +95,25 @@ export function Navigation({ userEmail, userName, isAdmin = false, onLogout, onA
     {
       to: '/new-referral',
       icon: FileText,
-      label: 'Demo Support Request'
+      label: 'New Support Request'
     },
     {
       to: '/referrals',
       icon: Users,
-      label: 'Demo Support Requests'
+      label: 'My Support Requests'
+    }
+  ];
+
+  const guestNavItems = [
+    {
+      to: '/',
+      icon: Home,
+      label: 'Home'
+    },
+    {
+      to: '/teacher-login',
+      icon: User,
+      label: 'Teacher Login'
     },
     {
       to: '/subscription/plans',
@@ -109,7 +122,7 @@ export function Navigation({ userEmail, userName, isAdmin = false, onLogout, onA
     }
   ];
 
-  const navItems = isAdmin ? adminNavItems : demoNavItems;
+  const navItems = isAdmin ? adminNavItems : (userEmail ? teacherNavItems : guestNavItems);
 
   return (
     <>
@@ -130,8 +143,13 @@ export function Navigation({ userEmail, userName, isAdmin = false, onLogout, onA
                     ADMIN
                   </div>
                 )}
-                {!isAdmin && (
+                {userEmail && !isAdmin && (
                   <div className="px-1.5 py-0.5 sm:px-2 sm:py-1 bg-gradient-to-r from-blue-100 to-cyan-100 text-blue-800 text-xs font-medium rounded-md sm:rounded-lg">
+                    TEACHER
+                  </div>
+                )}
+                {!userEmail && (
+                  <div className="px-1.5 py-0.5 sm:px-2 sm:py-1 bg-gradient-to-r from-gray-100 to-slate-100 text-gray-800 text-xs font-medium rounded-md sm:rounded-lg">
                     DEMO
                   </div>
                 )}
@@ -177,7 +195,7 @@ export function Navigation({ userEmail, userName, isAdmin = false, onLogout, onA
               
               {/* Authentication */}
               <div className="ml-4 flex items-center space-x-2">
-                {isAdmin && onLogout && (
+                {userEmail && onLogout && (
                   <Button
                     onClick={onLogout}
                     variant="outline"
@@ -238,7 +256,7 @@ export function Navigation({ userEmail, userName, isAdmin = false, onLogout, onA
                     <GraduationCap className="h-5 w-5 text-white" />
                   </div>
                   <span className="font-bold text-gray-900">
-                    {isAdmin ? 'Admin Menu' : 'Menu'}
+                    {isAdmin ? 'Admin Menu' : (userEmail ? 'Teacher Menu' : 'Menu')}
                   </span>
                 </div>
                 <Button
@@ -268,6 +286,16 @@ export function Navigation({ userEmail, userName, isAdmin = false, onLogout, onA
                 </div>
               </div>
               
+              {/* User Info */}
+              {userEmail && (
+                <div className="px-4 py-3 border-b border-gray-100 bg-gradient-to-r from-blue-50 to-purple-50">
+                  <div className="text-sm text-blue-800">
+                    <div className="font-medium">{userName}</div>
+                    <div className="text-xs text-blue-600">{userEmail}</div>
+                  </div>
+                </div>
+              )}
+              
               {/* Navigation Items */}
               <div className="flex-1 overflow-y-auto py-4">
                 <div className="space-y-2 px-4">
@@ -296,7 +324,7 @@ export function Navigation({ userEmail, userName, isAdmin = false, onLogout, onA
               
               {/* Mobile Authentication */}
               <div className="p-4 border-t border-gray-200">
-                {isAdmin && onLogout && (
+                {userEmail && onLogout && (
                   <Button
                     onClick={() => {
                       setIsMobileMenuOpen(false);
