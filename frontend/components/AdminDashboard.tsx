@@ -61,7 +61,14 @@ export function AdminDashboard({ user, onLogout }: AdminDashboardProps) {
     }
   ];
 
-  const quickActions = [
+  const adminTools = [
+    {
+      title: 'Manage Teachers',
+      description: 'Add, edit, or remove teacher accounts from the system',
+      icon: Users,
+      href: '/admin/teachers',
+      gradient: 'from-orange-500 to-red-500'
+    },
     {
       title: 'Create Sample Support Request',
       description: 'Demonstrate the support request creation process with AI recommendations',
@@ -181,19 +188,19 @@ export function AdminDashboard({ user, onLogout }: AdminDashboardProps) {
           </CardContent>
         </Card>
 
-        {/* Quick Actions */}
+        {/* Admin Tools */}
         <Card className="border-0 bg-white/90 backdrop-blur-sm shadow-xl rounded-3xl overflow-hidden">
           <CardHeader className="bg-gradient-to-r from-purple-500 via-pink-500 to-rose-500 text-white rounded-t-3xl">
             <CardTitle className="flex items-center gap-3 text-xl">
               <div className="w-10 h-10 bg-white/20 rounded-2xl flex items-center justify-center">
                 <Sparkles className="h-6 w-6" />
               </div>
-              Demo Actions
+              Admin Tools
             </CardTitle>
           </CardHeader>
           <CardContent className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {quickActions.map((action, index) => {
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {adminTools.map((action, index) => {
                 const Icon = action.icon;
                 return (
                   <Card key={index} className="border-0 bg-gradient-to-br from-gray-50 to-white hover:shadow-lg transition-all duration-200 hover:scale-105 transform rounded-2xl overflow-hidden">
@@ -209,7 +216,7 @@ export function AdminDashboard({ user, onLogout }: AdminDashboardProps) {
                             onClick={() => window.location.href = action.href}
                             className={`w-full bg-gradient-to-r ${action.gradient} hover:opacity-90 text-white rounded-xl`}
                           >
-                            Start Demo
+                            Go
                           </Button>
                         </div>
                       </div>
@@ -252,37 +259,6 @@ export function AdminDashboard({ user, onLogout }: AdminDashboardProps) {
                   <span className="font-medium text-gray-700">Session:</span>
                   <p className="text-gray-600">24 Hour Demo Access</p>
                 </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Demo Instructions */}
-        <Card className="border-0 bg-gradient-to-br from-amber-50 to-orange-50 shadow-xl rounded-3xl overflow-hidden">
-          <CardHeader className="bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-t-3xl">
-            <CardTitle className="flex items-center gap-3 text-xl">
-              <div className="w-10 h-10 bg-white/20 rounded-2xl flex items-center justify-center">
-                <Settings className="h-6 w-6" />
-              </div>
-              Demo Instructions
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-6">
-            <div className="space-y-4">
-              <h3 className="font-semibold text-amber-900">How to conduct the demo:</h3>
-              <ol className="list-decimal list-inside space-y-2 text-amber-800">
-                <li>Start by creating a new student support request to show the form interface</li>
-                <li>Demonstrate the AI-powered recommendations feature</li>
-                <li>Show the follow-up assistance functionality</li>
-                <li>Generate and download a PDF report</li>
-                <li>Display the support request management tools in "All Support Requests"</li>
-                <li>Explain the subscription model and value proposition</li>
-              </ol>
-              <div className="mt-4 p-4 bg-amber-100 rounded-xl">
-                <p className="text-amber-800 text-sm">
-                  <strong>Note:</strong> All AI features are fully functional using the admin DeepSeek API key. 
-                  The system will automatically use this key for all AI-generated recommendations during the demo.
-                </p>
               </div>
             </div>
           </CardContent>

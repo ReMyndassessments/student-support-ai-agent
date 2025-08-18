@@ -12,6 +12,7 @@ import { UserProfile } from './components/UserProfile';
 import { SubscriptionGate } from './components/SubscriptionGate';
 import { AdminLogin } from './components/AdminLogin';
 import { AdminDashboard } from './components/AdminDashboard';
+import { TeacherManagement } from './components/TeacherManagement';
 import { AuthenticatedApp } from './components/AuthenticatedApp';
 import { clerkPublishableKey } from './config';
 
@@ -90,6 +91,7 @@ function AppContent() {
           <Routes>
             <Route path="/" element={<LandingPage userEmail={adminUser.email} onAdminLogin={handleAdminLogin} />} />
             <Route path="/admin" element={<AdminDashboard user={adminUser} onLogout={handleAdminLogout} />} />
+            <Route path="/admin/teachers" element={<TeacherManagement />} />
             <Route path="/new-referral" element={<ReferralForm />} />
             <Route path="/referrals" element={<ReferralList />} />
             <Route path="/meeting/:referralId" element={<MeetingPreparation />} />
@@ -192,6 +194,7 @@ function DemoApp() {
           <Routes>
             <Route path="/" element={<LandingPage userEmail={adminUser.email} onAdminLogin={handleAdminLogin} />} />
             <Route path="/admin" element={<AdminDashboard user={adminUser} onLogout={handleAdminLogout} />} />
+            <Route path="/admin/teachers" element={<TeacherManagement />} />
             <Route path="/new-referral" element={<ReferralForm />} />
             <Route path="/referrals" element={<ReferralList />} />
             <Route path="/meeting/:referralId" element={<MeetingPreparation />} />
