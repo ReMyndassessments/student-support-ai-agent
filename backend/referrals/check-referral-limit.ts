@@ -1,6 +1,6 @@
 import { api } from "encore.dev/api";
 import { Query } from "encore.dev/api";
-import { userDB } from "./db";
+import { userDB } from "../users/db";
 import { APIError } from "encore.dev/api";
 
 export interface CheckSupportRequestLimitRequest {
