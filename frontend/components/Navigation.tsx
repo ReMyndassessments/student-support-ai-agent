@@ -57,17 +57,17 @@ export function Navigation({ userEmail, userName, isAdmin = false, onLogout, onA
     {
       to: '/admin',
       icon: Shield,
-      label: 'Admin Dashboard'
+      label: 'Dashboard'
     },
     {
       to: '/admin/teachers',
       icon: Users,
-      label: 'Teacher Management'
+      label: 'Teachers'
     },
     {
       to: '/admin/system-settings',
       icon: Settings,
-      label: 'System Settings'
+      label: 'Settings'
     },
     {
       to: '/admin/demo-data',
@@ -77,12 +77,12 @@ export function Navigation({ userEmail, userName, isAdmin = false, onLogout, onA
     {
       to: '/new-referral',
       icon: FileText,
-      label: 'New Support Request'
+      label: 'New Request'
     },
     {
       to: '/referrals',
       icon: FileText,
-      label: 'All Support Requests'
+      label: 'All Requests'
     }
   ];
 
@@ -167,7 +167,7 @@ export function Navigation({ userEmail, userName, isAdmin = false, onLogout, onA
             </div>
             
             {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center space-x-1 lg:space-x-2">
+            <div className="hidden lg:flex items-center space-x-1">
               {navItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = location.pathname === item.to;
@@ -176,14 +176,14 @@ export function Navigation({ userEmail, userName, isAdmin = false, onLogout, onA
                   <Link
                     key={item.to}
                     to={item.to}
-                    className={`flex items-center space-x-2 px-3 lg:px-4 py-2 rounded-xl lg:rounded-2xl text-sm font-medium transition-all duration-200 touch-manipulation ${
+                    className={`flex items-center space-x-2 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200 touch-manipulation ${
                       isActive
                         ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg transform scale-105'
                         : 'text-gray-600 hover:text-gray-900 hover:bg-white/60 hover:shadow-md'
                     }`}
                   >
                     <Icon className="h-4 w-4" />
-                    <span className="hidden lg:inline">{item.label}</span>
+                    <span className="hidden xl:inline">{item.label}</span>
                   </Link>
                 );
               })}
@@ -198,14 +198,14 @@ export function Navigation({ userEmail, userName, isAdmin = false, onLogout, onA
                     className="border-gray-300 text-gray-700 hover:bg-gray-50 rounded-xl touch-manipulation"
                   >
                     <LogOut className="h-4 w-4 mr-2" />
-                    <span className="hidden lg:inline">Logout</span>
+                    <span className="hidden xl:inline">Logout</span>
                   </Button>
                 )}
               </div>
             </div>
 
             {/* Mobile Menu Button */}
-            <div className="md:hidden flex items-center space-x-2">
+            <div className="lg:hidden flex items-center space-x-2">
               {/* Mobile Online/Offline Indicator */}
               <div className="flex items-center">
                 {isOnline ? (
@@ -234,7 +234,7 @@ export function Navigation({ userEmail, userName, isAdmin = false, onLogout, onA
 
       {/* Mobile Navigation Overlay */}
       {isMobileMenuOpen && (
-        <div className="fixed inset-0 z-50 md:hidden">
+        <div className="fixed inset-0 z-50 lg:hidden">
           {/* Backdrop */}
           <div 
             className="fixed inset-0 bg-black/50 backdrop-blur-sm"
