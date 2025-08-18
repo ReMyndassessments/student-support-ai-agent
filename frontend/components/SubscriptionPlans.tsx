@@ -130,7 +130,7 @@ Thank you!`;
               
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                 {[
-                  '5 support requests per month included',
+                  '20 support requests per month included',
                   'AI-powered Tier 2 recommendations',
                   'PDF report generation',
                   'Email sharing with colleagues',

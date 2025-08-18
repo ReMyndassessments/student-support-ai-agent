@@ -15,7 +15,7 @@ export interface IncrementSupportRequestUsageResponse {
 export const incrementSupportRequestUsage = api<IncrementSupportRequestUsageRequest, IncrementSupportRequestUsageResponse>(
   { expose: false, method: "POST", path: "/users/increment-support-request-usage" },
   async (req) => {
-    // For demo admin, just return success without incrementing
+    // For demo admin, track usage but with high limit
     if (req.email === 'admin@concern2care.demo') {
       return {
         success: true,

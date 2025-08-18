@@ -46,15 +46,13 @@ export const create = api<CreateSupportRequestRequest, SupportRequest>(
   async (req) => {
     const auth = getAuthData()!;
 
-    // Check support request limit for authenticated users
-    if (auth.email !== 'admin@concern2care.demo') {
-      const limitCheck = await users.checkSupportRequestLimit({ email: auth.email });
-      
-      if (!limitCheck.canCreateSupportRequest) {
-        throw APIError.resourceExhausted(
-          `Support request limit reached: ${limitCheck.reason}. You have used ${limitCheck.supportRequestsUsed} of ${limitCheck.totalLimit} support requests this month.`
-        );
-      }
+    // Check support request limit for all users (including admin for demo purposes)
+    const limitCheck = await users.checkSupportRequestLimit({ email: auth.email });
+    
+    if (!limitCheck.canCreateSupportRequest) {
+      throw APIError.resourceExhausted(
+        `Monthly support request limit reached: ${limitCheck.reason}. You have used ${limitCheck.supportRequestsUsed} of ${limitCheck.totalLimit} support requests this month. Please purchase additional packages or wait until next month.`
+      );
     }
 
     const row = await referralDB.queryRow<{
@@ -115,14 +113,12 @@ export const create = api<CreateSupportRequestRequest, SupportRequest>(
       throw new Error("Failed to create support request");
     }
 
-    // Increment support request usage count for non-admin users
-    if (auth.email !== 'admin@concern2care.demo') {
-      try {
-        await users.incrementSupportRequestUsage({ email: auth.email });
-      } catch (error) {
-        console.error('Failed to increment support request usage:', error);
-        // Don't fail the support request creation if usage tracking fails
-      }
+    // Increment support request usage count for all users
+    try {
+      await users.incrementSupportRequestUsage({ email: auth.email });
+    } catch (error) {
+      console.error('Failed to increment support request usage:', error);
+      // Don't fail the support request creation if usage tracking fails
     }
 
     return {

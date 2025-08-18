@@ -20,7 +20,7 @@ export interface SupportRequestLimitResponse {
 export const checkSupportRequestLimit = api<CheckSupportRequestLimitRequest, SupportRequestLimitResponse>(
   { expose: false, method: "GET", path: "/users/check-support-request-limit" },
   async (req) => {
-    // For demo admin, always allow
+    // For demo admin, use a high limit but still enforce it
     if (req.email === 'admin@concern2care.demo') {
       return {
         canCreateSupportRequest: true,

@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Checkbox } from '@/components/ui/checkbox';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Loader2, AlertTriangle, CheckCircle, ArrowLeft, Sparkles, HelpCircle, User, Calendar, MapPin, AlertCircle, Key, ChevronDown, ChevronUp, ShoppingCart } from 'lucide-react';
+import { Loader2, AlertTriangle, CheckCircle, ArrowLeft, Sparkles, HelpCircle, User, Calendar, MapPin, AlertCircle, Key, ChevronDown, ChevronUp, ShoppingCart, Lock } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { Link, useNavigate } from 'react-router-dom';
 import backend from '~backend/client';
@@ -63,6 +63,7 @@ export function ReferralForm() {
   const [hasSaved, setHasSaved] = useState(false);
   const [savedSupportRequestId, setSavedSupportRequestId] = useState<number | null>(null);
   const [supportRequestLimitError, setSupportRequestLimitError] = useState<string | null>(null);
+  const [isLimitReached, setIsLimitReached] = useState(false);
   
   // Follow-up assistance state
   const [followUpQuestion, setFollowUpQuestion] = useState('');
@@ -95,6 +96,7 @@ export function ReferralForm() {
     setHasSaved(false);
     setHasFollowUpAssistance(false);
     setSupportRequestLimitError(null);
+    setIsLimitReached(false);
   };
 
   const handleConcernTypeChange = (concernType: string, checked: boolean) => {
@@ -135,6 +137,7 @@ export function ReferralForm() {
 
     setIsGenerating(true);
     setSupportRequestLimitError(null);
+    setIsLimitReached(false);
     try {
       const request: GenerateRecommendationsRequest = {
         studentFirstName: formData.studentFirstName,
@@ -248,6 +251,7 @@ export function ReferralForm() {
 
     setIsSaving(true);
     setSupportRequestLimitError(null);
+    setIsLimitReached(false);
     try {
       const finalRecommendations = hasFollowUpAssistance 
         ? `${recommendations}\n\n--- FOLLOW-UP ASSISTANCE ---\n\nTeacher's Question: ${followUpQuestion}\n\nAdditional Guidance:\n${followUpAssistance}`
@@ -281,8 +285,9 @@ export function ReferralForm() {
       const errorMessage = error instanceof Error ? error.message : "Failed to save support request. Please try again.";
       
       // Check if it's a support request limit error
-      if (errorMessage.includes("Support request limit reached")) {
+      if (errorMessage.includes("Monthly support request limit reached") || errorMessage.includes("limit reached")) {
         setSupportRequestLimitError(errorMessage);
+        setIsLimitReached(true);
       }
       
       toast({
@@ -321,6 +326,7 @@ export function ReferralForm() {
     setFollowUpDisclaimer('');
     setHasFollowUpAssistance(false);
     setSupportRequestLimitError(null);
+    setIsLimitReached(false);
     
     // Reset expanded sections
     setExpandedSections({
@@ -461,13 +467,15 @@ export function ReferralForm() {
         {/* Support Request Limit Error */}
         {supportRequestLimitError && (
           <Alert className="border-red-200 bg-gradient-to-r from-red-50 to-pink-50 rounded-2xl">
-            <AlertTriangle className="h-4 w-4 text-red-600" />
+            <Lock className="h-4 w-4 text-red-600" />
             <AlertDescription className="text-red-800 text-sm">
               <div className="flex items-center justify-between">
                 <div>
                   <strong>Monthly Limit Reached</strong>
                   <br />
                   {supportRequestLimitError}
+                  <br />
+                  <span className="text-xs mt-1 block">You can purchase additional support request packages or wait until next month when your limit resets.</span>
                 </div>
                 <Link to="/profile">
                   <Button size="sm" className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white rounded-xl ml-4">
@@ -511,6 +519,7 @@ export function ReferralForm() {
                     onChange={(e) => handleInputChange('grade', e.target.value)}
                     placeholder="e.g., 3rd, 7th, 11th"
                     className="border-gray-200 rounded-xl focus:border-blue-500 focus:ring-blue-500 text-base touch-manipulation"
+                    disabled={isLimitReached}
                   />
                 </div>
                 
@@ -524,6 +533,7 @@ export function ReferralForm() {
                     onChange={(e) => handleInputChange('studentFirstName', e.target.value)}
                     placeholder="Enter first name"
                     className="border-gray-200 rounded-xl focus:border-blue-500 focus:ring-blue-500 text-base touch-manipulation"
+                    disabled={isLimitReached}
                   />
                 </div>
                 
@@ -538,6 +548,7 @@ export function ReferralForm() {
                     placeholder="Enter last initial"
                     maxLength={1}
                     className="border-gray-200 rounded-xl focus:border-blue-500 focus:ring-blue-500 text-base touch-manipulation"
+                    disabled={isLimitReached}
                   />
                 </div>
               </div>
@@ -577,6 +588,7 @@ export function ReferralForm() {
                     value={formData.incidentDate}
                     onChange={(e) => handleInputChange('incidentDate', e.target.value)}
                     className="border-gray-200 rounded-xl focus:border-orange-500 focus:ring-orange-500 text-base touch-manipulation"
+                    disabled={isLimitReached}
                   />
                 </div>
                 
@@ -591,6 +603,7 @@ export function ReferralForm() {
                     onChange={(e) => handleInputChange('location', e.target.value)}
                     placeholder="e.g., Classroom, Cafeteria, Hallway"
                     className="border-gray-200 rounded-xl focus:border-orange-500 focus:ring-orange-500 text-base touch-manipulation"
+                    disabled={isLimitReached}
                   />
                 </div>
               </div>
@@ -601,14 +614,15 @@ export function ReferralForm() {
                 </Label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                   {CONCERN_TYPES.map((type) => (
-                    <div key={type} className="flex items-center space-x-3 p-3 sm:p-3 rounded-xl bg-gradient-to-r from-orange-50 to-red-50 hover:from-orange-100 hover:to-red-100 transition-colors touch-manipulation active:scale-95">
+                    <div key={type} className={`flex items-center space-x-3 p-3 sm:p-3 rounded-xl bg-gradient-to-r from-orange-50 to-red-50 hover:from-orange-100 hover:to-red-100 transition-colors touch-manipulation active:scale-95 ${isLimitReached ? 'opacity-50 cursor-not-allowed' : ''}`}>
                       <Checkbox
                         id={`concern-${type}`}
                         checked={formData.concernTypes.includes(type)}
                         onCheckedChange={(checked) => handleConcernTypeChange(type, checked as boolean)}
                         className="rounded-lg"
+                        disabled={isLimitReached}
                       />
-                      <Label htmlFor={`concern-${type}`} className="text-sm text-gray-700 font-medium cursor-pointer">
+                      <Label htmlFor={`concern-${type}`} className={`text-sm text-gray-700 font-medium ${isLimitReached ? 'cursor-not-allowed' : 'cursor-pointer'}`}>
                         {type}
                       </Label>
                     </div>
@@ -625,6 +639,7 @@ export function ReferralForm() {
                     onChange={(e) => handleInputChange('otherConcernType', e.target.value)}
                     placeholder="Specify other concern type"
                     className="border-gray-200 rounded-xl focus:border-orange-500 focus:ring-orange-500 text-base touch-manipulation"
+                    disabled={isLimitReached}
                   />
                 </div>
               </div>
@@ -640,6 +655,7 @@ export function ReferralForm() {
                   placeholder="Please briefly describe the situation, behavior, or challenge"
                   rows={4}
                   className="border-gray-200 rounded-xl focus:border-orange-500 focus:ring-orange-500 resize-none text-base touch-manipulation"
+                  disabled={isLimitReached}
                 />
               </div>
 
@@ -651,11 +667,12 @@ export function ReferralForm() {
                   value={formData.severityLevel} 
                   onValueChange={(value) => handleInputChange('severityLevel', value)}
                   className="space-y-3"
+                  disabled={isLimitReached}
                 >
                   {SEVERITY_LEVELS.map((level) => (
-                    <div key={level.value} className="flex items-center space-x-3 p-3 rounded-xl bg-gradient-to-r from-yellow-50 to-orange-50 hover:from-yellow-100 hover:to-orange-100 transition-colors touch-manipulation active:scale-95">
-                      <RadioGroupItem value={level.value} id={`severity-${level.value}`} className="border-orange-400" />
-                      <Label htmlFor={`severity-${level.value}`} className="text-sm text-gray-700 font-medium cursor-pointer flex-1">
+                    <div key={level.value} className={`flex items-center space-x-3 p-3 rounded-xl bg-gradient-to-r from-yellow-50 to-orange-50 hover:from-yellow-100 hover:to-orange-100 transition-colors touch-manipulation active:scale-95 ${isLimitReached ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                      <RadioGroupItem value={level.value} id={`severity-${level.value}`} className="border-orange-400" disabled={isLimitReached} />
+                      <Label htmlFor={`severity-${level.value}`} className={`text-sm text-gray-700 font-medium flex-1 ${isLimitReached ? 'cursor-not-allowed' : 'cursor-pointer'}`}>
                         {level.label}
                       </Label>
                     </div>
@@ -669,14 +686,15 @@ export function ReferralForm() {
                 </Label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   {ACTIONS_TAKEN.map((action) => (
-                    <div key={action} className="flex items-center space-x-3 p-3 rounded-xl bg-gradient-to-r from-green-50 to-emerald-50 hover:from-green-100 hover:to-emerald-100 transition-colors touch-manipulation active:scale-95">
+                    <div key={action} className={`flex items-center space-x-3 p-3 rounded-xl bg-gradient-to-r from-green-50 to-emerald-50 hover:from-green-100 hover:to-emerald-100 transition-colors touch-manipulation active:scale-95 ${isLimitReached ? 'opacity-50 cursor-not-allowed' : ''}`}>
                       <Checkbox
                         id={`action-${action}`}
                         checked={formData.actionsTaken.includes(action)}
                         onCheckedChange={(checked) => handleActionTakenChange(action, checked as boolean)}
                         className="rounded-lg"
+                        disabled={isLimitReached}
                       />
-                      <Label htmlFor={`action-${action}`} className="text-sm text-gray-700 font-medium cursor-pointer">
+                      <Label htmlFor={`action-${action}`} className={`text-sm text-gray-700 font-medium ${isLimitReached ? 'cursor-not-allowed' : 'cursor-pointer'}`}>
                         {action}
                       </Label>
                     </div>
@@ -693,6 +711,7 @@ export function ReferralForm() {
                     onChange={(e) => handleInputChange('otherActionTaken', e.target.value)}
                     placeholder="Specify other action taken"
                     className="border-gray-200 rounded-xl focus:border-green-500 focus:ring-green-500 text-base touch-manipulation"
+                    disabled={isLimitReached}
                   />
                 </div>
               </div>
@@ -731,6 +750,7 @@ export function ReferralForm() {
                     onChange={(e) => handleInputChange('teacher', e.target.value)}
                     placeholder="Enter teacher name"
                     className="border-gray-200 rounded-xl focus:border-emerald-500 focus:ring-emerald-500 text-base touch-manipulation"
+                    disabled={isLimitReached}
                   />
                 </div>
                 
@@ -744,6 +764,7 @@ export function ReferralForm() {
                     onChange={(e) => handleInputChange('teacherPosition', e.target.value)}
                     placeholder="e.g., 3rd Grade Teacher, Math Teacher"
                     className="border-gray-200 rounded-xl focus:border-emerald-500 focus:ring-emerald-500 text-base touch-manipulation"
+                    disabled={isLimitReached}
                   />
                 </div>
               </div>
@@ -755,13 +776,18 @@ export function ReferralForm() {
         <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
           <Button 
             onClick={generateRecommendations}
-            disabled={isGenerating || !userEmail}
-            className="flex-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 text-white shadow-xl rounded-2xl py-4 sm:py-6 text-base sm:text-lg font-semibold transition-all duration-200 transform hover:scale-105 active:scale-95 touch-manipulation"
+            disabled={isGenerating || !userEmail || isLimitReached}
+            className="flex-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 text-white shadow-xl rounded-2xl py-4 sm:py-6 text-base sm:text-lg font-semibold transition-all duration-200 transform hover:scale-105 active:scale-95 touch-manipulation disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
           >
             {isGenerating ? (
               <>
                 <Loader2 className="mr-3 h-5 w-5 animate-spin" />
                 Generating Magic...
+              </>
+            ) : isLimitReached ? (
+              <>
+                <Lock className="mr-3 h-5 w-5" />
+                Monthly Limit Reached
               </>
             ) : (
               <>
@@ -774,11 +800,11 @@ export function ReferralForm() {
           {hasGenerated && (
             <Button 
               onClick={saveSupportRequest}
-              disabled={isSaving || hasSaved}
+              disabled={isSaving || hasSaved || isLimitReached}
               variant={hasSaved ? "outline" : "default"}
               className={hasSaved 
                 ? "border-green-500 text-green-600 rounded-2xl py-4 sm:py-6 px-6 sm:px-8 touch-manipulation active:scale-95" 
-                : "bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-xl rounded-2xl py-4 sm:py-6 px-6 sm:px-8 transform hover:scale-105 transition-all duration-200 touch-manipulation active:scale-95"
+                : "bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-xl rounded-2xl py-4 sm:py-6 px-6 sm:px-8 transform hover:scale-105 transition-all duration-200 touch-manipulation active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
               }
             >
               {isSaving ? (
@@ -790,6 +816,11 @@ export function ReferralForm() {
                 <>
                   <CheckCircle className="mr-2 h-5 w-5" />
                   Saved Successfully!
+                </>
+              ) : isLimitReached ? (
+                <>
+                  <Lock className="mr-2 h-5 w-5" />
+                  Limit Reached
                 </>
               ) : (
                 'Save Support Request'
@@ -913,18 +944,24 @@ export function ReferralForm() {
                     placeholder="e.g., How do I set up a behavior chart for this student? What materials do I need for the sensory break area? How often should I check in with the student?"
                     rows={3}
                     className="border-blue-200 rounded-xl focus:border-blue-500 focus:ring-blue-500 resize-none bg-white/80 text-base touch-manipulation"
+                    disabled={isLimitReached}
                   />
                 </div>
                 
                 <Button 
                   onClick={generateFollowUpAssistance}
-                  disabled={isGeneratingFollowUp || !followUpQuestion.trim() || !userEmail}
-                  className="bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 text-white shadow-lg rounded-2xl py-3 px-6 transform hover:scale-105 transition-all duration-200 touch-manipulation active:scale-95"
+                  disabled={isGeneratingFollowUp || !followUpQuestion.trim() || !userEmail || isLimitReached}
+                  className="bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 text-white shadow-lg rounded-2xl py-3 px-6 transform hover:scale-105 transition-all duration-200 touch-manipulation active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                 >
                   {isGeneratingFollowUp ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       Getting Assistance...
+                    </>
+                  ) : isLimitReached ? (
+                    <>
+                      <Lock className="mr-2 h-4 w-4" />
+                      Limit Reached
                     </>
                   ) : (
                     <>
