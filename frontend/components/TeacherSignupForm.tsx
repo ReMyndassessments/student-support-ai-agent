@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, GraduationCap, User, School, Calendar, CheckCircle } from 'lucide-react';
+import { Loader2, GraduationCap, User } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { useNavigate } from 'react-router-dom';
 import backend from '~backend/client';
@@ -252,7 +252,7 @@ export function TeacherSignupForm() {
             </div>
 
             <Alert className="border-blue-200 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-2xl">
-              <CheckCircle className="h-4 w-4 text-blue-600" />
+              <GraduationCap className="h-4 w-4 text-blue-600" />
               <AlertDescription className="text-blue-800 text-sm">
                 <strong>Account Setup</strong>
                 <br />
