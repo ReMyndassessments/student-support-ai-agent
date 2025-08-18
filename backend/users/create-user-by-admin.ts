@@ -15,10 +15,12 @@ export interface CreateUserByAdminRequest {
 
 // Creates a new user (teacher). For admins only or self-signup.
 export const createUserByAdmin = api<CreateUserByAdminRequest, UserProfile>(
-  { expose: true, method: "POST", path: "/users/admin/create" },
+  { expose: true, method: "POST", path: "/users/admin/create", auth: false },
   async (req) => {
     // Allow both admin access and self-signup (no auth required for self-signup)
     const auth = getAuthData();
+    
+    // If there is auth data, check if user is admin
     if (auth && !auth.isAdmin) {
       throw APIError.permissionDenied("You do not have permission to create users.");
     }

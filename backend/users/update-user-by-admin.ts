@@ -15,12 +15,15 @@ export interface UpdateUserByAdminRequest {
   supportRequestsLimit?: number;
 }
 
-// Updates a user's profile. For admins only.
+// Updates a user's profile. For admins only or self-signup follow-up.
 export const updateUserByAdmin = api<UpdateUserByAdminRequest, UserProfile>(
-  { expose: true, method: "PUT", path: "/users/admin/:id", auth: true },
+  { expose: true, method: "PUT", path: "/users/admin/:id", auth: false },
   async (req) => {
-    const auth = getAuthData()!;
-    if (!auth.isAdmin) {
+    // Allow both admin access and self-signup follow-up (no auth required for self-signup)
+    const auth = getAuthData();
+    
+    // If there is auth data, check if user is admin
+    if (auth && !auth.isAdmin) {
       throw APIError.permissionDenied("You do not have permission to update users.");
     }
 
