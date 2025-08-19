@@ -37,6 +37,7 @@ export class Client {
     public readonly ai: ai.ServiceClient
     public readonly analytics: analytics.ServiceClient
     public readonly auth: auth.ServiceClient
+    public readonly health: health.ServiceClient
     public readonly notifications: notifications.ServiceClient
     public readonly referrals: referrals.ServiceClient
     public readonly templates: templates.ServiceClient
@@ -59,6 +60,7 @@ export class Client {
         this.ai = new ai.ServiceClient(base)
         this.analytics = new analytics.ServiceClient(base)
         this.auth = new auth.ServiceClient(base)
+        this.health = new health.ServiceClient(base)
         this.notifications = new notifications.ServiceClient(base)
         this.referrals = new referrals.ServiceClient(base)
         this.templates = new templates.ServiceClient(base)
@@ -383,6 +385,32 @@ export namespace auth {
             // Now make the actual call to the API
             const resp = await this.baseClient.callTypedAPI(`/auth/teacher/logout`, {method: "POST", body: undefined})
             return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_auth_teacher_logout_teacherLogout>
+        }
+    }
+}
+
+/**
+ * Import the endpoint handlers to derive the types for the client.
+ */
+import { healthCheck as api_health_health_check_healthCheck } from "~backend/health/health-check";
+
+export namespace health {
+
+    export class ServiceClient {
+        private baseClient: BaseClient
+
+        constructor(baseClient: BaseClient) {
+            this.baseClient = baseClient
+            this.healthCheck = this.healthCheck.bind(this)
+        }
+
+        /**
+         * Health check endpoint for Railway and monitoring
+         */
+        public async healthCheck(): Promise<ResponseType<typeof api_health_health_check_healthCheck>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/health`, {method: "GET", body: undefined})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_health_health_check_healthCheck>
         }
     }
 }
