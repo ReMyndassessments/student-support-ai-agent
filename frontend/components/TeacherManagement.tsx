@@ -14,6 +14,7 @@ import type { UserProfile } from '~backend/users/get-profile';
 import { AddEditTeacherDialog } from './AddEditTeacherDialog';
 import { AdminResetPasswordDialog } from './AdminResetPasswordDialog';
 import { BulkOperationsDialog } from './BulkOperationsDialog';
+import { BulkCSVUploadDialog } from './BulkCSVUploadDialog';
 
 export function TeacherManagement() {
   const [teachers, setTeachers] = useState<UserProfile[]>([]);
@@ -22,6 +23,7 @@ export function TeacherManagement() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isResetPasswordDialogOpen, setIsResetPasswordDialogOpen] = useState(false);
   const [isBulkOperationsDialogOpen, setIsBulkOperationsDialogOpen] = useState(false);
+  const [isBulkCSVUploadDialogOpen, setIsBulkCSVUploadDialogOpen] = useState(false);
   const [bulkOperation, setBulkOperation] = useState<'update' | 'delete'>('update');
   const [selectedTeacher, setSelectedTeacher] = useState<UserProfile | null>(null);
   const [selectedTeachers, setSelectedTeachers] = useState<Set<number>>(new Set());
@@ -141,6 +143,11 @@ export function TeacherManagement() {
   };
 
   const handleBulkOperationSuccess = () => {
+    setSelectedTeachers(new Set());
+    loadTeachers();
+  };
+
+  const handleBulkCSVUploadSuccess = () => {
     setSelectedTeachers(new Set());
     loadTeachers();
   };
@@ -268,6 +275,15 @@ export function TeacherManagement() {
               </CardTitle>
               <div className="flex items-center gap-2">
                 <Button
+                  onClick={() => setIsBulkCSVUploadDialogOpen(true)}
+                  size="sm"
+                  variant="outline"
+                  className="bg-white/10 border-white/30 text-white hover:bg-white/20 rounded-xl"
+                >
+                  <Upload className="mr-2 h-4 w-4" />
+                  Bulk Upload CSV
+                </Button>
+                <Button
                   onClick={handleExportTeachers}
                   size="sm"
                   variant="outline"
@@ -390,6 +406,12 @@ export function TeacherManagement() {
           selectedTeachers={selectedTeacherObjects}
           onSuccess={handleBulkOperationSuccess}
           operation={bulkOperation}
+        />
+
+        <BulkCSVUploadDialog
+          isOpen={isBulkCSVUploadDialogOpen}
+          onClose={() => setIsBulkCSVUploadDialogOpen(false)}
+          onSuccess={handleBulkCSVUploadSuccess}
         />
 
         <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>

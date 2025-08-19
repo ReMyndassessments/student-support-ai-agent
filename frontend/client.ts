@@ -102,6 +102,7 @@ export interface ClientOptions {
 /**
  * Import the endpoint handlers to derive the types for the client.
  */
+import { bulkCSVUpload as api_admin_bulk_csv_upload_bulkCSVUpload } from "~backend/admin/bulk-csv-upload";
 import {
     bulkDeleteTeachers as api_admin_bulk_operations_bulkDeleteTeachers,
     bulkUpdateTeachers as api_admin_bulk_operations_bulkUpdateTeachers
@@ -126,6 +127,7 @@ export namespace admin {
         constructor(baseClient: BaseClient) {
             this.baseClient = baseClient
             this.adminResetPassword = this.adminResetPassword.bind(this)
+            this.bulkCSVUpload = this.bulkCSVUpload.bind(this)
             this.bulkDeleteTeachers = this.bulkDeleteTeachers.bind(this)
             this.bulkUpdateTeachers = this.bulkUpdateTeachers.bind(this)
             this.clearDemoData = this.clearDemoData.bind(this)
@@ -148,6 +150,15 @@ export namespace admin {
             // Now make the actual call to the API
             const resp = await this.baseClient.callTypedAPI(`/admin/teachers/${encodeURIComponent(params.teacherId)}/reset-password`, {method: "POST", body: JSON.stringify(body)})
             return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_admin_reset_teacher_password_adminResetPassword>
+        }
+
+        /**
+         * Bulk upload teachers from CSV file.
+         */
+        public async bulkCSVUpload(params: RequestType<typeof api_admin_bulk_csv_upload_bulkCSVUpload>): Promise<ResponseType<typeof api_admin_bulk_csv_upload_bulkCSVUpload>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/admin/teachers/bulk-csv-upload`, {method: "POST", body: JSON.stringify(params)})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_admin_bulk_csv_upload_bulkCSVUpload>
         }
 
         /**
