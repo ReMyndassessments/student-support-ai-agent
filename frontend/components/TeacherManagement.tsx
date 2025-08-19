@@ -301,88 +301,90 @@ export function TeacherManagement() {
                 <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
               </div>
             ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-12">
-                      <Checkbox
-                        checked={isAllSelected}
-                        onCheckedChange={handleSelectAll}
-                        className="rounded-lg"
-                        ref={(el) => {
-                          if (el) {
-                            el.indeterminate = isPartiallySelected;
-                          }
-                        }}
-                      />
-                    </TableHead>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Email</TableHead>
-                    <TableHead>School</TableHead>
-                    <TableHead>District</TableHead>
-                    <TableHead>Type</TableHead>
-                    <TableHead>Subscription End</TableHead>
-                    <TableHead>Limit</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {teachers.map((teacher) => {
-                    const isSubActive = teacher.subscriptionEndDate ? new Date(teacher.subscriptionEndDate) > new Date() : false;
-                    const isSelected = selectedTeachers.has(teacher.id);
-                    
-                    return (
-                      <TableRow key={teacher.id} className={isSelected ? 'bg-blue-50' : ''}>
-                        <TableCell>
-                          <Checkbox
-                            checked={isSelected}
-                            onCheckedChange={(checked) => handleSelectTeacher(teacher.id, checked as boolean)}
-                            className="rounded-lg"
-                          />
-                        </TableCell>
-                        <TableCell className="font-medium">{teacher.name}</TableCell>
-                        <TableCell>{teacher.email}</TableCell>
-                        <TableCell>{teacher.schoolName || 'N/A'}</TableCell>
-                        <TableCell>{teacher.schoolDistrict || 'N/A'}</TableCell>
-                        <TableCell>
-                          <Badge variant="outline" className="rounded-lg">
-                            {teacher.teacherType || 'N/A'}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>{formatDate(teacher.subscriptionEndDate)}</TableCell>
-                        <TableCell>{teacher.supportRequestsLimit}</TableCell>
-                        <TableCell>
-                          <Badge variant={isSubActive ? 'default' : 'destructive'} className={isSubActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}>
-                            {isSubActive ? 'Active' : 'Expired'}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" className="h-8 w-8 p-0">
-                                <span className="sr-only">Open menu</span>
-                                <MoreHorizontal className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem onClick={() => handleEditClick(teacher)}>
-                                <Edit className="mr-2 h-4 w-4" /> Edit
-                              </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handleResetPasswordClick(teacher)}>
-                                <Lock className="mr-2 h-4 w-4" /> Reset Password
-                              </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handleDeleteClick(teacher)} className="text-red-600">
-                                <Trash2 className="mr-2 h-4 w-4" /> Delete
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-12">
+                        <Checkbox
+                          checked={isAllSelected}
+                          onCheckedChange={handleSelectAll}
+                          className="rounded-lg"
+                          ref={(el) => {
+                            if (el) {
+                              el.indeterminate = isPartiallySelected;
+                            }
+                          }}
+                        />
+                      </TableHead>
+                      <TableHead>Name</TableHead>
+                      <TableHead>Email</TableHead>
+                      <TableHead>School</TableHead>
+                      <TableHead>District</TableHead>
+                      <TableHead>Type</TableHead>
+                      <TableHead>Subscription End</TableHead>
+                      <TableHead>Limit</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {teachers.map((teacher) => {
+                      const isSubActive = teacher.subscriptionEndDate ? new Date(teacher.subscriptionEndDate) > new Date() : false;
+                      const isSelected = selectedTeachers.has(teacher.id);
+                      
+                      return (
+                        <TableRow key={teacher.id} className={isSelected ? 'bg-blue-50' : ''}>
+                          <TableCell>
+                            <Checkbox
+                              checked={isSelected}
+                              onCheckedChange={(checked) => handleSelectTeacher(teacher.id, checked as boolean)}
+                              className="rounded-lg"
+                            />
+                          </TableCell>
+                          <TableCell className="font-medium">{teacher.name}</TableCell>
+                          <TableCell>{teacher.email}</TableCell>
+                          <TableCell>{teacher.schoolName || 'N/A'}</TableCell>
+                          <TableCell>{teacher.schoolDistrict || 'N/A'}</TableCell>
+                          <TableCell>
+                            <Badge variant="outline" className="rounded-lg">
+                              {teacher.teacherType || 'N/A'}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>{formatDate(teacher.subscriptionEndDate)}</TableCell>
+                          <TableCell>{teacher.supportRequestsLimit}</TableCell>
+                          <TableCell>
+                            <Badge variant={isSubActive ? 'default' : 'destructive'} className={isSubActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}>
+                              {isSubActive ? 'Active' : 'Expired'}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" className="h-8 w-8 p-0">
+                                  <span className="sr-only">Open menu</span>
+                                  <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem onClick={() => handleEditClick(teacher)}>
+                                  <Edit className="mr-2 h-4 w-4" /> Edit
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleResetPasswordClick(teacher)}>
+                                  <Lock className="mr-2 h-4 w-4" /> Reset Password
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleDeleteClick(teacher)} className="text-red-600">
+                                  <Trash2 className="mr-2 h-4 w-4" /> Delete
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </div>
             )}
           </CardContent>
         </Card>

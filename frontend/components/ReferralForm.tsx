@@ -436,51 +436,49 @@ export function ReferralForm() {
               </div>
             </CardTitle>
           </CardHeader>
-          {(expandedSections.student || window.innerWidth >= 640) && (
-            <CardContent className="p-4 sm:p-6 space-y-4 sm:space-y-6">
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
-                <div className="space-y-2">
-                  <Label htmlFor="grade" className="text-sm font-medium text-gray-700">
-                    Grade *
-                  </Label>
-                  <Input
-                    id="grade"
-                    value={formData.grade}
-                    onChange={(e) => handleInputChange('grade', e.target.value)}
-                    placeholder="e.g., 3rd, 7th, 11th"
-                    className="border-gray-200 rounded-xl focus:border-blue-500 focus:ring-blue-500 text-base touch-manipulation"
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="firstName" className="text-sm font-medium text-gray-700">
-                    First Name *
-                  </Label>
-                  <Input
-                    id="firstName"
-                    value={formData.studentFirstName}
-                    onChange={(e) => handleInputChange('studentFirstName', e.target.value)}
-                    placeholder="Enter first name"
-                    className="border-gray-200 rounded-xl focus:border-blue-500 focus:ring-blue-500 text-base touch-manipulation"
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="lastInitial" className="text-sm font-medium text-gray-700">
-                    Last Initial *
-                  </Label>
-                  <Input
-                    id="lastInitial"
-                    value={formData.studentLastInitial}
-                    onChange={(e) => handleInputChange('studentLastInitial', e.target.value)}
-                    placeholder="Enter last initial"
-                    maxLength={1}
-                    className="border-gray-200 rounded-xl focus:border-blue-500 focus:ring-blue-500 text-base touch-manipulation"
-                  />
-                </div>
+          <CardContent className={`p-4 sm:p-6 space-y-4 sm:space-y-6 ${expandedSections.student ? 'block' : 'hidden sm:block'}`}>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+              <div className="space-y-2">
+                <Label htmlFor="grade" className="text-sm font-medium text-gray-700">
+                  Grade *
+                </Label>
+                <Input
+                  id="grade"
+                  value={formData.grade}
+                  onChange={(e) => handleInputChange('grade', e.target.value)}
+                  placeholder="e.g., 3rd, 7th, 11th"
+                  className="border-gray-200 rounded-xl focus:border-blue-500 focus:ring-blue-500 text-base touch-manipulation"
+                />
               </div>
-            </CardContent>
-          )}
+              
+              <div className="space-y-2">
+                <Label htmlFor="firstName" className="text-sm font-medium text-gray-700">
+                  First Name *
+                </Label>
+                <Input
+                  id="firstName"
+                  value={formData.studentFirstName}
+                  onChange={(e) => handleInputChange('studentFirstName', e.target.value)}
+                  placeholder="Enter first name"
+                  className="border-gray-200 rounded-xl focus:border-blue-500 focus:ring-blue-500 text-base touch-manipulation"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="lastInitial" className="text-sm font-medium text-gray-700">
+                  Last Initial *
+                </Label>
+                <Input
+                  id="lastInitial"
+                  value={formData.studentLastInitial}
+                  onChange={(e) => handleInputChange('studentLastInitial', e.target.value)}
+                  placeholder="Enter last initial"
+                  maxLength={1}
+                  className="border-gray-200 rounded-xl focus:border-blue-500 focus:ring-blue-500 text-base touch-manipulation"
+                />
+              </div>
+            </div>
+          </CardContent>
         </Card>
 
         {/* Incident/Concern */}
@@ -501,141 +499,139 @@ export function ReferralForm() {
               </div>
             </CardTitle>
           </CardHeader>
-          {(expandedSections.incident || window.innerWidth >= 640) && (
-            <CardContent className="p-4 sm:p-6 space-y-4 sm:space-y-6">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-                <div className="space-y-2">
-                  <Label htmlFor="incidentDate" className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                    <Calendar className="h-4 w-4" />
-                    Date *
-                  </Label>
-                  <Input
-                    id="incidentDate"
-                    type="date"
-                    value={formData.incidentDate}
-                    onChange={(e) => handleInputChange('incidentDate', e.target.value)}
-                    className="border-gray-200 rounded-xl focus:border-orange-500 focus:ring-orange-500 text-base touch-manipulation"
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="location" className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                    <MapPin className="h-4 w-4" />
-                    Location *
-                  </Label>
-                  <Input
-                    id="location"
-                    value={formData.location}
-                    onChange={(e) => handleInputChange('location', e.target.value)}
-                    placeholder="e.g., Classroom, Cafeteria, Hallway"
-                    className="border-gray-200 rounded-xl focus:border-orange-500 focus:ring-orange-500 text-base touch-manipulation"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <Label className="text-sm font-medium text-gray-700">
-                  Type of Concern (check one or more) *
-                </Label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-                  {CONCERN_TYPES.map((type) => (
-                    <div key={type} className="flex items-center space-x-3 p-3 sm:p-3 rounded-xl bg-gradient-to-r from-orange-50 to-red-50 hover:from-orange-100 hover:to-red-100 transition-colors touch-manipulation active:scale-95">
-                      <Checkbox
-                        id={`concern-${type}`}
-                        checked={formData.concernTypes.includes(type)}
-                        onCheckedChange={(checked) => handleConcernTypeChange(type, checked as boolean)}
-                        className="rounded-lg"
-                      />
-                      <Label htmlFor={`concern-${type}`} className="text-sm text-gray-700 font-medium cursor-pointer">
-                        {type}
-                      </Label>
-                    </div>
-                  ))}
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="otherConcern" className="text-sm font-medium text-gray-700">
-                    Other (specify):
-                  </Label>
-                  <Input
-                    id="otherConcern"
-                    value={formData.otherConcernType}
-                    onChange={(e) => handleInputChange('otherConcernType', e.target.value)}
-                    placeholder="Specify other concern type"
-                    className="border-gray-200 rounded-xl focus:border-orange-500 focus:ring-orange-500 text-base touch-manipulation"
-                  />
-                </div>
-              </div>
-
+          <CardContent className={`p-4 sm:p-6 space-y-4 sm:space-y-6 ${expandedSections.incident ? 'block' : 'hidden sm:block'}`}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
               <div className="space-y-2">
-                <Label htmlFor="concernDescription" className="text-sm font-medium text-gray-700">
-                  Details of Concern *
+                <Label htmlFor="incidentDate" className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                  <Calendar className="h-4 w-4" />
+                  Date *
                 </Label>
-                <Textarea
-                  id="concernDescription"
-                  value={formData.concernDescription}
-                  onChange={(e) => handleInputChange('concernDescription', e.target.value)}
-                  placeholder="Please briefly describe the situation, behavior, or challenge"
-                  rows={4}
-                  className="border-gray-200 rounded-xl focus:border-orange-500 focus:ring-orange-500 resize-none text-base touch-manipulation"
+                <Input
+                  id="incidentDate"
+                  type="date"
+                  value={formData.incidentDate}
+                  onChange={(e) => handleInputChange('incidentDate', e.target.value)}
+                  className="border-gray-200 rounded-xl focus:border-orange-500 focus:ring-orange-500 text-base touch-manipulation"
                 />
               </div>
-
-              <div className="space-y-4">
-                <Label className="text-sm font-medium text-gray-700">
-                  Severity Level *
+              
+              <div className="space-y-2">
+                <Label htmlFor="location" className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                  <MapPin className="h-4 w-4" />
+                  Location *
                 </Label>
-                <RadioGroup 
-                  value={formData.severityLevel} 
-                  onValueChange={(value) => handleInputChange('severityLevel', value)}
-                  className="space-y-3"
-                >
-                  {SEVERITY_LEVELS.map((level) => (
-                    <div key={level.value} className="flex items-center space-x-3 p-3 rounded-xl bg-gradient-to-r from-yellow-50 to-orange-50 hover:from-yellow-100 hover:to-orange-100 transition-colors touch-manipulation active:scale-95">
-                      <RadioGroupItem value={level.value} id={`severity-${level.value}`} className="border-orange-400" />
-                      <Label htmlFor={`severity-${level.value}`} className="text-sm text-gray-700 font-medium flex-1 cursor-pointer">
-                        {level.label}
-                      </Label>
-                    </div>
-                  ))}
-                </RadioGroup>
+                <Input
+                  id="location"
+                  value={formData.location}
+                  onChange={(e) => handleInputChange('location', e.target.value)}
+                  placeholder="e.g., Classroom, Cafeteria, Hallway"
+                  className="border-gray-200 rounded-xl focus:border-orange-500 focus:ring-orange-500 text-base touch-manipulation"
+                />
               </div>
+            </div>
 
-              <div className="space-y-4">
-                <Label className="text-sm font-medium text-gray-700">
-                  Actions Taken Already (optional)
-                </Label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                  {ACTIONS_TAKEN.map((action) => (
-                    <div key={action} className="flex items-center space-x-3 p-3 rounded-xl bg-gradient-to-r from-green-50 to-emerald-50 hover:from-green-100 hover:to-emerald-100 transition-colors touch-manipulation active:scale-95">
-                      <Checkbox
-                        id={`action-${action}`}
-                        checked={formData.actionsTaken.includes(action)}
-                        onCheckedChange={(checked) => handleActionTakenChange(action, checked as boolean)}
-                        className="rounded-lg"
-                      />
-                      <Label htmlFor={`action-${action}`} className="text-sm text-gray-700 font-medium cursor-pointer">
-                        {action}
-                      </Label>
-                    </div>
-                  ))}
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="otherAction" className="text-sm font-medium text-gray-700">
-                    Other (specify):
-                  </Label>
-                  <Input
-                    id="otherAction"
-                    value={formData.otherActionTaken}
-                    onChange={(e) => handleInputChange('otherActionTaken', e.target.value)}
-                    placeholder="Specify other action taken"
-                    className="border-gray-200 rounded-xl focus:border-green-500 focus:ring-green-500 text-base touch-manipulation"
-                  />
-                </div>
+            <div className="space-y-4">
+              <Label className="text-sm font-medium text-gray-700">
+                Type of Concern (check one or more) *
+              </Label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+                {CONCERN_TYPES.map((type) => (
+                  <div key={type} className="flex items-center space-x-3 p-3 sm:p-3 rounded-xl bg-gradient-to-r from-orange-50 to-red-50 hover:from-orange-100 hover:to-red-100 transition-colors touch-manipulation active:scale-95">
+                    <Checkbox
+                      id={`concern-${type}`}
+                      checked={formData.concernTypes.includes(type)}
+                      onCheckedChange={(checked) => handleConcernTypeChange(type, checked as boolean)}
+                      className="rounded-lg"
+                    />
+                    <Label htmlFor={`concern-${type}`} className="text-sm text-gray-700 font-medium cursor-pointer">
+                      {type}
+                    </Label>
+                  </div>
+                ))}
               </div>
-            </CardContent>
-          )}
+              
+              <div className="space-y-2">
+                <Label htmlFor="otherConcern" className="text-sm font-medium text-gray-700">
+                  Other (specify):
+                </Label>
+                <Input
+                  id="otherConcern"
+                  value={formData.otherConcernType}
+                  onChange={(e) => handleInputChange('otherConcernType', e.target.value)}
+                  placeholder="Specify other concern type"
+                  className="border-gray-200 rounded-xl focus:border-orange-500 focus:ring-orange-500 text-base touch-manipulation"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="concernDescription" className="text-sm font-medium text-gray-700">
+                Details of Concern *
+              </Label>
+              <Textarea
+                id="concernDescription"
+                value={formData.concernDescription}
+                onChange={(e) => handleInputChange('concernDescription', e.target.value)}
+                placeholder="Please briefly describe the situation, behavior, or challenge"
+                rows={4}
+                className="border-gray-200 rounded-xl focus:border-orange-500 focus:ring-orange-500 resize-none text-base touch-manipulation"
+              />
+            </div>
+
+            <div className="space-y-4">
+              <Label className="text-sm font-medium text-gray-700">
+                Severity Level *
+              </Label>
+              <RadioGroup 
+                value={formData.severityLevel} 
+                onValueChange={(value) => handleInputChange('severityLevel', value)}
+                className="space-y-3"
+              >
+                {SEVERITY_LEVELS.map((level) => (
+                  <div key={level.value} className="flex items-center space-x-3 p-3 rounded-xl bg-gradient-to-r from-yellow-50 to-orange-50 hover:from-yellow-100 hover:to-orange-100 transition-colors touch-manipulation active:scale-95">
+                    <RadioGroupItem value={level.value} id={`severity-${level.value}`} className="border-orange-400" />
+                    <Label htmlFor={`severity-${level.value}`} className="text-sm text-gray-700 font-medium flex-1 cursor-pointer">
+                      {level.label}
+                    </Label>
+                  </div>
+                ))}
+              </RadioGroup>
+            </div>
+
+            <div className="space-y-4">
+              <Label className="text-sm font-medium text-gray-700">
+                Actions Taken Already (optional)
+              </Label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                {ACTIONS_TAKEN.map((action) => (
+                  <div key={action} className="flex items-center space-x-3 p-3 rounded-xl bg-gradient-to-r from-green-50 to-emerald-50 hover:from-green-100 hover:to-emerald-100 transition-colors touch-manipulation active:scale-95">
+                    <Checkbox
+                      id={`action-${action}`}
+                      checked={formData.actionsTaken.includes(action)}
+                      onCheckedChange={(checked) => handleActionTakenChange(action, checked as boolean)}
+                      className="rounded-lg"
+                    />
+                    <Label htmlFor={`action-${action}`} className="text-sm text-gray-700 font-medium cursor-pointer">
+                      {action}
+                    </Label>
+                  </div>
+                ))}
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="otherAction" className="text-sm font-medium text-gray-700">
+                  Other (specify):
+                </Label>
+                <Input
+                  id="otherAction"
+                  value={formData.otherActionTaken}
+                  onChange={(e) => handleInputChange('otherActionTaken', e.target.value)}
+                  placeholder="Specify other action taken"
+                  className="border-gray-200 rounded-xl focus:border-green-500 focus:ring-green-500 text-base touch-manipulation"
+                />
+              </div>
+            </div>
+          </CardContent>
         </Card>
 
         {/* Teacher Information */}
@@ -656,37 +652,35 @@ export function ReferralForm() {
               </div>
             </CardTitle>
           </CardHeader>
-          {(expandedSections.teacher || window.innerWidth >= 640) && (
-            <CardContent className="p-4 sm:p-6 space-y-4 sm:space-y-6">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-                <div className="space-y-2">
-                  <Label htmlFor="teacher" className="text-sm font-medium text-gray-700">
-                    Name *
-                  </Label>
-                  <Input
-                    id="teacher"
-                    value={formData.teacher}
-                    onChange={(e) => handleInputChange('teacher', e.target.value)}
-                    placeholder="Enter teacher name"
-                    className="border-gray-200 rounded-xl focus:border-emerald-500 focus:ring-emerald-500 text-base touch-manipulation"
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="teacherPosition" className="text-sm font-medium text-gray-700">
-                    Position *
-                  </Label>
-                  <Input
-                    id="teacherPosition"
-                    value={formData.teacherPosition}
-                    onChange={(e) => handleInputChange('teacherPosition', e.target.value)}
-                    placeholder="e.g., 3rd Grade Teacher, Math Teacher"
-                    className="border-gray-200 rounded-xl focus:border-emerald-500 focus:ring-emerald-500 text-base touch-manipulation"
-                  />
-                </div>
+          <CardContent className={`p-4 sm:p-6 space-y-4 sm:space-y-6 ${expandedSections.teacher ? 'block' : 'hidden sm:block'}`}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+              <div className="space-y-2">
+                <Label htmlFor="teacher" className="text-sm font-medium text-gray-700">
+                  Name *
+                </Label>
+                <Input
+                  id="teacher"
+                  value={formData.teacher}
+                  onChange={(e) => handleInputChange('teacher', e.target.value)}
+                  placeholder="Enter teacher name"
+                  className="border-gray-200 rounded-xl focus:border-emerald-500 focus:ring-emerald-500 text-base touch-manipulation"
+                />
               </div>
-            </CardContent>
-          )}
+              
+              <div className="space-y-2">
+                <Label htmlFor="teacherPosition" className="text-sm font-medium text-gray-700">
+                  Position *
+                </Label>
+                <Input
+                  id="teacherPosition"
+                  value={formData.teacherPosition}
+                  onChange={(e) => handleInputChange('teacherPosition', e.target.value)}
+                  placeholder="e.g., 3rd Grade Teacher, Math Teacher"
+                  className="border-gray-200 rounded-xl focus:border-emerald-500 focus:ring-emerald-500 text-base touch-manipulation"
+                />
+              </div>
+            </div>
+          </CardContent>
         </Card>
 
         {/* Action Buttons */}
@@ -794,24 +788,22 @@ export function ReferralForm() {
                 </div>
               </CardTitle>
             </CardHeader>
-            {(expandedSections.recommendations || window.innerWidth >= 640) && (
-              <CardContent className="p-4 sm:p-6 space-y-4 sm:space-y-6">
-                <div className="bg-gradient-to-br from-purple-50 via-pink-50 to-rose-50 p-4 sm:p-6 rounded-2xl border border-purple-200">
-                  <div className="prose max-w-none text-sm sm:text-base">
-                    {formatRecommendations(recommendations + (hasFollowUpAssistance ? `\n\n--- FOLLOW-UP ASSISTANCE ---\n\nTeacher's Question: ${followUpQuestion}\n\nAdditional Guidance:\n${followUpAssistance}` : ''))}
-                  </div>
+            <CardContent className={`p-4 sm:p-6 space-y-4 sm:space-y-6 ${expandedSections.recommendations ? 'block' : 'hidden sm:block'}`}>
+              <div className="bg-gradient-to-br from-purple-50 via-pink-50 to-rose-50 p-4 sm:p-6 rounded-2xl border border-purple-200">
+                <div className="prose max-w-none text-sm sm:text-base">
+                  {formatRecommendations(recommendations + (hasFollowUpAssistance ? `\n\n--- FOLLOW-UP ASSISTANCE ---\n\nTeacher's Question: ${followUpQuestion}\n\nAdditional Guidance:\n${followUpAssistance}` : ''))}
                 </div>
-                
-                {disclaimer && (
-                  <Alert className="border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl">
-                    <AlertTriangle className="h-5 w-5 text-amber-600" />
-                    <AlertDescription className="text-xs sm:text-sm text-amber-800 leading-relaxed">
-                      {disclaimer}
-                    </AlertDescription>
-                  </Alert>
-                )}
-              </CardContent>
-            )}
+              </div>
+              
+              {disclaimer && (
+                <Alert className="border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl">
+                  <AlertTriangle className="h-5 w-5 text-amber-600" />
+                  <AlertDescription className="text-xs sm:text-sm text-amber-800 leading-relaxed">
+                    {disclaimer}
+                  </AlertDescription>
+                </Alert>
+              )}
+            </CardContent>
           </Card>
         )}
 
@@ -834,54 +826,52 @@ export function ReferralForm() {
                 </div>
               </CardTitle>
             </CardHeader>
-            {(expandedSections.followUp || window.innerWidth >= 640) && (
-              <CardContent className="p-4 sm:p-6 space-y-4 sm:space-y-6">
-                <p className="text-blue-800 font-medium text-sm sm:text-base">
-                  Ask a specific question about implementing any of the recommended interventions and get detailed guidance.
-                </p>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="followUpQuestion" className="text-sm font-medium text-blue-900">
-                    Your Implementation Question
-                  </Label>
-                  <Textarea
-                    id="followUpQuestion"
-                    value={followUpQuestion}
-                    onChange={(e) => setFollowUpQuestion(e.target.value)}
-                    placeholder="e.g., How do I set up a behavior chart for this student? What materials do I need for the sensory break area? How often should I check in with the student?"
-                    rows={3}
-                    className="border-blue-200 rounded-xl focus:border-blue-500 focus:ring-blue-500 resize-none bg-white/80 text-base touch-manipulation"
-                  />
-                </div>
-                
-                <Button 
-                  onClick={generateFollowUpAssistance}
-                  disabled={isGeneratingFollowUp || !followUpQuestion.trim()}
-                  className="bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 text-white shadow-lg rounded-2xl py-3 px-6 transform hover:scale-105 transition-all duration-200 touch-manipulation active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-                >
-                  {isGeneratingFollowUp ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Getting Assistance...
-                    </>
-                  ) : (
-                    <>
-                      <HelpCircle className="mr-2 h-4 w-4" />
-                      Get Implementation Assistance
-                    </>
-                  )}
-                </Button>
-                
-                {hasFollowUpAssistance && followUpDisclaimer && (
-                  <Alert className="border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl mt-4">
-                    <AlertTriangle className="h-4 w-4 text-amber-600" />
-                    <AlertDescription className="text-xs sm:text-sm text-amber-800 leading-relaxed">
-                      {followUpDisclaimer}
-                    </AlertDescription>
-                  </Alert>
+            <CardContent className={`p-4 sm:p-6 space-y-4 sm:space-y-6 ${expandedSections.followUp ? 'block' : 'hidden sm:block'}`}>
+              <p className="text-blue-800 font-medium text-sm sm:text-base">
+                Ask a specific question about implementing any of the recommended interventions and get detailed guidance.
+              </p>
+              
+              <div className="space-y-2">
+                <Label htmlFor="followUpQuestion" className="text-sm font-medium text-blue-900">
+                  Your Implementation Question
+                </Label>
+                <Textarea
+                  id="followUpQuestion"
+                  value={followUpQuestion}
+                  onChange={(e) => setFollowUpQuestion(e.target.value)}
+                  placeholder="e.g., How do I set up a behavior chart for this student? What materials do I need for the sensory break area? How often should I check in with the student?"
+                  rows={3}
+                  className="border-blue-200 rounded-xl focus:border-blue-500 focus:ring-blue-500 resize-none bg-white/80 text-base touch-manipulation"
+                />
+              </div>
+              
+              <Button 
+                onClick={generateFollowUpAssistance}
+                disabled={isGeneratingFollowUp || !followUpQuestion.trim()}
+                className="bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 text-white shadow-lg rounded-2xl py-3 px-6 transform hover:scale-105 transition-all duration-200 touch-manipulation active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+              >
+                {isGeneratingFollowUp ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Getting Assistance...
+                  </>
+                ) : (
+                  <>
+                    <HelpCircle className="mr-2 h-4 w-4" />
+                    Get Implementation Assistance
+                  </>
                 )}
-              </CardContent>
-            )}
+              </Button>
+              
+              {hasFollowUpAssistance && followUpDisclaimer && (
+                <Alert className="border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl mt-4">
+                  <AlertTriangle className="h-4 w-4 text-amber-600" />
+                  <AlertDescription className="text-xs sm:text-sm text-amber-800 leading-relaxed">
+                    {followUpDisclaimer}
+                  </AlertDescription>
+                </Alert>
+              )}
+            </CardContent>
           </Card>
         )}
       </div>
