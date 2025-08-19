@@ -35,8 +35,11 @@ const BROWSER = typeof globalThis === "object" && ("window" in globalThis);
 export class Client {
     public readonly admin: admin.ServiceClient
     public readonly ai: ai.ServiceClient
+    public readonly analytics: analytics.ServiceClient
     public readonly auth: auth.ServiceClient
+    public readonly notifications: notifications.ServiceClient
     public readonly referrals: referrals.ServiceClient
+    public readonly templates: templates.ServiceClient
     public readonly users: users.ServiceClient
     private readonly options: ClientOptions
     private readonly target: string
@@ -54,8 +57,11 @@ export class Client {
         const base = new BaseClient(this.target, this.options)
         this.admin = new admin.ServiceClient(base)
         this.ai = new ai.ServiceClient(base)
+        this.analytics = new analytics.ServiceClient(base)
         this.auth = new auth.ServiceClient(base)
+        this.notifications = new notifications.ServiceClient(base)
         this.referrals = new referrals.ServiceClient(base)
+        this.templates = new templates.ServiceClient(base)
         this.users = new users.ServiceClient(base)
     }
 
@@ -275,6 +281,32 @@ export namespace ai {
 /**
  * Import the endpoint handlers to derive the types for the client.
  */
+import { getDashboardAnalytics as api_analytics_dashboard_analytics_getDashboardAnalytics } from "~backend/analytics/dashboard-analytics";
+
+export namespace analytics {
+
+    export class ServiceClient {
+        private baseClient: BaseClient
+
+        constructor(baseClient: BaseClient) {
+            this.baseClient = baseClient
+            this.getDashboardAnalytics = this.getDashboardAnalytics.bind(this)
+        }
+
+        /**
+         * Gets comprehensive analytics dashboard data for administrators.
+         */
+        public async getDashboardAnalytics(): Promise<ResponseType<typeof api_analytics_dashboard_analytics_getDashboardAnalytics>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/analytics/dashboard`, {method: "GET", body: undefined})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_analytics_dashboard_analytics_getDashboardAnalytics>
+        }
+    }
+}
+
+/**
+ * Import the endpoint handlers to derive the types for the client.
+ */
 import { adminLogin as api_auth_admin_login_adminLogin } from "~backend/auth/admin-login";
 import { adminLogout as api_auth_admin_logout_adminLogout } from "~backend/auth/admin-logout";
 import {
@@ -358,6 +390,56 @@ export namespace auth {
 /**
  * Import the endpoint handlers to derive the types for the client.
  */
+import {
+    listNotifications as api_notifications_manage_notifications_listNotifications,
+    markAllAsRead as api_notifications_manage_notifications_markAllAsRead,
+    markAsRead as api_notifications_manage_notifications_markAsRead
+} from "~backend/notifications/manage-notifications";
+
+export namespace notifications {
+
+    export class ServiceClient {
+        private baseClient: BaseClient
+
+        constructor(baseClient: BaseClient) {
+            this.baseClient = baseClient
+            this.listNotifications = this.listNotifications.bind(this)
+            this.markAllAsRead = this.markAllAsRead.bind(this)
+            this.markAsRead = this.markAsRead.bind(this)
+        }
+
+        /**
+         * Lists notifications for the authenticated user.
+         */
+        public async listNotifications(): Promise<ResponseType<typeof api_notifications_manage_notifications_listNotifications>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/notifications`, {method: "GET", body: undefined})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_notifications_manage_notifications_listNotifications>
+        }
+
+        /**
+         * Marks all notifications as read for the user.
+         */
+        public async markAllAsRead(): Promise<ResponseType<typeof api_notifications_manage_notifications_markAllAsRead>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/notifications/read-all`, {method: "PUT", body: undefined})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_notifications_manage_notifications_markAllAsRead>
+        }
+
+        /**
+         * Marks a notification as read.
+         */
+        public async markAsRead(params: { id: number }): Promise<ResponseType<typeof api_notifications_manage_notifications_markAsRead>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/notifications/${encodeURIComponent(params.id)}/read`, {method: "PUT", body: undefined})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_notifications_manage_notifications_markAsRead>
+        }
+    }
+}
+
+/**
+ * Import the endpoint handlers to derive the types for the client.
+ */
 import { create as api_referrals_create_create } from "~backend/referrals/create";
 import { generatePDF as api_referrals_generate_pdf_generatePDF } from "~backend/referrals/generate-pdf";
 import { get as api_referrals_get_get } from "~backend/referrals/get";
@@ -434,6 +516,78 @@ export namespace referrals {
             // Now make the actual call to the API
             const resp = await this.baseClient.callTypedAPI(`/referrals/${encodeURIComponent(params.supportRequestId)}/share`, {method: "POST", body: JSON.stringify(body)})
             return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_referrals_share_email_shareEmail>
+        }
+    }
+}
+
+/**
+ * Import the endpoint handlers to derive the types for the client.
+ */
+import {
+    createTemplate as api_templates_manage_templates_createTemplate,
+    deleteTemplate as api_templates_manage_templates_deleteTemplate,
+    listTemplates as api_templates_manage_templates_listTemplates,
+    updateTemplate as api_templates_manage_templates_updateTemplate
+} from "~backend/templates/manage-templates";
+
+export namespace templates {
+
+    export class ServiceClient {
+        private baseClient: BaseClient
+
+        constructor(baseClient: BaseClient) {
+            this.baseClient = baseClient
+            this.createTemplate = this.createTemplate.bind(this)
+            this.deleteTemplate = this.deleteTemplate.bind(this)
+            this.listTemplates = this.listTemplates.bind(this)
+            this.updateTemplate = this.updateTemplate.bind(this)
+        }
+
+        /**
+         * Creates a new intervention template.
+         */
+        public async createTemplate(params: RequestType<typeof api_templates_manage_templates_createTemplate>): Promise<ResponseType<typeof api_templates_manage_templates_createTemplate>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/templates`, {method: "POST", body: JSON.stringify(params)})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_templates_manage_templates_createTemplate>
+        }
+
+        /**
+         * Deletes a template.
+         */
+        public async deleteTemplate(params: { id: number }): Promise<ResponseType<typeof api_templates_manage_templates_deleteTemplate>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/templates/${encodeURIComponent(params.id)}`, {method: "DELETE", body: undefined})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_templates_manage_templates_deleteTemplate>
+        }
+
+        /**
+         * Lists all available templates.
+         */
+        public async listTemplates(): Promise<ResponseType<typeof api_templates_manage_templates_listTemplates>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/templates`, {method: "GET", body: undefined})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_templates_manage_templates_listTemplates>
+        }
+
+        /**
+         * Updates an existing template.
+         */
+        public async updateTemplate(params: RequestType<typeof api_templates_manage_templates_updateTemplate>): Promise<ResponseType<typeof api_templates_manage_templates_updateTemplate>> {
+            // Construct the body with only the fields which we want encoded within the body (excluding query string or header fields)
+            const body: Record<string, any> = {
+                category:        params.category,
+                concernTypes:    params.concernTypes,
+                description:     params.description,
+                isPublic:        params.isPublic,
+                name:            params.name,
+                severityLevel:   params.severityLevel,
+                templateContent: params.templateContent,
+            }
+
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/templates/${encodeURIComponent(params.id)}`, {method: "PUT", body: JSON.stringify(body)})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_templates_manage_templates_updateTemplate>
         }
     }
 }

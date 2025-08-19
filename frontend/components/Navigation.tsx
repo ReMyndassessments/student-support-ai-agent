@@ -1,7 +1,8 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Home, Menu, X, GraduationCap, FileText, Users, LogOut, CreditCard, User, Wifi, WifiOff, Shield, Settings, Database } from 'lucide-react';
+import { Home, Menu, X, GraduationCap, FileText, Users, LogOut, CreditCard, User, Wifi, WifiOff, Shield, Settings, Database, BarChart3 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
+import { NotificationCenter } from './NotificationCenter';
 
 interface NavigationProps {
   userEmail?: string;
@@ -58,6 +59,11 @@ export function Navigation({ userEmail, userName, isAdmin = false, onLogout, onA
       to: '/admin',
       icon: Shield,
       label: 'Dashboard'
+    },
+    {
+      to: '/admin/analytics',
+      icon: BarChart3,
+      label: 'Analytics'
     },
     {
       to: '/admin/teachers',
@@ -188,8 +194,9 @@ export function Navigation({ userEmail, userName, isAdmin = false, onLogout, onA
                 );
               })}
               
-              {/* Authentication */}
+              {/* Authentication and Notifications */}
               <div className="ml-4 flex items-center space-x-2">
+                {userEmail && <NotificationCenter />}
                 {userEmail && onLogout && (
                   <Button
                     onClick={onLogout}
@@ -214,6 +221,9 @@ export function Navigation({ userEmail, userName, isAdmin = false, onLogout, onA
                   <WifiOff className="h-4 w-4 text-red-600" />
                 )}
               </div>
+              
+              {/* Mobile Notifications */}
+              {userEmail && <NotificationCenter />}
               
               <Button
                 variant="ghost"

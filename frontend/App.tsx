@@ -15,6 +15,7 @@ import { AdminDashboard } from './components/AdminDashboard';
 import { TeacherManagement } from './components/TeacherManagement';
 import { AdminSystemSettings } from './components/AdminSystemSettings';
 import { AdminDemoData } from './components/AdminDemoData';
+import { AnalyticsDashboard } from './components/AnalyticsDashboard';
 
 interface User {
   email: string;
@@ -117,6 +118,7 @@ function DemoApp() {
             {user.isAdmin && (
               <>
                 <Route path="/admin" element={<AdminDashboard user={user} onLogout={handleLogout} />} />
+                <Route path="/admin/analytics" element={<AnalyticsDashboard />} />
                 <Route path="/admin/teachers" element={<TeacherManagement />} />
                 <Route path="/admin/system-settings" element={<AdminSystemSettings />} />
                 <Route path="/admin/demo-data" element={<AdminDemoData />} />
