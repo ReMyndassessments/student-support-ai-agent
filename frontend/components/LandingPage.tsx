@@ -2,8 +2,9 @@ import { Link } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { ArrowRight, Sparkles, Users, Brain, Shield, CreditCard, Mail, Copy, CheckCircle, User, GraduationCap } from 'lucide-react';
+import { ArrowRight, Sparkles, Users, Brain, Shield, CreditCard, Mail, Copy, CheckCircle, User, GraduationCap, HelpCircle } from 'lucide-react';
 import { AdminLoginFooter } from './AdminLoginFooter';
+import { TeacherHelpGuide } from './TeacherHelpGuide';
 import { useToast } from '@/components/ui/use-toast';
 import { useState } from 'react';
 
@@ -15,6 +16,7 @@ interface LandingPageProps {
 export function LandingPage({ userEmail = "teacher@school.edu", onAdminLogin }: LandingPageProps) {
   const [isContactDialogOpen, setIsContactDialogOpen] = useState(false);
   const [isDemoDialogOpen, setIsDemoDialogOpen] = useState(false);
+  const [isHelpDialogOpen, setIsHelpDialogOpen] = useState(false);
   const [copiedEmail, setCopiedEmail] = useState<string | null>(null);
   const { toast } = useToast();
 
@@ -174,6 +176,34 @@ Thank you!`
                     Teacher Login
                   </Button>
                 </Link>
+
+                <Dialog open={isHelpDialogOpen} onOpenChange={setIsHelpDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button 
+                      variant="outline" 
+                      className="w-full sm:w-auto border-gray-300 text-gray-700 hover:bg-white/80 rounded-xl sm:rounded-2xl py-4 sm:py-6 px-6 sm:px-8 text-base sm:text-lg font-semibold touch-manipulation active:scale-95"
+                    >
+                      <HelpCircle className="mr-2 h-5 w-5" />
+                      Teacher Help Guide
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-6xl rounded-3xl max-h-[90vh] overflow-y-auto mx-4">
+                    <DialogHeader>
+                      <DialogTitle className="flex items-center gap-3 text-xl">
+                        <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
+                          <HelpCircle className="h-5 w-5 text-white" />
+                        </div>
+                        Teacher Help Guide
+                      </DialogTitle>
+                      <DialogDescription>
+                        Learn how to use Concern2Care effectively to support your students.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="mt-6">
+                      <TeacherHelpGuide />
+                    </div>
+                  </DialogContent>
+                </Dialog>
 
                 <Dialog open={isContactDialogOpen} onOpenChange={setIsContactDialogOpen}>
                   <DialogTrigger asChild>
