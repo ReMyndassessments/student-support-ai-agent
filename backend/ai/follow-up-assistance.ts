@@ -39,13 +39,6 @@ export const followUpAssistance = api<FollowUpAssistanceRequest, FollowUpAssista
       }
       apiKey = key;
     } else {
-      // Check user access to follow-up assistance feature
-      const accessCheck = await users.checkAccess();
-      
-      if (!accessCheck.hasAccess) {
-        throw APIError.permissionDenied(`Access denied: ${accessCheck.reason}. Please upgrade to ${accessCheck.suggestedPlan} plan.`);
-      }
-
       // Get user's personal DeepSeek API key
       try {
         const userKeyResponse = await users.getDeepSeekKey({ email: auth.email });
