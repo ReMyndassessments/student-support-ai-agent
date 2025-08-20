@@ -38,7 +38,7 @@ Stronger Tools for Teachers. Smarter Support for Students.
 
 4. **Set environment variables**:
    ```bash
-   railway variables set AdminDeepSeekAPIKey=your_deepseek_api_key
+   railway variables set AdminDeepSeekAPIKey=sk-baac06039caa4c7a887151e8952e34a3
    ```
 
 5. **Deploy**:
