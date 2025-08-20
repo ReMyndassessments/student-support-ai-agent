@@ -1,5 +1,4 @@
 import { api } from "encore.dev/api";
-import { users } from "~encore/clients";
 import { APIError } from "encore.dev/api";
 import { getAuthData } from "~encore/auth";
 import { secret } from "encore.dev/config";
@@ -27,30 +26,12 @@ export const followUpAssistance = api<FollowUpAssistanceRequest, FollowUpAssista
   async (req) => {
     const auth = getAuthData()!;
     
-    let apiKey: string;
-
-    if (auth.isAdmin) {
-      const key = adminDeepSeekApiKey();
-      if (!key) {
-        console.log("AdminDeepSeekAPIKey not set, returning mock data for admin.");
-        const mockAssistance = generateMockFollowUpAssistance(req);
-        const disclaimer = "⚠️ IMPORTANT DISCLAIMER: This AI-generated assistance is for informational purposes only and should not replace professional educational consultation. Please work with your school's student support department, special education team, or educational specialists for comprehensive guidance. All suggestions should be reviewed and approved by qualified educational professionals before implementation. (Admin API key not set, returning mock data)";
-        return { assistance: mockAssistance, disclaimer };
-      }
-      apiKey = key;
-    } else {
-      // Get user's personal DeepSeek API key
-      try {
-        const userKeyResponse = await users.getDeepSeekKey({ email: auth.email });
-        if (userKeyResponse.hasKey && userKeyResponse.key) {
-          apiKey = userKeyResponse.key;
-        } else {
-          throw APIError.invalidArgument("No DeepSeek API key found. Please add your API key in your profile settings to use AI features.");
-        }
-      } catch (error) {
-        if (error instanceof APIError) throw error;
-        throw APIError.internal("Could not retrieve your API key. Please try again.");
-      }
+    const apiKey = adminDeepSeekApiKey();
+    if (!apiKey) {
+      console.log("AdminDeepSeekAPIKey not set, returning mock data.");
+      const mockAssistance = generateMockFollowUpAssistance(req);
+      const disclaimer = "⚠️ IMPORTANT DISCLAIMER: This AI-generated assistance is for informational purposes only and should not replace professional educational consultation. Please work with your school's student support department, special education team, or educational specialists for comprehensive guidance. All suggestions should be reviewed and approved by qualified educational professionals before implementation. (Admin API key not set, returning mock data)";
+      return { assistance: mockAssistance, disclaimer };
     }
 
     const concernTypesText = req.concernTypes.length > 0 
@@ -127,7 +108,7 @@ Focus on actionable advice that a classroom teacher can realistically implement.
       console.error('Error calling DeepSeek API for follow-up assistance:', error);
       
       if (error instanceof Error && error.message.includes('401')) {
-        throw APIError.invalidArgument("Invalid DeepSeek API key. Please check your API key in your profile settings.");
+        throw APIError.invalidArgument("Invalid DeepSeek API key. Please contact your administrator.");
       }
       
       return {
