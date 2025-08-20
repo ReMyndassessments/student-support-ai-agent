@@ -3,6 +3,9 @@ import { userDB } from "../users/db";
 import { referralDB } from "../referrals/db";
 import { getAuthData } from "~encore/auth";
 import { APIError } from "encore.dev/api";
+import { secret } from "encore.dev/config";
+
+const adminDeepSeekApiKey = secret("AdminDeepSeekAPIKey");
 
 export interface CreateDemoDataRequest {
   teacherCount: number;
@@ -76,10 +79,10 @@ export const createDemoData = api<CreateDemoDataRequest, CreateDemoDataResponse>
           INSERT INTO users (
             email, name, school_name, school_district, primary_grade, primary_subject,
             teacher_type, referrals_limit, subscription_start_date, subscription_end_date,
-            created_at, updated_at
+            deepseek_api_key, created_at, updated_at
           ) VALUES (
             ${email}, ${name}, ${schoolName}, ${schoolDistrict}, ${grade}, ${subject},
-            ${teacherType}, 20, NOW(), ${subscriptionEndDate}, NOW(), NOW()
+            ${teacherType}, 20, NOW(), ${subscriptionEndDate}, ${adminDeepSeekApiKey()}, NOW(), NOW()
           )
         `;
         teachersCreated++;

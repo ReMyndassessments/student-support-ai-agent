@@ -3,6 +3,9 @@ import { userDB } from "../users/db";
 import { getAuthData } from "~encore/auth";
 import { APIError } from "encore.dev/api";
 import * as bcrypt from "bcrypt";
+import { secret } from "encore.dev/config";
+
+const adminDeepSeekApiKey = secret("AdminDeepSeekAPIKey");
 
 export interface BulkCSVUploadRequest {
   csvData: string; // Base64 encoded CSV content
@@ -234,14 +237,14 @@ export const bulkCSVUpload = api<BulkCSVUploadRequest, BulkCSVUploadResult>(
             INSERT INTO users (
               email, name, password_hash, school_name, school_district, 
               primary_grade, primary_subject, teacher_type, referrals_limit,
-              subscription_start_date, subscription_end_date,
+              subscription_start_date, subscription_end_date, deepseek_api_key,
               created_at, updated_at
             ) VALUES (
               ${teacher.email}, ${teacher.name}, ${passwordHash}, 
               ${teacher.schoolName || null}, ${teacher.schoolDistrict || null},
               ${teacher.primaryGrade || null}, ${teacher.primarySubject || null}, 
               ${teacherType}, ${supportRequestsLimit},
-              NOW(), ${subscriptionEndDate},
+              NOW(), ${subscriptionEndDate}, ${adminDeepSeekApiKey()},
               NOW(), NOW()
             )
           `;

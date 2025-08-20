@@ -4,6 +4,9 @@ import { getAuthData } from "~encore/auth";
 import { APIError } from "encore.dev/api";
 import type { UserProfile } from "./get-profile";
 import * as bcrypt from "bcrypt";
+import { secret } from "encore.dev/config";
+
+const adminDeepSeekApiKey = secret("AdminDeepSeekAPIKey");
 
 export interface CreateUserByAdminRequest {
   email: string;
@@ -47,12 +50,12 @@ export const createUserByAdmin = api<CreateUserByAdminRequest, UserProfile>(
     const user = await userDB.queryRow<any>`
       INSERT INTO users (
         email, name, password_hash, school_name, school_district, teacher_type, 
-        subscription_start_date, subscription_end_date,
+        subscription_start_date, subscription_end_date, deepseek_api_key,
         created_at, updated_at
       )
       VALUES (
         ${req.email}, ${req.name}, ${passwordHash}, ${req.schoolName || null}, ${req.schoolDistrict || null}, ${req.teacherType || 'classroom'},
-        NOW(), ${subscriptionEndDate},
+        NOW(), ${subscriptionEndDate}, ${adminDeepSeekApiKey()},
         NOW(), NOW()
       )
       RETURNING 
