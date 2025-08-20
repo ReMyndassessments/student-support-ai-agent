@@ -4,11 +4,14 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Shield, Users, FileText, Sparkles, LogOut, User, Settings, CreditCard, TrendingUp, Calendar, AlertTriangle, Database, Download, Trash2, Plus, Edit3 } from 'lucide-react';
+import { Shield, Users, FileText, Sparkles, LogOut, User, Settings, CreditCard, TrendingUp, Calendar, AlertTriangle, Database, Download, Trash2, Plus, Edit3, UserPlus, Upload } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { Link } from 'react-router-dom';
 import backend from '~backend/client';
 import type { DashboardStats } from '~backend/admin/dashboard-stats';
+import { AddEditTeacherDialog } from './AddEditTeacherDialog';
+import { BulkCSVUploadDialog } from './BulkCSVUploadDialog';
+import type { UserProfile } from '~backend/users/get-profile';
 
 interface AdminDashboardProps {
   user: { email: string; name: string; isAdmin: boolean };
@@ -20,6 +23,8 @@ export function AdminDashboard({ user, onLogout }: AdminDashboardProps) {
   const [loading, setLoading] = useState(true);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const { toast } = useToast();
+  const [isAddTeacherDialogOpen, setIsAddTeacherDialogOpen] = useState(false);
+  const [isBulkUploadDialogOpen, setIsBulkUploadDialogOpen] = useState(false);
 
   useEffect(() => {
     loadDashboardStats();
@@ -83,6 +88,10 @@ export function AdminDashboard({ user, onLogout }: AdminDashboardProps) {
       default:
         return <AlertTriangle className="h-4 w-4 text-gray-500" />;
     }
+  };
+
+  const handleSaveTeacher = (teacher: UserProfile) => {
+    loadDashboardStats();
   };
 
   if (loading) {
@@ -208,10 +217,18 @@ export function AdminDashboard({ user, onLogout }: AdminDashboardProps) {
               </CardHeader>
               <CardContent className="p-8">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <Button onClick={() => setIsAddTeacherDialogOpen(true)} className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-xl py-4 text-base font-medium">
+                    <UserPlus className="h-5 w-5 mr-3" />
+                    Add Single Teacher
+                  </Button>
+                  <Button onClick={() => setIsBulkUploadDialogOpen(true)} className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-xl py-4 text-base font-medium">
+                    <Upload className="h-5 w-5 mr-3" />
+                    Bulk Upload Teachers
+                  </Button>
                   <Link to="/admin/teachers">
-                    <Button className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-xl py-4 text-base font-medium">
+                    <Button variant="outline" className="w-full border-gray-300 text-gray-700 hover:bg-gray-50 rounded-xl py-4 text-base font-medium">
                       <Users className="h-5 w-5 mr-3" />
-                      Manage Teachers
+                      Manage All Teachers
                     </Button>
                   </Link>
                   <Link to="/admin/system-settings">
@@ -220,14 +237,6 @@ export function AdminDashboard({ user, onLogout }: AdminDashboardProps) {
                       System Settings
                     </Button>
                   </Link>
-                  <Button variant="outline" className="w-full border-gray-300 text-gray-700 hover:bg-gray-50 rounded-xl py-4 text-base font-medium" disabled>
-                    <Edit3 className="h-5 w-5 mr-3" />
-                    Bulk Operations
-                  </Button>
-                  <Button variant="outline" className="w-full border-gray-300 text-gray-700 hover:bg-gray-50 rounded-xl py-4 text-base font-medium" disabled>
-                    <Download className="h-5 w-5 mr-3" />
-                    Export Data
-                  </Button>
                 </div>
               </CardContent>
             </Card>
@@ -383,6 +392,17 @@ export function AdminDashboard({ user, onLogout }: AdminDashboardProps) {
           </Card>
         </div>
       </div>
+      <AddEditTeacherDialog
+        isOpen={isAddTeacherDialogOpen}
+        onClose={() => setIsAddTeacherDialogOpen(false)}
+        onSave={handleSaveTeacher}
+        teacher={null}
+      />
+      <BulkCSVUploadDialog
+        isOpen={isBulkUploadDialogOpen}
+        onClose={() => setIsBulkUploadDialogOpen(false)}
+        onSuccess={loadDashboardStats}
+      />
     </div>
   );
 }
