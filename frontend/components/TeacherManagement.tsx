@@ -6,11 +6,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Loader2, Users, Plus, MoreHorizontal, Edit, Trash2, Lock, CheckSquare, Square, Edit3, Trash, Download, Upload } from 'lucide-react';
+import { Loader2, Users, Plus, MoreHorizontal, Edit, Trash2, Lock, Edit3, Trash, Download, Upload } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { Link } from 'react-router-dom';
 import backend from '~backend/client';
-import type { UserProfile } from '~backend/users/get-profile';
+import type { UserProfile } from '~backend/users/me';
 import { AddEditTeacherDialog } from './AddEditTeacherDialog';
 import { AdminResetPasswordDialog } from './AdminResetPasswordDialog';
 import { BulkOperationsDialog } from './BulkOperationsDialog';

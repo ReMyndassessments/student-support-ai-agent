@@ -1,6 +1,6 @@
-import { api } from "encore.dev/api";
+import { api, APIError } from "encore.dev/api";
 import { referralDB } from "./db";
-import { APIError } from "encore.dev/api";
+import { getAuthData } from "~encore/auth";
 
 export interface GeneratePDFRequest {
   supportRequestId: number;
@@ -13,8 +13,9 @@ export interface GeneratePDFResponse {
 
 // Generates a PDF report for a support request suitable for student support meetings.
 export const generatePDF = api<GeneratePDFRequest, GeneratePDFResponse>(
-  { expose: true, method: "POST", path: "/referrals/:supportRequestId/pdf" },
+  { expose: true, method: "POST", path: "/referrals/:supportRequestId/pdf", auth: true },
   async (req) => {
+    const auth = getAuthData()!;
     const supportRequest = await referralDB.queryRow<{
       id: number;
       student_first_name: string;
@@ -32,12 +33,17 @@ export const generatePDF = api<GeneratePDFRequest, GeneratePDFResponse>(
       other_action_taken: string | null;
       ai_recommendations: string | null;
       created_at: Date;
+      created_by_email: string;
     }>`
       SELECT * FROM referrals WHERE id = ${req.supportRequestId}
     `;
 
     if (!supportRequest) {
       throw APIError.notFound("Support request not found");
+    }
+
+    if (!auth.isAdmin && supportRequest.created_by_email !== auth.email) {
+      throw APIError.permissionDenied("You do not have permission to access this report.");
     }
 
     const concernTypes = JSON.parse(supportRequest.concern_types);
@@ -86,24 +92,23 @@ export const generatePDF = api<GeneratePDFRequest, GeneratePDFResponse>(
             font-size: 16px;
             margin-bottom: 15px;
         }
-        .info-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-bottom: 15px;
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
         }
-        .info-item {
-            margin-bottom: 10px;
+        .info-table td {
+            padding: 10px;
+            vertical-align: top;
         }
         .info-label {
             font-weight: bold;
             color: #374151;
+            width: 150px;
         }
         .info-value {
-            margin-top: 5px;
-            padding: 8px;
             background-color: #f9fafb;
             border-radius: 4px;
+            padding: 8px;
         }
         .concern-description {
             background-color: #fef3c7;
@@ -185,54 +190,46 @@ export const generatePDF = api<GeneratePDFRequest, GeneratePDFResponse>(
 
     <div class="section">
         <div class="section-title">Student Information</div>
-        <div class="info-grid">
-            <div class="info-item">
-                <div class="info-label">Student Name:</div>
-                <div class="info-value">${supportRequest.student_first_name} ${supportRequest.student_last_initial}.</div>
-            </div>
-            <div class="info-item">
-                <div class="info-label">Grade:</div>
-                <div class="info-value">${supportRequest.grade}</div>
-            </div>
-            <div class="info-item">
-                <div class="info-label">Teacher:</div>
-                <div class="info-value">${supportRequest.teacher}</div>
-            </div>
-            <div class="info-item">
-                <div class="info-label">Position:</div>
-                <div class="info-value">${supportRequest.teacher_position}</div>
-            </div>
-        </div>
+        <table class="info-table">
+            <tr>
+                <td class="info-label">Student Name:</td>
+                <td class="info-value">${supportRequest.student_first_name} ${supportRequest.student_last_initial}.</td>
+                <td class="info-label">Grade:</td>
+                <td class="info-value">${supportRequest.grade}</td>
+            </tr>
+            <tr>
+                <td class="info-label">Teacher:</td>
+                <td class="info-value">${supportRequest.teacher}</td>
+                <td class="info-label">Position:</td>
+                <td class="info-value">${supportRequest.teacher_position}</td>
+            </tr>
+        </table>
     </div>
 
     <div class="section">
         <div class="section-title">Incident Details</div>
-        <div class="info-grid">
-            <div class="info-item">
-                <div class="info-label">Date of Incident:</div>
-                <div class="info-value">${new Date(supportRequest.incident_date).toLocaleDateString('en-US', {
+        <table class="info-table">
+            <tr>
+                <td class="info-label">Date of Incident:</td>
+                <td class="info-value">${new Date(supportRequest.incident_date).toLocaleDateString('en-US', {
                   year: 'numeric',
                   month: 'long', 
                   day: 'numeric'
-                })}</div>
-            </div>
-            <div class="info-item">
-                <div class="info-label">Location:</div>
-                <div class="info-value">${supportRequest.location}</div>
-            </div>
-            <div class="info-item">
-                <div class="info-label">Severity Level:</div>
-                <div class="info-value">
+                })}</td>
+                <td class="info-label">Location:</td>
+                <td class="info-value">${supportRequest.location}</td>
+            </tr>
+            <tr>
+                <td class="info-label">Severity Level:</td>
+                <td class="info-value">
                     <span class="badge severity-${supportRequest.severity_level.toLowerCase()}">
                         ${supportRequest.severity_level.charAt(0).toUpperCase() + supportRequest.severity_level.slice(1)}
                     </span>
-                </div>
-            </div>
-            <div class="info-item">
-                <div class="info-label">Support Request ID:</div>
-                <div class="info-value">#${supportRequest.id}</div>
-            </div>
-        </div>
+                </td>
+                <td class="info-label">Support Request ID:</td>
+                <td class="info-value">#${supportRequest.id}</td>
+            </tr>
+        </table>
     </div>
 
     <div class="section">

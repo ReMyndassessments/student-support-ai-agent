@@ -81,11 +81,6 @@ export class Client {
 }
 
 /**
- * Import the auth handler to be able to derive the auth type
- */
-import type { auth as auth_auth } from "~backend/auth/auth";
-
-/**
  * ClientOptions allows you to override any default behaviour within the generated Encore client.
  */
 export interface ClientOptions {
@@ -98,13 +93,6 @@ export interface ClientOptions {
 
     /** Default RequestInit to be used for the client */
     requestInit?: Omit<RequestInit, "headers"> & { headers?: Record<string, string> }
-
-    /**
-     * Allows you to set the authentication data to be used for each
-     * request either by passing in a static object or by passing in
-     * a function which returns a new object for each request.
-     */
-    auth?: RequestType<typeof auth_auth> | AuthDataGenerator
 }
 
 /**
@@ -309,14 +297,12 @@ export namespace analytics {
 /**
  * Import the endpoint handlers to derive the types for the client.
  */
-import { adminLogin as api_auth_admin_login_adminLogin } from "~backend/auth/admin-login";
-import { adminLogout as api_auth_admin_logout_adminLogout } from "~backend/auth/admin-logout";
+import { login as api_auth_login_login } from "~backend/auth/login";
+import { logout as api_auth_logout_logout } from "~backend/auth/logout";
 import {
     requestPasswordReset as api_auth_password_reset_requestPasswordReset,
     resetPassword as api_auth_password_reset_resetPassword
 } from "~backend/auth/password-reset";
-import { teacherLogin as api_auth_teacher_login_teacherLogin } from "~backend/auth/teacher-login";
-import { teacherLogout as api_auth_teacher_logout_teacherLogout } from "~backend/auth/teacher-logout";
 
 export namespace auth {
 
@@ -325,30 +311,28 @@ export namespace auth {
 
         constructor(baseClient: BaseClient) {
             this.baseClient = baseClient
-            this.adminLogin = this.adminLogin.bind(this)
-            this.adminLogout = this.adminLogout.bind(this)
+            this.login = this.login.bind(this)
+            this.logout = this.logout.bind(this)
             this.requestPasswordReset = this.requestPasswordReset.bind(this)
             this.resetPassword = this.resetPassword.bind(this)
-            this.teacherLogin = this.teacherLogin.bind(this)
-            this.teacherLogout = this.teacherLogout.bind(this)
         }
 
         /**
-         * Admin login for demo purposes.
+         * Login for both teachers and the demo admin.
          */
-        public async adminLogin(params: RequestType<typeof api_auth_admin_login_adminLogin>): Promise<ResponseType<typeof api_auth_admin_login_adminLogin>> {
+        public async login(params: RequestType<typeof api_auth_login_login>): Promise<ResponseType<typeof api_auth_login_login>> {
             // Now make the actual call to the API
-            const resp = await this.baseClient.callTypedAPI(`/auth/admin/login`, {method: "POST", body: JSON.stringify(params)})
-            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_auth_admin_login_adminLogin>
+            const resp = await this.baseClient.callTypedAPI(`/auth/login`, {method: "POST", body: JSON.stringify(params)})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_auth_login_login>
         }
 
         /**
-         * Admin logout for demo purposes.
+         * Logs out the current user by deleting their session.
          */
-        public async adminLogout(): Promise<ResponseType<typeof api_auth_admin_logout_adminLogout>> {
+        public async logout(): Promise<ResponseType<typeof api_auth_logout_logout>> {
             // Now make the actual call to the API
-            const resp = await this.baseClient.callTypedAPI(`/auth/admin/logout`, {method: "POST", body: undefined})
-            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_auth_admin_logout_adminLogout>
+            const resp = await this.baseClient.callTypedAPI(`/auth/logout`, {method: "POST", body: undefined})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_auth_logout_logout>
         }
 
         /**
@@ -367,24 +351,6 @@ export namespace auth {
             // Now make the actual call to the API
             const resp = await this.baseClient.callTypedAPI(`/auth/password-reset/confirm`, {method: "POST", body: JSON.stringify(params)})
             return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_auth_password_reset_resetPassword>
-        }
-
-        /**
-         * Teacher login with email and password authentication.
-         */
-        public async teacherLogin(params: RequestType<typeof api_auth_teacher_login_teacherLogin>): Promise<ResponseType<typeof api_auth_teacher_login_teacherLogin>> {
-            // Now make the actual call to the API
-            const resp = await this.baseClient.callTypedAPI(`/auth/teacher/login`, {method: "POST", body: JSON.stringify(params)})
-            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_auth_teacher_login_teacherLogin>
-        }
-
-        /**
-         * Teacher logout for demo purposes.
-         */
-        public async teacherLogout(): Promise<ResponseType<typeof api_auth_teacher_logout_teacherLogout>> {
-            // Now make the actual call to the API
-            const resp = await this.baseClient.callTypedAPI(`/auth/teacher/logout`, {method: "POST", body: undefined})
-            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_auth_teacher_logout_teacherLogout>
         }
     }
 }
@@ -626,8 +592,8 @@ export namespace templates {
 import { checkAccess as api_users_check_access_checkAccess } from "~backend/users/check-access";
 import { createUserByAdmin as api_users_create_user_by_admin_createUserByAdmin } from "~backend/users/create-user-by-admin";
 import { deleteUserByAdmin as api_users_delete_user_by_admin_deleteUserByAdmin } from "~backend/users/delete-user-by-admin";
-import { getProfile as api_users_get_profile_getProfile } from "~backend/users/get-profile";
 import { listUsers as api_users_list_users_listUsers } from "~backend/users/list-users";
+import { me as api_users_me_me } from "~backend/users/me";
 import { purchaseSupportRequestPackage as api_users_purchase_referral_package_purchaseSupportRequestPackage } from "~backend/users/purchase-referral-package";
 import { updateProfile as api_users_update_profile_updateProfile } from "~backend/users/update-profile";
 import { updateUserByAdmin as api_users_update_user_by_admin_updateUserByAdmin } from "~backend/users/update-user-by-admin";
@@ -642,8 +608,8 @@ export namespace users {
             this.checkAccess = this.checkAccess.bind(this)
             this.createUserByAdmin = this.createUserByAdmin.bind(this)
             this.deleteUserByAdmin = this.deleteUserByAdmin.bind(this)
-            this.getProfile = this.getProfile.bind(this)
             this.listUsers = this.listUsers.bind(this)
+            this.me = this.me.bind(this)
             this.purchaseSupportRequestPackage = this.purchaseSupportRequestPackage.bind(this)
             this.updateProfile = this.updateProfile.bind(this)
             this.updateUserByAdmin = this.updateUserByAdmin.bind(this)
@@ -659,7 +625,7 @@ export namespace users {
         }
 
         /**
-         * Creates a new user (teacher). For admins only or self-signup.
+         * Creates a new user (teacher). For admins only.
          */
         public async createUserByAdmin(params: RequestType<typeof api_users_create_user_by_admin_createUserByAdmin>): Promise<ResponseType<typeof api_users_create_user_by_admin_createUserByAdmin>> {
             // Now make the actual call to the API
@@ -677,21 +643,21 @@ export namespace users {
         }
 
         /**
-         * Retrieves the authenticated user's profile information.
-         */
-        public async getProfile(): Promise<ResponseType<typeof api_users_get_profile_getProfile>> {
-            // Now make the actual call to the API
-            const resp = await this.baseClient.callTypedAPI(`/users/profile`, {method: "GET", body: undefined})
-            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_users_get_profile_getProfile>
-        }
-
-        /**
          * Lists all users in the system. For admins only.
          */
         public async listUsers(): Promise<ResponseType<typeof api_users_list_users_listUsers>> {
             // Now make the actual call to the API
             const resp = await this.baseClient.callTypedAPI(`/users/admin/list`, {method: "GET", body: undefined})
             return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_users_list_users_listUsers>
+        }
+
+        /**
+         * Retrieves the authenticated user's profile information.
+         */
+        public async me(): Promise<ResponseType<typeof api_users_me_me>> {
+            // Now make the actual call to the API
+            const resp = await this.baseClient.callTypedAPI(`/users/me`, {method: "GET", body: undefined})
+            return JSON.parse(await resp.text(), dateReviver) as ResponseType<typeof api_users_me_me>
         }
 
         /**
@@ -713,7 +679,7 @@ export namespace users {
         }
 
         /**
-         * Updates a user's profile. For admins only or self-signup follow-up.
+         * Updates a user's profile. For admins only.
          */
         public async updateUserByAdmin(params: RequestType<typeof api_users_update_user_by_admin_updateUserByAdmin>): Promise<ResponseType<typeof api_users_update_user_by_admin_updateUserByAdmin>> {
             // Construct the body with only the fields which we want encoded within the body (excluding query string or header fields)
@@ -989,11 +955,6 @@ type CallParameters = Omit<RequestInit, "headers"> & {
     query?: Record<string, string | string[]>
 }
 
-// AuthDataGenerator is a function that returns a new instance of the authentication data required by this API
-export type AuthDataGenerator = () =>
-  | RequestType<typeof auth_auth>
-  | Promise<RequestType<typeof auth_auth> | undefined>
-  | undefined;
 
 // A fetcher is the prototype for the inbuilt Fetch function
 export type Fetcher = typeof fetch;
@@ -1005,7 +966,6 @@ class BaseClient {
     readonly fetcher: Fetcher
     readonly headers: Record<string, string>
     readonly requestInit: Omit<RequestInit, "headers"> & { headers?: Record<string, string> }
-    readonly authGenerator?: AuthDataGenerator
 
     constructor(baseURL: string, options: ClientOptions) {
         this.baseURL = baseURL
@@ -1025,41 +985,9 @@ class BaseClient {
         } else {
             this.fetcher = boundFetch
         }
-
-        // Setup an authentication data generator using the auth data token option
-        if (options.auth !== undefined) {
-            const auth = options.auth
-            if (typeof auth === "function") {
-                this.authGenerator = auth
-            } else {
-                this.authGenerator = () => auth
-            }
-        }
     }
 
     async getAuthData(): Promise<CallParameters | undefined> {
-        let authData: RequestType<typeof auth_auth> | undefined;
-
-        // If authorization data generator is present, call it and add the returned data to the request
-        if (this.authGenerator) {
-            const mayBePromise = this.authGenerator();
-            if (mayBePromise instanceof Promise) {
-                authData = await mayBePromise;
-            } else {
-                authData = mayBePromise;
-            }
-        }
-
-        if (authData) {
-            const data: CallParameters = {};
-
-            data.headers = makeRecord<string, string>({
-                authorization: authData.authorization,
-            });
-
-            return data;
-        }
-
         return undefined;
     }
 

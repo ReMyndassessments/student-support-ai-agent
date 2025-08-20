@@ -6,17 +6,16 @@ import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, Shield, Eye, EyeOff, Lock } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
-import backend from '~backend/client';
+import { useAuth } from '../hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
 
-interface AdminLoginProps {
-  onLoginSuccess: (user: { email: string; name: string; isAdmin: boolean }) => void;
-}
-
-export function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
+export function AdminLogin() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const { toast } = useToast();
+  const { login } = useAuth();
+  const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,20 +31,18 @@ export function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
 
     setIsLoggingIn(true);
     try {
-      const response = await backend.auth.adminLogin({ password });
-      
-      if (response.success) {
-        toast({
-          title: "Login Successful",
-          description: "Welcome to the Concern2Care demo!"
-        });
-        onLoginSuccess(response.user);
-      }
+      await login({ email: 'admin@concern2care.demo', password });
+      toast({
+        title: "Login Successful",
+        description: "Welcome to the Concern2Care demo!"
+      });
+      navigate('/admin');
     } catch (error) {
       console.error('Login error:', error);
+      const errorMessage = error instanceof Error ? error.message : "Invalid admin password.";
       toast({
         title: "Login Failed",
-        description: "Invalid admin password.",
+        description: errorMessage,
         variant: "destructive"
       });
     } finally {
@@ -54,8 +51,8 @@ export function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex items-center justify-center">
-      <div className="max-w-md w-full mx-6">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex items-center justify-center p-4">
+      <div className="max-w-md w-full mx-auto">
         {/* Header */}
         <div className="text-center mb-8 relative">
           <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 rounded-3xl shadow-2xl mb-6">
@@ -81,7 +78,7 @@ export function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
               Demo Login
             </CardTitle>
           </CardHeader>
-          <CardContent className="p-8">
+          <CardContent className="p-6 sm:p-8">
             <form onSubmit={handleLogin} className="space-y-6">
               <div className="space-y-2">
                 <Label htmlFor="password" className="text-sm font-medium text-gray-700">
@@ -113,7 +110,7 @@ export function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
               <Button
                 type="submit"
                 disabled={isLoggingIn || !password.trim()}
-                className="w-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 text-white shadow-xl rounded-2xl py-6 text-lg font-semibold transition-all duration-200 transform hover:scale-105"
+                className="w-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 text-white shadow-xl rounded-2xl py-4 sm:py-6 text-lg font-semibold transition-all duration-200 transform hover:scale-105"
               >
                 {isLoggingIn ? (
                   <>
@@ -137,35 +134,6 @@ export function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
                 This is a demonstration environment with sample data. All AI features are fully functional using the admin DeepSeek API key.
               </AlertDescription>
             </Alert>
-          </CardContent>
-        </Card>
-
-        {/* Demo Features */}
-        <Card className="mt-6 border-0 bg-gradient-to-br from-emerald-50 to-teal-50 shadow-xl rounded-3xl overflow-hidden">
-          <CardContent className="p-6">
-            <h3 className="font-semibold text-emerald-900 mb-3">Demo Features Available:</h3>
-            <ul className="space-y-2 text-emerald-800 text-sm">
-              <li className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
-                Create and manage student referrals
-              </li>
-              <li className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
-                AI-powered intervention recommendations
-              </li>
-              <li className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
-                PDF report generation
-              </li>
-              <li className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
-                Meeting preparation tools
-              </li>
-              <li className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
-                Follow-up implementation assistance
-              </li>
-            </ul>
           </CardContent>
         </Card>
       </div>

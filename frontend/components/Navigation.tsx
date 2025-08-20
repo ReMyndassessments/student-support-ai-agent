@@ -3,16 +3,10 @@ import { Home, Menu, X, GraduationCap, FileText, Users, LogOut, CreditCard, User
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { NotificationCenter } from './NotificationCenter';
+import { useAuth } from '../hooks/useAuth';
 
-interface NavigationProps {
-  userEmail?: string;
-  userName?: string;
-  isAdmin?: boolean;
-  onLogout?: () => void;
-  onAdminLogin?: (user: { email: string; name: string; isAdmin: boolean }) => void;
-}
-
-export function Navigation({ userEmail, userName, isAdmin = false, onLogout, onAdminLogin }: NavigationProps) {
+export function Navigation() {
+  const { user, logout, isAdmin } = useAuth();
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
@@ -50,85 +44,29 @@ export function Navigation({ userEmail, userName, isAdmin = false, onLogout, onA
   }, [isMobileMenuOpen]);
 
   const adminNavItems = [
-    {
-      to: '/',
-      icon: Home,
-      label: 'Home'
-    },
-    {
-      to: '/admin',
-      icon: Shield,
-      label: 'Dashboard'
-    },
-    {
-      to: '/admin/analytics',
-      icon: BarChart3,
-      label: 'Analytics'
-    },
-    {
-      to: '/admin/teachers',
-      icon: Users,
-      label: 'Teachers'
-    },
-    {
-      to: '/admin/system-settings',
-      icon: Settings,
-      label: 'Settings'
-    },
-    {
-      to: '/admin/demo-data',
-      icon: Database,
-      label: 'Demo Data'
-    },
-    {
-      to: '/new-referral',
-      icon: FileText,
-      label: 'New Request'
-    },
-    {
-      to: '/referrals',
-      icon: FileText,
-      label: 'All Requests'
-    }
+    { to: '/', icon: Home, label: 'Home' },
+    { to: '/admin', icon: Shield, label: 'Dashboard' },
+    { to: '/admin/analytics', icon: BarChart3, label: 'Analytics' },
+    { to: '/admin/teachers', icon: Users, label: 'Teachers' },
+    { to: '/admin/system-settings', icon: Settings, label: 'Settings' },
+    { to: '/admin/demo-data', icon: Database, label: 'Demo Data' },
+    { to: '/new-referral', icon: FileText, label: 'New Request' },
+    { to: '/referrals', icon: FileText, label: 'All Requests' }
   ];
 
   const teacherNavItems = [
-    {
-      to: '/',
-      icon: Home,
-      label: 'Home'
-    },
-    {
-      to: '/new-referral',
-      icon: FileText,
-      label: 'New Support Request'
-    },
-    {
-      to: '/referrals',
-      icon: Users,
-      label: 'My Support Requests'
-    }
+    { to: '/', icon: Home, label: 'Home' },
+    { to: '/new-referral', icon: FileText, label: 'New Support Request' },
+    { to: '/referrals', icon: Users, label: 'My Support Requests' }
   ];
 
   const guestNavItems = [
-    {
-      to: '/',
-      icon: Home,
-      label: 'Home'
-    },
-    {
-      to: '/teacher-login',
-      icon: User,
-      label: 'Teacher Login'
-    },
-    {
-      to: '/subscription/plans',
-      icon: CreditCard,
-      label: 'Subscribe'
-    }
+    { to: '/', icon: Home, label: 'Home' },
+    { to: '/teacher-login', icon: User, label: 'Teacher Login' },
+    { to: '/subscription/plans', icon: CreditCard, label: 'Subscribe' }
   ];
 
-  const navItems = isAdmin ? adminNavItems : (userEmail ? teacherNavItems : guestNavItems);
+  const navItems = isAdmin ? adminNavItems : (user ? teacherNavItems : guestNavItems);
 
   return (
     <>
@@ -149,28 +87,13 @@ export function Navigation({ userEmail, userName, isAdmin = false, onLogout, onA
                     ADMIN
                   </div>
                 )}
-                {userEmail && !isAdmin && (
+                {user && !isAdmin && (
                   <div className="px-1.5 py-0.5 sm:px-2 sm:py-1 bg-gradient-to-r from-blue-100 to-cyan-100 text-blue-800 text-xs font-medium rounded-md sm:rounded-lg">
                     TEACHER
                   </div>
                 )}
               </div>
             </Link>
-            
-            {/* Online/Offline Indicator */}
-            <div className="hidden sm:flex items-center mr-4">
-              {isOnline ? (
-                <div className="flex items-center text-green-600 text-xs">
-                  <Wifi className="h-3 w-3 mr-1" />
-                  Online
-                </div>
-              ) : (
-                <div className="flex items-center text-red-600 text-xs">
-                  <WifiOff className="h-3 w-3 mr-1" />
-                  Offline
-                </div>
-              )}
-            </div>
             
             {/* Desktop Navigation */}
             <div className="hidden lg:flex items-center space-x-1">
@@ -196,10 +119,10 @@ export function Navigation({ userEmail, userName, isAdmin = false, onLogout, onA
               
               {/* Authentication and Notifications */}
               <div className="ml-4 flex items-center space-x-2">
-                {userEmail && <NotificationCenter />}
-                {userEmail && onLogout && (
+                {user && <NotificationCenter />}
+                {user && (
                   <Button
-                    onClick={onLogout}
+                    onClick={logout}
                     variant="outline"
                     size="sm"
                     className="border-gray-300 text-gray-700 hover:bg-gray-50 rounded-xl touch-manipulation"
@@ -213,7 +136,6 @@ export function Navigation({ userEmail, userName, isAdmin = false, onLogout, onA
 
             {/* Mobile Menu Button */}
             <div className="lg:hidden flex items-center space-x-2">
-              {/* Mobile Online/Offline Indicator */}
               <div className="flex items-center">
                 {isOnline ? (
                   <Wifi className="h-4 w-4 text-green-600" />
@@ -222,8 +144,7 @@ export function Navigation({ userEmail, userName, isAdmin = false, onLogout, onA
                 )}
               </div>
               
-              {/* Mobile Notifications */}
-              {userEmail && <NotificationCenter />}
+              {user && <NotificationCenter />}
               
               <Button
                 variant="ghost"
@@ -245,23 +166,20 @@ export function Navigation({ userEmail, userName, isAdmin = false, onLogout, onA
       {/* Mobile Navigation Overlay */}
       {isMobileMenuOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
-          {/* Backdrop */}
           <div 
             className="fixed inset-0 bg-black/50 backdrop-blur-sm"
             onClick={() => setIsMobileMenuOpen(false)}
           />
           
-          {/* Menu Panel */}
           <div className="fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-white shadow-2xl transform transition-transform duration-300 ease-out">
             <div className="flex flex-col h-full">
-              {/* Header */}
               <div className="flex items-center justify-between p-4 border-b border-gray-200">
                 <div className="flex items-center space-x-3">
                   <div className="w-8 h-8 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg">
                     <GraduationCap className="h-5 w-5 text-white" />
                   </div>
                   <span className="font-bold text-gray-900">
-                    {isAdmin ? 'Admin Menu' : (userEmail ? 'Teacher Menu' : 'Menu')}
+                    {isAdmin ? 'Admin Menu' : (user ? 'Teacher Menu' : 'Menu')}
                   </span>
                 </div>
                 <Button
@@ -274,7 +192,6 @@ export function Navigation({ userEmail, userName, isAdmin = false, onLogout, onA
                 </Button>
               </div>
 
-              {/* Online/Offline Status */}
               <div className="px-4 py-2 border-b border-gray-100">
                 <div className={`flex items-center text-sm ${isOnline ? 'text-green-600' : 'text-red-600'}`}>
                   {isOnline ? (
@@ -291,17 +208,15 @@ export function Navigation({ userEmail, userName, isAdmin = false, onLogout, onA
                 </div>
               </div>
               
-              {/* User Info */}
-              {userEmail && (
+              {user && (
                 <div className="px-4 py-3 border-b border-gray-100 bg-gradient-to-r from-blue-50 to-purple-50">
                   <div className="text-sm text-blue-800">
-                    <div className="font-medium">{userName}</div>
-                    <div className="text-xs text-blue-600">{userEmail}</div>
+                    <div className="font-medium">{user.name}</div>
+                    <div className="text-xs text-blue-600">{user.email}</div>
                   </div>
                 </div>
               )}
               
-              {/* Navigation Items */}
               <div className="flex-1 overflow-y-auto py-4">
                 <div className="space-y-2 px-4">
                   {navItems.map((item) => {
@@ -327,13 +242,12 @@ export function Navigation({ userEmail, userName, isAdmin = false, onLogout, onA
                 </div>
               </div>
               
-              {/* Mobile Authentication */}
               <div className="p-4 border-t border-gray-200">
-                {userEmail && onLogout && (
+                {user && (
                   <Button
                     onClick={() => {
                       setIsMobileMenuOpen(false);
-                      onLogout();
+                      logout();
                     }}
                     variant="outline"
                     className="w-full justify-start border-gray-300 text-gray-700 hover:bg-gray-50 rounded-xl touch-manipulation active:scale-95 transition-transform"

@@ -1,8 +1,8 @@
-import { api } from "encore.dev/api";
+import { api, APIError } from "encore.dev/api";
 import { userDB } from "../users/db";
-import { APIError } from "encore.dev/api";
 import * as bcrypt from "bcrypt";
 import * as crypto from "crypto";
+import log from "encore.dev/log";
 
 export interface RequestPasswordResetRequest {
   email: string;
@@ -65,28 +65,7 @@ export const requestPasswordReset = api<RequestPasswordResetRequest, RequestPass
     // In a real implementation, you would send an email here
     // For demo purposes, we'll log the reset link
     const resetLink = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/reset-password?token=${resetToken}`;
-    console.log(`Password reset link for ${user.email}: ${resetLink}`);
-
-    // Simulate email sending
-    console.log(`
-=== PASSWORD RESET EMAIL ===
-To: ${user.email}
-Subject: Reset Your Concern2Care Password
-
-Hello ${user.name || 'Teacher'},
-
-You requested a password reset for your Concern2Care account. Click the link below to reset your password:
-
-${resetLink}
-
-This link will expire in 1 hour.
-
-If you didn't request this reset, please ignore this email.
-
-Best regards,
-The Concern2Care Team
-============================
-    `);
+    log.info("Password reset link generated", { email: user.email, link: resetLink });
 
     return {
       success: true,

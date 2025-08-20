@@ -1,9 +1,9 @@
-import { api } from "encore.dev/api";
+import { api, APIError } from "encore.dev/api";
 import { userDB } from "../users/db";
 import { getAuthData } from "~encore/auth";
-import { APIError } from "encore.dev/api";
 import * as bcrypt from "bcrypt";
 import { secret } from "encore.dev/config";
+import log from "encore.dev/log";
 
 const adminDeepSeekApiKey = secret("AdminDeepSeekAPIKey");
 
@@ -96,6 +96,7 @@ export const bulkCSVUpload = api<BulkCSVUploadRequest, BulkCSVUploadResult>(
       for (let i = 0; i < dataRows.length; i++) {
         const rowNumber = i + 2; // +2 because we start from row 2 (after header)
         const rowData = parseCSVRow(dataRows[i]);
+        let teacher: Partial<TeacherCSVRow> = {};
         
         try {
           if (rowData.length === 0 || rowData.every(cell => !cell.trim())) {
@@ -104,7 +105,6 @@ export const bulkCSVUpload = api<BulkCSVUploadRequest, BulkCSVUploadResult>(
           }
 
           // Map CSV data to teacher object
-          const teacher: TeacherCSVRow = {};
           headers.forEach((header, index) => {
             if (index < rowData.length && rowData[index].trim()) {
               const value = rowData[index].trim();
@@ -252,7 +252,7 @@ export const bulkCSVUpload = api<BulkCSVUploadRequest, BulkCSVUploadResult>(
           successfulImports++;
 
         } catch (error) {
-          console.error(`Error processing row ${rowNumber}:`, error);
+          log.error(`Error processing row ${rowNumber}:`, { error });
           errors.push({
             row: rowNumber,
             email: teacher.email,
@@ -274,8 +274,8 @@ export const bulkCSVUpload = api<BulkCSVUploadRequest, BulkCSVUploadResult>(
       };
 
     } catch (error) {
-      console.error('Error processing CSV:', error);
-      throw APIError.invalidArgument(`Failed to process CSV: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      log.error('Error processing CSV:', { error });
+      throw APIError.internal(`Failed to process CSV: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 );

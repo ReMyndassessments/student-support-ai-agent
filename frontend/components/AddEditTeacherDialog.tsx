@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Loader2, Eye, EyeOff } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import backend from '~backend/client';
-import type { UserProfile } from '~backend/users/get-profile';
+import type { UserProfile } from '~backend/users/me';
 
 interface AddEditTeacherDialogProps {
   isOpen: boolean;

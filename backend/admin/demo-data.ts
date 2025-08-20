@@ -1,9 +1,9 @@
-import { api } from "encore.dev/api";
+import { api, APIError } from "encore.dev/api";
 import { userDB } from "../users/db";
 import { referralDB } from "../referrals/db";
 import { getAuthData } from "~encore/auth";
-import { APIError } from "encore.dev/api";
 import { secret } from "encore.dev/config";
+import log from "encore.dev/log";
 
 const adminDeepSeekApiKey = secret("AdminDeepSeekAPIKey");
 
@@ -87,7 +87,7 @@ export const createDemoData = api<CreateDemoDataRequest, CreateDemoDataResponse>
         `;
         teachersCreated++;
       } catch (error) {
-        console.error(`Failed to create demo teacher ${i + 1}:`, error);
+        log.error(`Failed to create demo teacher ${i + 1}:`, { error });
       }
     }
 
@@ -163,7 +163,7 @@ export const createDemoData = api<CreateDemoDataRequest, CreateDemoDataResponse>
         `;
         supportRequestsCreated++;
       } catch (error) {
-        console.error(`Failed to create demo support request ${i + 1}:`, error);
+        log.error(`Failed to create demo support request ${i + 1}:`, { error });
       }
     }
 

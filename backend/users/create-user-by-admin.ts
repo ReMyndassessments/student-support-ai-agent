@@ -1,8 +1,7 @@
-import { api } from "encore.dev/api";
+import { api, APIError } from "encore.dev/api";
 import { userDB } from "./db";
 import { getAuthData } from "~encore/auth";
-import { APIError } from "encore.dev/api";
-import type { UserProfile } from "./get-profile";
+import type { UserProfile } from "./me";
 import * as bcrypt from "bcrypt";
 import { secret } from "encore.dev/config";
 
@@ -18,15 +17,12 @@ export interface CreateUserByAdminRequest {
   subscriptionEndDate?: string; // ISO 8601 date string
 }
 
-// Creates a new user (teacher). For admins only or self-signup.
+// Creates a new user (teacher). For admins only.
 export const createUserByAdmin = api<CreateUserByAdminRequest, UserProfile>(
-  { expose: true, method: "POST", path: "/users/admin/create", auth: false },
+  { expose: true, method: "POST", path: "/users/admin/create", auth: true },
   async (req) => {
-    // Allow both admin access and self-signup (no auth required for self-signup)
-    const auth = getAuthData();
-    
-    // If there is auth data, check if user is admin
-    if (auth && !auth.isAdmin) {
+    const auth = getAuthData()!;
+    if (!auth.isAdmin) {
       throw APIError.permissionDenied("You do not have permission to create users.");
     }
 
@@ -73,6 +69,7 @@ export const createUserByAdmin = api<CreateUserByAdminRequest, UserProfile>(
       id: user.id,
       email: user.email,
       name: user.name || undefined,
+      isAdmin: false, // New users created by admin are not admins
       schoolName: user.school_name || undefined,
       schoolDistrict: user.school_district || undefined,
       primaryGrade: user.primary_grade || undefined,

@@ -1,8 +1,7 @@
-import { api } from "encore.dev/api";
+import { api, APIError } from "encore.dev/api";
 import { userDB } from "./db";
 import { getAuthData } from "~encore/auth";
-import { APIError } from "encore.dev/api";
-import type { UserProfile } from "./get-profile";
+import type { UserProfile } from "./me";
 import * as bcrypt from "bcrypt";
 
 export interface UpdateUserByAdminRequest {
@@ -17,15 +16,12 @@ export interface UpdateUserByAdminRequest {
   supportRequestsLimit?: number;
 }
 
-// Updates a user's profile. For admins only or self-signup follow-up.
+// Updates a user's profile. For admins only.
 export const updateUserByAdmin = api<UpdateUserByAdminRequest, UserProfile>(
-  { expose: true, method: "PUT", path: "/users/admin/:id", auth: false },
+  { expose: true, method: "PUT", path: "/users/admin/:id", auth: true },
   async (req) => {
-    // Allow both admin access and self-signup follow-up (no auth required for self-signup)
-    const auth = getAuthData();
-    
-    // If there is auth data, check if user is admin
-    if (auth && !auth.isAdmin) {
+    const auth = getAuthData()!;
+    if (!auth.isAdmin) {
       throw APIError.permissionDenied("You do not have permission to update users.");
     }
 
@@ -68,6 +64,7 @@ export const updateUserByAdmin = api<UpdateUserByAdminRequest, UserProfile>(
       id: user.id,
       email: user.email,
       name: user.name || undefined,
+      isAdmin: false, // Only non-admin users can be updated this way
       schoolName: user.school_name || undefined,
       schoolDistrict: user.school_district || undefined,
       primaryGrade: user.primary_grade || undefined,

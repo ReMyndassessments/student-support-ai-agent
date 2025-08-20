@@ -1,8 +1,8 @@
-import { api } from "encore.dev/api";
+import { api, APIError } from "encore.dev/api";
 import { referralDB } from "./db";
 import { users } from "~encore/clients";
-import { APIError } from "encore.dev/api";
 import { getAuthData } from "~encore/auth";
+import log from "encore.dev/log";
 
 export interface CreateSupportRequestRequest {
   studentFirstName: string;
@@ -110,14 +110,14 @@ export const create = api<CreateSupportRequestRequest, SupportRequest>(
     `;
 
     if (!row) {
-      throw new Error("Failed to create support request");
+      throw APIError.internal("Failed to create support request");
     }
 
     // Increment support request usage count for all users
     try {
       await users.incrementSupportRequestUsage({ email: auth.email });
     } catch (error) {
-      console.error('Failed to increment support request usage:', error);
+      log.error('Failed to increment support request usage:', { error, email: auth.email });
       // Don't fail the support request creation if usage tracking fails
     }
 

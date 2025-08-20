@@ -2,18 +2,13 @@ import { Link } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { ArrowRight, Sparkles, Users, Brain, Shield, CreditCard, Mail, Copy, CheckCircle, User, GraduationCap, HelpCircle } from 'lucide-react';
+import { ArrowRight, Sparkles, Users, Brain, Shield, Mail, Copy, CheckCircle, User, GraduationCap, HelpCircle } from 'lucide-react';
 import { AdminLoginFooter } from './AdminLoginFooter';
 import { TeacherHelpGuide } from './TeacherHelpGuide';
 import { useToast } from '@/components/ui/use-toast';
 import { useState } from 'react';
 
-interface LandingPageProps {
-  userEmail?: string;
-  onAdminLogin?: (user: { email: string; name: string; isAdmin: boolean }) => void;
-}
-
-export function LandingPage({ userEmail = "teacher@school.edu", onAdminLogin }: LandingPageProps) {
+export function LandingPage() {
   const [isContactDialogOpen, setIsContactDialogOpen] = useState(false);
   const [isDemoDialogOpen, setIsDemoDialogOpen] = useState(false);
   const [isHelpDialogOpen, setIsHelpDialogOpen] = useState(false);
@@ -91,7 +86,6 @@ Thank you!`
     const body = encodeURIComponent(emailData.body);
     const mailtoUrl = `mailto:${emailData.email}?subject=${subject}&body=${body}`;
     
-    // Try to open email client
     try {
       const link = document.createElement('a');
       link.href = mailtoUrl;
@@ -101,13 +95,11 @@ Thank you!`
       link.click();
       document.body.removeChild(link);
       
-      // Show success message
       toast({
         title: "Opening Email Client",
         description: "Your email client should open with a pre-filled message."
       });
       
-      // Close dialog after a short delay
       setTimeout(() => {
         if (type === 'sales') setIsContactDialogOpen(false);
         if (type === 'demo') setIsDemoDialogOpen(false);
@@ -123,20 +115,11 @@ Thank you!`
     }
   };
 
-  const handleDemoRequest = () => {
-    setIsDemoDialogOpen(true);
-  };
-
-  const handleContactSales = () => {
-    setIsContactDialogOpen(true);
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
         {/* Header */}
         <div className="text-center mb-12 sm:mb-16 relative">
-          {/* Decorative elements - hidden on mobile */}
           <div className="hidden sm:block absolute top-0 left-1/4 w-20 h-20 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full opacity-20 animate-pulse"></div>
           <div className="hidden sm:block absolute top-10 right-1/3 w-16 h-16 bg-gradient-to-br from-pink-400 to-orange-500 rounded-full opacity-20 animate-pulse delay-1000"></div>
           <div className="hidden sm:block absolute -top-5 right-1/4 w-12 h-12 bg-gradient-to-br from-green-400 to-cyan-500 rounded-full opacity-20 animate-pulse delay-500"></div>
@@ -346,7 +329,6 @@ Thank you!`
             return (
               <Card key={index} className={`border-0 bg-gradient-to-br ${feature.bgGradient} hover:shadow-xl transition-all duration-300 hover:scale-105 transform rounded-2xl sm:rounded-3xl overflow-hidden touch-manipulation active:scale-95`}>
                 <CardContent className="p-6 sm:p-8 text-center relative">
-                  {/* Decorative background */}
                   <div className="absolute inset-0 opacity-5">
                     <div className={`w-full h-full bg-gradient-to-br ${feature.gradient}`}></div>
                   </div>
@@ -438,9 +420,8 @@ Thank you!`
               }
             ].map((item, index) => (
               <div key={index} className="text-center relative">
-                {/* Connection line - hidden on mobile */}
                 {index < 2 && (
-                  <div className="hidden md:block absolute top-8 left-full w-8 h-0.5 bg-gradient-to-r from-gray-300 to-gray-400 transform translate-x-4 z-0"></div>
+                  <div className="hidden md:block absolute top-8 left-1/2 w-full h-0.5 bg-gray-300 transform -translate-x-1/2 z-0"></div>
                 )}
                 
                 <div className={`inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br ${item.gradient} rounded-xl sm:rounded-2xl shadow-lg text-white font-bold text-lg sm:text-xl mb-3 sm:mb-4 relative z-10 touch-manipulation active:scale-95 transition-transform`}>
@@ -461,48 +442,29 @@ Thank you!`
         <div className="text-center mt-12 sm:mt-16">
           <Card className="border-0 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 shadow-2xl rounded-2xl sm:rounded-3xl overflow-hidden">
             <CardContent className="p-8 sm:p-12">
-              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-3 sm:mb-4">
-                Ready to Transform Student Support?
-              </h2>
-              <p className="text-base sm:text-lg text-gray-600 mb-6 sm:mb-8 max-w-2xl mx-auto">
-                Join thousands of educators using AI-powered tools to better support their students.
-              </p>
-              <div className="flex flex-col sm:flex-row sm:flex-wrap items-center justify-center gap-3 sm:gap-4">
-                <Link to="/teacher-login">
-                  <Button className="w-full sm:w-auto bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 text-white shadow-xl rounded-xl sm:rounded-2xl py-4 sm:py-6 px-6 sm:px-8 text-base sm:text-lg font-semibold transition-all duration-200 transform hover:scale-105 active:scale-95 touch-manipulation">
-                    <User className="mr-2 h-5 w-5" />
-                    Get Started
-                  </Button>
-                </Link>
-                <Button 
-                  onClick={handleContactSales}
-                  variant="outline" 
-                  className="w-full sm:w-auto border-gray-300 text-gray-700 hover:bg-white/80 rounded-xl sm:rounded-2xl py-4 sm:py-6 px-6 sm:px-8 text-base sm:text-lg font-semibold touch-manipulation active:scale-95"
-                >
-                  <Mail className="mr-2 h-5 w-5" />
-                  Contact Sales
-                </Button>
-                <Button 
-                  onClick={handleDemoRequest}
-                  variant="outline" 
-                  className="w-full sm:w-auto border-gray-300 text-gray-700 hover:bg-white/80 rounded-xl sm:rounded-2xl py-4 sm:py-6 px-6 sm:px-8 text-base sm:text-lg font-semibold touch-manipulation active:scale-95"
-                >
-                  <GraduationCap className="mr-2 h-5 w-5" />
-                  Request Demo
-                </Button>
-                <Link to="/subscription/plans">
-                  <Button variant="outline" className="w-full sm:w-auto border-gray-300 text-gray-700 hover:bg-white/80 rounded-xl sm:rounded-2xl py-4 sm:py-6 px-6 sm:px-8 text-base sm:text-lg font-semibold touch-manipulation active:scale-95">
-                    View Plans
-                  </Button>
-                </Link>
+              <div className="max-w-3xl mx-auto">
+                <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-3 sm:mb-4">
+                  Ready to Transform Student Support?
+                </h2>
+                <p className="text-base sm:text-lg text-gray-600 mb-6 sm:mb-8">
+                  Join thousands of educators using AI-powered tools to better support their students.
+                </p>
+                
+                <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                  <Link to="/teacher-login">
+                    <Button className="w-full sm:w-auto bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 text-white shadow-xl rounded-xl sm:rounded-2xl py-4 sm:py-6 px-6 sm:px-8 text-base sm:text-lg font-semibold transition-all duration-200 transform hover:scale-105 active:scale-95 touch-manipulation">
+                      <User className="mr-2 h-5 w-5" />
+                      Get Started
+                    </Button>
+                  </Link>
+                </div>
               </div>
             </CardContent>
           </Card>
         </div>
       </div>
 
-      {/* Admin Login Footer */}
-      {onAdminLogin && <AdminLoginFooter onAdminLogin={onAdminLogin} />}
+      <AdminLoginFooter />
     </div>
   );
 }

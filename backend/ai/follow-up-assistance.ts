@@ -1,7 +1,7 @@
-import { api } from "encore.dev/api";
-import { APIError } from "encore.dev/api";
+import { api, APIError } from "encore.dev/api";
 import { getAuthData } from "~encore/auth";
 import { secret } from "encore.dev/config";
+import log from "encore.dev/log";
 
 const adminDeepSeekApiKey = secret("AdminDeepSeekAPIKey");
 
@@ -28,7 +28,7 @@ export const followUpAssistance = api<FollowUpAssistanceRequest, FollowUpAssista
     
     const apiKey = adminDeepSeekApiKey();
     if (!apiKey) {
-      console.log("AdminDeepSeekAPIKey not set, returning mock data.");
+      log.info("AdminDeepSeekAPIKey not set, returning mock data.");
       const mockAssistance = generateMockFollowUpAssistance(req);
       const disclaimer = "⚠️ IMPORTANT DISCLAIMER: This AI-generated assistance is for informational purposes only and should not replace professional educational consultation. Please work with your school's student support department, special education team, or educational specialists for comprehensive guidance. All suggestions should be reviewed and approved by qualified educational professionals before implementation. (Admin API key not set, returning mock data)";
       return { assistance: mockAssistance, disclaimer };
@@ -91,7 +91,7 @@ Focus on actionable advice that a classroom teacher can realistically implement.
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error(`DeepSeek API error: ${response.status} - ${errorText}`);
+        log.error(`DeepSeek API error: ${response.status} - ${errorText}`);
         throw new Error(`DeepSeek API error: ${response.status}`);
       }
 
@@ -105,16 +105,13 @@ Focus on actionable advice that a classroom teacher can realistically implement.
         disclaimer
       };
     } catch (error) {
-      console.error('Error calling DeepSeek API for follow-up assistance:', error);
+      log.error('Error calling DeepSeek API for follow-up assistance:', { error });
       
       if (error instanceof Error && error.message.includes('401')) {
         throw APIError.invalidArgument("Invalid DeepSeek API key. Please contact your administrator.");
       }
       
-      return {
-        assistance: 'Unable to generate follow-up assistance at this time due to a technical error. Please try again later or contact your student support department directly for implementation guidance.',
-        disclaimer: "⚠️ IMPORTANT DISCLAIMER: This AI-generated assistance is for informational purposes only and should not replace professional educational consultation. Please work with your school's student support department, special education team, or educational specialists for comprehensive guidance. All suggestions should be reviewed and approved by qualified educational professionals before implementation."
-      };
+      throw APIError.internal('Unable to generate follow-up assistance at this time due to a technical error. Please try again later or contact your student support department directly for implementation guidance.');
     }
   }
 );

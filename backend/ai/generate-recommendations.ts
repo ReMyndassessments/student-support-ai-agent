@@ -1,7 +1,7 @@
-import { api } from "encore.dev/api";
-import { APIError } from "encore.dev/api";
+import { api, APIError } from "encore.dev/api";
 import { getAuthData } from "~encore/auth";
 import { secret } from "encore.dev/config";
+import log from "encore.dev/log";
 
 const adminDeepSeekApiKey = secret("AdminDeepSeekAPIKey");
 
@@ -34,7 +34,7 @@ export const generateRecommendations = api<GenerateRecommendationsRequest, Gener
     
     const apiKey = adminDeepSeekApiKey();
     if (!apiKey) {
-      console.log("AdminDeepSeekAPIKey not set, returning mock data.");
+      log.info("AdminDeepSeekAPIKey not set, returning mock data.");
       const mockRecommendations = generateMockRecommendations(req);
       const disclaimer = "⚠️ IMPORTANT DISCLAIMER: These AI-generated recommendations are for informational purposes only and should not replace professional educational assessment. Please refer this student to your school's student support department for proper evaluation and vetting. All AI-generated suggestions must be reviewed and approved by qualified educational professionals before implementation. (Admin API key not set, returning mock data)";
       return { recommendations: mockRecommendations, disclaimer };
@@ -106,7 +106,7 @@ Use professional educational terminology and ensure recommendations are practica
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error(`DeepSeek API error: ${response.status} - ${errorText}`);
+        log.error(`DeepSeek API error: ${response.status} - ${errorText}`);
         throw new Error(`DeepSeek API error: ${response.status}`);
       }
 
@@ -120,16 +120,13 @@ Use professional educational terminology and ensure recommendations are practica
         disclaimer
       };
     } catch (error) {
-      console.error('Error calling DeepSeek API:', error);
+      log.error('Error calling DeepSeek API:', { error });
       
       if (error instanceof Error && error.message.includes('401')) {
         throw APIError.invalidArgument("Invalid DeepSeek API key. Please contact your administrator.");
       }
       
-      return {
-        recommendations: 'Unable to generate recommendations at this time due to a technical error. Please try again later or contact your student support department directly.',
-        disclaimer: "⚠️ IMPORTANT DISCLAIMER: These AI-generated recommendations are for informational purposes only and should not replace professional educational assessment. Please refer this student to your school's student support department for proper evaluation and vetting. All AI-generated suggestions must be reviewed and approved by qualified educational professionals before implementation."
-      };
+      throw APIError.internal('Unable to generate recommendations at this time due to a technical error. Please try again later or contact your student support department directly.');
     }
   }
 );

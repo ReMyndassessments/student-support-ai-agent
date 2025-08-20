@@ -6,19 +6,17 @@ import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, User, Eye, EyeOff, GraduationCap, AlertTriangle } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
-import { Link } from 'react-router-dom';
-import backend from '~backend/client';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth';
 
-interface TeacherLoginProps {
-  onLoginSuccess: (user: { email: string; name: string; isAdmin: boolean }) => void;
-}
-
-export function TeacherLogin({ onLoginSuccess }: TeacherLoginProps) {
+export function TeacherLogin() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const { toast } = useToast();
+  const { login } = useAuth();
+  const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,15 +32,12 @@ export function TeacherLogin({ onLoginSuccess }: TeacherLoginProps) {
 
     setIsLoggingIn(true);
     try {
-      const response = await backend.auth.teacherLogin({ email, password });
-      
-      if (response.success) {
-        toast({
-          title: "Login Successful",
-          description: `Welcome back, ${response.user.name}!`
-        });
-        onLoginSuccess(response.user);
-      }
+      await login({ email, password });
+      toast({
+        title: "Login Successful",
+        description: `Welcome back!`
+      });
+      navigate('/new-referral');
     } catch (error) {
       console.error('Login error:', error);
       const errorMessage = error instanceof Error ? error.message : "Invalid email or password.";
@@ -57,8 +52,8 @@ export function TeacherLogin({ onLoginSuccess }: TeacherLoginProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex items-center justify-center">
-      <div className="max-w-md w-full mx-6">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex items-center justify-center p-4">
+      <div className="max-w-md w-full mx-auto">
         {/* Header */}
         <div className="text-center mb-8 relative">
           <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 rounded-3xl shadow-2xl mb-6">
@@ -84,7 +79,7 @@ export function TeacherLogin({ onLoginSuccess }: TeacherLoginProps) {
               Teacher Access
             </CardTitle>
           </CardHeader>
-          <CardContent className="p-8">
+          <CardContent className="p-6 sm:p-8">
             <form onSubmit={handleLogin} className="space-y-6">
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-sm font-medium text-gray-700">
@@ -131,7 +126,7 @@ export function TeacherLogin({ onLoginSuccess }: TeacherLoginProps) {
               <Button
                 type="submit"
                 disabled={isLoggingIn || !email.trim() || !password.trim()}
-                className="w-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 text-white shadow-xl rounded-2xl py-6 text-lg font-semibold transition-all duration-200 transform hover:scale-105"
+                className="w-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 text-white shadow-xl rounded-2xl py-4 sm:py-6 text-lg font-semibold transition-all duration-200 transform hover:scale-105"
               >
                 {isLoggingIn ? (
                   <>

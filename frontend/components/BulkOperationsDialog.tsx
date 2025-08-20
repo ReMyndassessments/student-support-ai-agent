@@ -3,12 +3,11 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, Users, AlertTriangle, CheckCircle, Trash2, Edit } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import backend from '~backend/client';
-import type { UserProfile } from '~backend/users/get-profile';
+import type { UserProfile } from '~backend/users/me';
 
 interface BulkOperationsDialogProps {
   isOpen: boolean;

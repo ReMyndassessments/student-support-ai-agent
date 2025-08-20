@@ -5,18 +5,17 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Label } from '@/components/ui/label';
 import { Loader2, Shield, Eye, EyeOff, Lock } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
-import backend from '~backend/client';
+import { useAuth } from '../hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
 
-interface AdminLoginFooterProps {
-  onAdminLogin: (user: { email: string; name: string; isAdmin: boolean }) => void;
-}
-
-export function AdminLoginFooter({ onAdminLogin }: AdminLoginFooterProps) {
+export function AdminLoginFooter() {
   const [isOpen, setIsOpen] = useState(false);
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const { toast } = useToast();
+  const { login } = useAuth();
+  const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,22 +31,20 @@ export function AdminLoginFooter({ onAdminLogin }: AdminLoginFooterProps) {
 
     setIsLoggingIn(true);
     try {
-      const response = await backend.auth.adminLogin({ password });
-      
-      if (response.success) {
-        toast({
-          title: "Login Successful",
-          description: "Welcome to the Concern2Care demo!"
-        });
-        onAdminLogin(response.user);
-        setIsOpen(false);
-        setPassword('');
-      }
+      await login({ email: 'admin@concern2care.demo', password });
+      toast({
+        title: "Login Successful",
+        description: "Welcome to the Concern2Care demo!"
+      });
+      setIsOpen(false);
+      setPassword('');
+      navigate('/admin');
     } catch (error) {
       console.error('Login error:', error);
+      const errorMessage = error instanceof Error ? error.message : "Invalid admin password.";
       toast({
         title: "Login Failed",
-        description: "Invalid admin password.",
+        description: errorMessage,
         variant: "destructive"
       });
     } finally {
@@ -57,8 +54,8 @@ export function AdminLoginFooter({ onAdminLogin }: AdminLoginFooterProps) {
 
   return (
     <footer className="bg-white/60 backdrop-blur-sm border-t border-white/20 mt-16">
-      <div className="max-w-6xl mx-auto px-6 py-8">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="text-center md:text-left">
             <p className="text-gray-600 text-sm">
               © 2024 Concern2Care from Remynd. All rights reserved.
@@ -93,7 +90,7 @@ export function AdminLoginFooter({ onAdminLogin }: AdminLoginFooterProps) {
                   <Shield className="h-4 w-4" />
                 </Button>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-md rounded-3xl">
+              <DialogContent className="sm:max-w-md rounded-3xl mx-4">
                 <DialogHeader>
                   <DialogTitle className="flex items-center gap-2">
                     <Shield className="h-5 w-5 text-blue-600" />

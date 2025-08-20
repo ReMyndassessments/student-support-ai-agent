@@ -1,8 +1,7 @@
-import { api } from "encore.dev/api";
+import { api, APIError } from "encore.dev/api";
 import { userDB } from "./db";
 import { getAuthData } from "~encore/auth";
-import { APIError } from "encore.dev/api";
-import type { UserProfile } from "./get-profile";
+import type { UserProfile } from "./me";
 
 export interface ListUsersResponse {
   users: UserProfile[];
@@ -32,6 +31,7 @@ export const listUsers = api<void, ListUsersResponse>(
         id: user.id,
         email: user.email,
         name: user.name || undefined,
+        isAdmin: false,
         schoolName: user.school_name || undefined,
         schoolDistrict: user.school_district || undefined,
         primaryGrade: user.primary_grade || undefined,

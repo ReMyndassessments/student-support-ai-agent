@@ -7,7 +7,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, Lock, Eye, EyeOff, AlertTriangle } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import backend from '~backend/client';
-import type { UserProfile } from '~backend/users/get-profile';
+import type { UserProfile } from '~backend/users/me';
 
 interface AdminResetPasswordDialogProps {
   isOpen: boolean;

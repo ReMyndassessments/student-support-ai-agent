@@ -2,23 +2,18 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Shield, Users, FileText, Sparkles, LogOut, User, Settings, CreditCard, TrendingUp, Calendar, AlertTriangle, Database, Download, Trash2, Plus, Edit3, UserPlus, Upload } from 'lucide-react';
+import { Shield, Users, FileText, Sparkles, LogOut, User, Settings, TrendingUp, Calendar, AlertTriangle, Database, Plus, Trash2, Upload } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { Link } from 'react-router-dom';
 import backend from '~backend/client';
 import type { DashboardStats } from '~backend/admin/dashboard-stats';
 import { AddEditTeacherDialog } from './AddEditTeacherDialog';
 import { BulkCSVUploadDialog } from './BulkCSVUploadDialog';
-import type { UserProfile } from '~backend/users/get-profile';
+import type { UserProfile } from '~backend/users/me';
+import { useAuth } from '../hooks/useAuth';
 
-interface AdminDashboardProps {
-  user: { email: string; name: string; isAdmin: boolean };
-  onLogout: () => void;
-}
-
-export function AdminDashboard({ user, onLogout }: AdminDashboardProps) {
+export function AdminDashboard() {
+  const { user, logout } = useAuth();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -50,12 +45,11 @@ export function AdminDashboard({ user, onLogout }: AdminDashboardProps) {
   const handleLogout = async () => {
     setIsLoggingOut(true);
     try {
-      await backend.auth.adminLogout();
+      await logout();
       toast({
         title: "Logged Out",
         description: "You have been successfully logged out."
       });
-      onLogout();
     } catch (error) {
       console.error('Logout error:', error);
       toast({
@@ -109,94 +103,94 @@ export function AdminDashboard({ user, onLogout }: AdminDashboardProps) {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        <div className="space-y-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+        <div className="space-y-6 sm:space-y-8">
           {/* Header Section */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-6">
-              <div className="w-20 h-20 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 rounded-3xl flex items-center justify-center shadow-2xl">
-                <Shield className="h-10 w-10 text-white" />
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 rounded-2xl sm:rounded-3xl flex items-center justify-center shadow-2xl">
+                <Shield className="h-8 w-8 sm:h-10 sm:w-10 text-white" />
               </div>
               <div>
-                <h1 className="text-4xl font-bold text-gray-900">Admin Dashboard</h1>
-                <p className="text-xl text-gray-600 mt-1">Welcome back, {user.name}</p>
+                <h1 className="text-2xl sm:text-4xl font-bold text-gray-900">Admin Dashboard</h1>
+                <p className="text-base sm:text-xl text-gray-600 mt-1">Welcome back, {user?.name}</p>
               </div>
             </div>
             
-            <div className="flex items-center gap-4">
-              <Badge className="bg-gradient-to-r from-emerald-100 to-teal-100 text-emerald-800 border-emerald-200 rounded-xl px-6 py-3 text-base font-medium">
-                <Shield className="h-5 w-5 mr-2" />
+            <div className="flex items-center gap-2 sm:gap-4">
+              <Badge className="bg-gradient-to-r from-emerald-100 to-teal-100 text-emerald-800 border-emerald-200 rounded-lg sm:rounded-xl px-3 py-2 sm:px-6 sm:py-3 text-xs sm:text-base font-medium">
+                <Shield className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                 Administrator
               </Badge>
               <Button
                 onClick={handleLogout}
                 disabled={isLoggingOut}
                 variant="outline"
-                className="border-gray-300 text-gray-700 hover:bg-gray-50 rounded-xl px-6 py-3"
+                className="border-gray-300 text-gray-700 hover:bg-gray-50 rounded-lg sm:rounded-xl px-3 py-2 sm:px-6 sm:py-3 text-xs sm:text-base"
               >
-                <LogOut className="h-5 w-5 mr-2" />
+                <LogOut className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                 {isLoggingOut ? 'Logging Out...' : 'Logout'}
               </Button>
             </div>
           </div>
 
           {/* Quick Stats Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-            <Card className="border-0 bg-white/90 backdrop-blur-sm shadow-xl rounded-3xl overflow-hidden hover:shadow-2xl transition-all duration-300">
-              <CardContent className="p-8">
-                <div className="flex items-center gap-6">
-                  <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center shadow-lg">
-                    <Users className="h-8 w-8 text-white" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-6">
+            <Card className="border-0 bg-white/90 backdrop-blur-sm shadow-xl rounded-2xl sm:rounded-3xl overflow-hidden hover:shadow-2xl transition-all duration-300">
+              <CardContent className="p-4 sm:p-8">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg">
+                    <Users className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-1">Total Teachers</h3>
-                    <p className="text-3xl font-bold text-gray-900">{stats?.totalTeachers || 0}</p>
-                    <p className="text-gray-600 text-sm mt-1">{stats?.activeTeachers || 0} active</p>
+                    <h3 className="text-sm sm:text-lg font-semibold text-gray-900 mb-1">Total Teachers</h3>
+                    <p className="text-2xl sm:text-3xl font-bold text-gray-900">{stats?.totalTeachers || 0}</p>
+                    <p className="text-gray-600 text-xs sm:text-sm mt-1">{stats?.activeTeachers || 0} active</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="border-0 bg-white/90 backdrop-blur-sm shadow-xl rounded-3xl overflow-hidden hover:shadow-2xl transition-all duration-300">
-              <CardContent className="p-8">
-                <div className="flex items-center gap-6">
-                  <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center shadow-lg">
-                    <FileText className="h-8 w-8 text-white" />
+            <Card className="border-0 bg-white/90 backdrop-blur-sm shadow-xl rounded-2xl sm:rounded-3xl overflow-hidden hover:shadow-2xl transition-all duration-300">
+              <CardContent className="p-4 sm:p-8">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg">
+                    <FileText className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-1">Support Requests</h3>
-                    <p className="text-3xl font-bold text-gray-900">{stats?.totalSupportRequests || 0}</p>
-                    <p className="text-gray-600 text-sm mt-1">{stats?.supportRequestsThisMonth || 0} this month</p>
+                    <h3 className="text-sm sm:text-lg font-semibold text-gray-900 mb-1">Support Requests</h3>
+                    <p className="text-2xl sm:text-3xl font-bold text-gray-900">{stats?.totalSupportRequests || 0}</p>
+                    <p className="text-gray-600 text-xs sm:text-sm mt-1">{stats?.supportRequestsThisMonth || 0} this month</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="border-0 bg-white/90 backdrop-blur-sm shadow-xl rounded-3xl overflow-hidden hover:shadow-2xl transition-all duration-300">
-              <CardContent className="p-8">
-                <div className="flex items-center gap-6">
-                  <div className="w-16 h-16 bg-gradient-to-r from-orange-500 to-red-500 rounded-2xl flex items-center justify-center shadow-lg">
-                    <TrendingUp className="h-8 w-8 text-white" />
+            <Card className="border-0 bg-white/90 backdrop-blur-sm shadow-xl rounded-2xl sm:rounded-3xl overflow-hidden hover:shadow-2xl transition-all duration-300">
+              <CardContent className="p-4 sm:p-8">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-r from-orange-500 to-red-500 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg">
+                    <TrendingUp className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-1">Avg per Teacher</h3>
-                    <p className="text-3xl font-bold text-gray-900">{stats?.averageRequestsPerTeacher || 0}</p>
-                    <p className="text-gray-600 text-sm mt-1">requests total</p>
+                    <h3 className="text-sm sm:text-lg font-semibold text-gray-900 mb-1">Avg per Teacher</h3>
+                    <p className="text-2xl sm:text-3xl font-bold text-gray-900">{stats?.averageRequestsPerTeacher || 0}</p>
+                    <p className="text-gray-600 text-xs sm:text-sm mt-1">requests total</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="border-0 bg-white/90 backdrop-blur-sm shadow-xl rounded-3xl overflow-hidden hover:shadow-2xl transition-all duration-300">
-              <CardContent className="p-8">
-                <div className="flex items-center gap-6">
-                  <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center shadow-lg">
-                    <Sparkles className="h-8 w-8 text-white" />
+            <Card className="border-0 bg-white/90 backdrop-blur-sm shadow-xl rounded-2xl sm:rounded-3xl overflow-hidden hover:shadow-2xl transition-all duration-300">
+              <CardContent className="p-4 sm:p-8">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg">
+                    <Sparkles className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-1">AI Features</h3>
-                    <p className="text-3xl font-bold text-gray-900">Active</p>
-                    <p className="text-gray-600 text-sm mt-1">Full access</p>
+                    <h3 className="text-sm sm:text-lg font-semibold text-gray-900 mb-1">AI Features</h3>
+                    <p className="text-2xl sm:text-3xl font-bold text-gray-900">Active</p>
+                    <p className="text-gray-600 text-xs sm:text-sm mt-1">Full access</p>
                   </div>
                 </div>
               </CardContent>
@@ -204,37 +198,31 @@ export function AdminDashboard({ user, onLogout }: AdminDashboardProps) {
           </div>
 
           {/* Management Tools and Demo Tools Row */}
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 sm:gap-8">
             {/* Management Tools */}
-            <Card className="border-0 bg-white/90 backdrop-blur-sm shadow-xl rounded-3xl overflow-hidden">
-              <CardHeader className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white rounded-t-3xl">
-                <CardTitle className="flex items-center gap-4 text-2xl">
-                  <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center">
-                    <Settings className="h-7 w-7" />
+            <Card className="border-0 bg-white/90 backdrop-blur-sm shadow-xl rounded-2xl sm:rounded-3xl overflow-hidden">
+              <CardHeader className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white rounded-t-2xl sm:rounded-t-3xl">
+                <CardTitle className="flex items-center gap-3 sm:gap-4 text-lg sm:text-2xl">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/20 rounded-xl sm:rounded-2xl flex items-center justify-center">
+                    <Settings className="h-5 w-5 sm:h-7 sm:w-7" />
                   </div>
                   Management Tools
                 </CardTitle>
               </CardHeader>
-              <CardContent className="p-8">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <Button onClick={() => setIsAddTeacherDialogOpen(true)} className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-xl py-4 text-base font-medium">
-                    <UserPlus className="h-5 w-5 mr-3" />
-                    Add Single Teacher
+              <CardContent className="p-4 sm:p-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                  <Button onClick={() => setIsAddTeacherDialogOpen(true)} className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-xl py-3 sm:py-4 text-sm sm:text-base font-medium">
+                    <Plus className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+                    Add Teacher
                   </Button>
-                  <Button onClick={() => setIsBulkUploadDialogOpen(true)} className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-xl py-4 text-base font-medium">
-                    <Upload className="h-5 w-5 mr-3" />
-                    Bulk Upload Teachers
+                  <Button onClick={() => setIsBulkUploadDialogOpen(true)} className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-xl py-3 sm:py-4 text-sm sm:text-base font-medium">
+                    <Upload className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+                    Bulk Upload
                   </Button>
-                  <Link to="/admin/teachers">
-                    <Button variant="outline" className="w-full border-gray-300 text-gray-700 hover:bg-gray-50 rounded-xl py-4 text-base font-medium">
-                      <Users className="h-5 w-5 mr-3" />
+                  <Link to="/admin/teachers" className="col-span-1 sm:col-span-2">
+                    <Button variant="outline" className="w-full border-gray-300 text-gray-700 hover:bg-gray-50 rounded-xl py-3 sm:py-4 text-sm sm:text-base font-medium">
+                      <Users className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                       Manage All Teachers
-                    </Button>
-                  </Link>
-                  <Link to="/admin/system-settings">
-                    <Button variant="outline" className="w-full border-gray-300 text-gray-700 hover:bg-gray-50 rounded-xl py-4 text-base font-medium">
-                      <Settings className="h-5 w-5 mr-3" />
-                      System Settings
                     </Button>
                   </Link>
                 </div>
@@ -242,39 +230,33 @@ export function AdminDashboard({ user, onLogout }: AdminDashboardProps) {
             </Card>
 
             {/* Demo Tools */}
-            <Card className="border-0 bg-white/90 backdrop-blur-sm shadow-xl rounded-3xl overflow-hidden">
-              <CardHeader className="bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 text-white rounded-t-3xl">
-                <CardTitle className="flex items-center gap-4 text-2xl">
-                  <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center">
-                    <Sparkles className="h-7 w-7" />
+            <Card className="border-0 bg-white/90 backdrop-blur-sm shadow-xl rounded-2xl sm:rounded-3xl overflow-hidden">
+              <CardHeader className="bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 text-white rounded-t-2xl sm:rounded-t-3xl">
+                <CardTitle className="flex items-center gap-3 sm:gap-4 text-lg sm:text-2xl">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/20 rounded-xl sm:rounded-2xl flex items-center justify-center">
+                    <Sparkles className="h-5 w-5 sm:h-7 sm:w-7" />
                   </div>
                   Demo Tools
                 </CardTitle>
               </CardHeader>
-              <CardContent className="p-8">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <CardContent className="p-4 sm:p-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <Link to="/new-referral">
-                    <Button className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white rounded-xl py-4 text-base font-medium">
-                      <FileText className="h-5 w-5 mr-3" />
-                      Demo Support Request
+                    <Button className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white rounded-xl py-3 sm:py-4 text-sm sm:text-base font-medium">
+                      <FileText className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+                      New Request
                     </Button>
                   </Link>
                   <Link to="/referrals">
-                    <Button variant="outline" className="w-full border-gray-300 text-gray-700 hover:bg-gray-50 rounded-xl py-4 text-base font-medium">
-                      <FileText className="h-5 w-5 mr-3" />
-                      View All Requests
+                    <Button variant="outline" className="w-full border-gray-300 text-gray-700 hover:bg-gray-50 rounded-xl py-3 sm:py-4 text-sm sm:text-base font-medium">
+                      <FileText className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+                      View Requests
                     </Button>
                   </Link>
-                  <Link to="/admin/demo-data">
-                    <Button variant="outline" className="w-full border-gray-300 text-gray-700 hover:bg-gray-50 rounded-xl py-4 text-base font-medium">
-                      <Plus className="h-5 w-5 mr-3" />
-                      Create Demo Data
-                    </Button>
-                  </Link>
-                  <Link to="/admin/demo-data">
-                    <Button variant="outline" className="w-full border-red-300 text-red-700 hover:bg-red-50 rounded-xl py-4 text-base font-medium">
-                      <Trash2 className="h-5 w-5 mr-3" />
-                      Clear Demo Data
+                  <Link to="/admin/demo-data" className="col-span-1 sm:col-span-2">
+                    <Button variant="outline" className="w-full border-gray-300 text-gray-700 hover:bg-gray-50 rounded-xl py-3 sm:py-4 text-sm sm:text-base font-medium">
+                      <Database className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+                      Manage Demo Data
                     </Button>
                   </Link>
                 </div>
@@ -283,26 +265,26 @@ export function AdminDashboard({ user, onLogout }: AdminDashboardProps) {
           </div>
 
           {/* Recent Activity and Top Concerns Row */}
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 sm:gap-8">
             {/* Recent Activity */}
-            <Card className="border-0 bg-white/90 backdrop-blur-sm shadow-xl rounded-3xl overflow-hidden">
-              <CardHeader className="bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 text-white rounded-t-3xl">
-                <CardTitle className="flex items-center gap-4 text-2xl">
-                  <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center">
-                    <Calendar className="h-7 w-7" />
+            <Card className="border-0 bg-white/90 backdrop-blur-sm shadow-xl rounded-2xl sm:rounded-3xl overflow-hidden">
+              <CardHeader className="bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 text-white rounded-t-2xl sm:rounded-t-3xl">
+                <CardTitle className="flex items-center gap-3 sm:gap-4 text-lg sm:text-2xl">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/20 rounded-xl sm:rounded-2xl flex items-center justify-center">
+                    <Calendar className="h-5 w-5 sm:h-7 sm:w-7" />
                   </div>
                   Recent Activity
                 </CardTitle>
               </CardHeader>
-              <CardContent className="p-8">
-                <div className="space-y-4 max-h-96 overflow-y-auto">
+              <CardContent className="p-4 sm:p-8">
+                <div className="space-y-3 max-h-96 overflow-y-auto">
                   {stats?.recentActivity.map((activity, index) => (
-                    <div key={index} className="flex items-start gap-4 p-4 bg-gray-50 rounded-2xl hover:bg-gray-100 transition-colors">
+                    <div key={index} className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
                       <div className="flex-shrink-0 mt-1">
                         {getActivityIcon(activity.type)}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm text-gray-900 font-medium leading-relaxed">{activity.description}</p>
+                        <p className="text-xs sm:text-sm text-gray-900 font-medium leading-relaxed">{activity.description}</p>
                         <p className="text-xs text-gray-500 mt-1">{formatDate(activity.timestamp)}</p>
                       </div>
                     </div>
@@ -318,21 +300,21 @@ export function AdminDashboard({ user, onLogout }: AdminDashboardProps) {
             </Card>
 
             {/* Top Concern Types */}
-            <Card className="border-0 bg-white/90 backdrop-blur-sm shadow-xl rounded-3xl overflow-hidden">
-              <CardHeader className="bg-gradient-to-r from-purple-500 via-pink-500 to-rose-500 text-white rounded-t-3xl">
-                <CardTitle className="flex items-center gap-4 text-2xl">
-                  <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center">
-                    <TrendingUp className="h-7 w-7" />
+            <Card className="border-0 bg-white/90 backdrop-blur-sm shadow-xl rounded-2xl sm:rounded-3xl overflow-hidden">
+              <CardHeader className="bg-gradient-to-r from-purple-500 via-pink-500 to-rose-500 text-white rounded-t-2xl sm:rounded-t-3xl">
+                <CardTitle className="flex items-center gap-3 sm:gap-4 text-lg sm:text-2xl">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/20 rounded-xl sm:rounded-2xl flex items-center justify-center">
+                    <TrendingUp className="h-5 w-5 sm:h-7 sm:w-7" />
                   </div>
                   Top Concern Types
                 </CardTitle>
               </CardHeader>
-              <CardContent className="p-8">
-                <div className="space-y-4">
+              <CardContent className="p-4 sm:p-8">
+                <div className="space-y-3">
                   {stats?.topConcernTypes.map((concern, index) => (
-                    <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl hover:bg-gray-100 transition-colors">
-                      <span className="text-base font-medium text-gray-900">{concern.type}</span>
-                      <Badge variant="outline" className="bg-white border-gray-300 text-gray-700 rounded-lg px-4 py-2 text-sm font-medium">
+                    <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
+                      <span className="text-sm sm:text-base font-medium text-gray-900">{concern.type}</span>
+                      <Badge variant="outline" className="bg-white border-gray-300 text-gray-700 rounded-lg px-3 py-1 text-xs sm:text-sm font-medium">
                         {concern.count}
                       </Badge>
                     </div>
@@ -347,49 +329,6 @@ export function AdminDashboard({ user, onLogout }: AdminDashboardProps) {
               </CardContent>
             </Card>
           </div>
-
-          {/* System Status */}
-          <Card className="border-0 bg-white/90 backdrop-blur-sm shadow-xl rounded-3xl overflow-hidden">
-            <CardHeader className="bg-gradient-to-r from-gray-600 via-slate-600 to-gray-700 text-white rounded-t-3xl">
-              <CardTitle className="flex items-center gap-4 text-2xl">
-                <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center">
-                  <Shield className="h-7 w-7" />
-                </div>
-                System Status
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-8">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-                    <Database className="h-8 w-8 text-white" />
-                  </div>
-                  <h4 className="text-lg font-medium text-gray-900 mb-2">Database</h4>
-                  <Badge className="bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 border-green-200 rounded-xl px-4 py-2 text-sm font-medium">
-                    Operational
-                  </Badge>
-                </div>
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-                    <Sparkles className="h-8 w-8 text-white" />
-                  </div>
-                  <h4 className="text-lg font-medium text-gray-900 mb-2">AI Services</h4>
-                  <Badge className="bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 border-green-200 rounded-xl px-4 py-2 text-sm font-medium">
-                    Active
-                  </Badge>
-                </div>
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-gradient-to-r from-orange-500 to-red-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-                    <Shield className="h-8 w-8 text-white" />
-                  </div>
-                  <h4 className="text-lg font-medium text-gray-900 mb-2">Security</h4>
-                  <Badge className="bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 border-green-200 rounded-xl px-4 py-2 text-sm font-medium">
-                    Secure
-                  </Badge>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
         </div>
       </div>
       <AddEditTeacherDialog

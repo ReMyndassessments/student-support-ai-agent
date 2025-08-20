@@ -1,11 +1,9 @@
-import { Header, Cookie, APIError, Gateway } from "encore.dev/api";
+import { Cookie, APIError, Gateway } from "encore.dev/api";
 import { authHandler } from "encore.dev/auth";
-import { userDB } from "../users/db";
+import { authDB } from "./db";
 
 interface AuthParams {
-  authorization?: Header<"Authorization">;
-  session?: Cookie<"admin_session">;
-  teacherSession?: Cookie<"teacher_session">;
+  session?: Cookie<"app_session">;
 }
 
 export interface AuthData {
@@ -16,53 +14,33 @@ export interface AuthData {
 }
 
 const auth = authHandler<AuthParams, AuthData>(
-  async (data) => {
-    // Check for admin session cookie first (for demo purposes)
-    if (data.session?.value) {
-      try {
-        const sessionData = JSON.parse(Buffer.from(data.session.value, 'base64').toString());
-        if (sessionData.isAdmin && sessionData.email === 'admin@concern2care.demo') {
-          return {
-            userID: 'admin',
-            email: 'admin@concern2care.demo',
-            isAdmin: true,
-            name: 'Demo Administrator'
-          };
-        }
-      } catch (error) {
-        // Invalid session, continue to other auth methods
-      }
+  async (params) => {
+    const token = params.session?.value;
+    if (!token) {
+      throw APIError.unauthenticated("not logged in");
     }
 
-    // Check for teacher session cookie
-    if (data.teacherSession?.value) {
-      try {
-        const sessionData = JSON.parse(Buffer.from(data.teacherSession.value, 'base64').toString());
-        if (sessionData.email && sessionData.userId) {
-          // Verify user still exists in database
-          const user = await userDB.queryRow<{
-            id: number;
-            email: string;
-            name: string | null;
-          }>`
-            SELECT id, email, name FROM users WHERE id = ${sessionData.userId}
-          `;
+    const session = await authDB.queryRow<{
+      user_id: string;
+      user_email: string;
+      user_name: string;
+      is_admin: boolean;
+    }>`
+      SELECT user_id, user_email, user_name, is_admin
+      FROM sessions
+      WHERE token = ${token} AND expires_at > NOW()
+    `;
 
-          if (user) {
-            return {
-              userID: user.id.toString(),
-              email: user.email,
-              isAdmin: false,
-              name: user.name || 'Teacher'
-            };
-          }
-        }
-      } catch (error) {
-        // Invalid session, continue to other auth methods
-      }
+    if (!session) {
+      throw APIError.unauthenticated("invalid session");
     }
 
-    throw APIError.unauthenticated("Please log in to access this feature");
+    return {
+      userID: session.user_id,
+      email: session.user_email,
+      name: session.user_name,
+      isAdmin: session.is_admin,
+    };
   }
 );
 

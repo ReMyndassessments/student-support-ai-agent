@@ -1,6 +1,6 @@
-import { api } from "encore.dev/api";
+import { api, APIError } from "encore.dev/api";
 import { referralDB } from "./db";
-import { APIError } from "encore.dev/api";
+import { getAuthData } from "~encore/auth";
 
 export interface GetSupportRequestRequest {
   id: number;
@@ -27,8 +27,9 @@ export interface SupportRequest {
 
 // Retrieves a single support request by ID.
 export const get = api<GetSupportRequestRequest, SupportRequest>(
-  { expose: true, method: "GET", path: "/referrals/:id" },
+  { expose: true, method: "GET", path: "/referrals/:id", auth: true },
   async (req) => {
+    const auth = getAuthData()!;
     const row = await referralDB.queryRow<{
       id: number;
       student_first_name: string;
@@ -46,12 +47,17 @@ export const get = api<GetSupportRequestRequest, SupportRequest>(
       other_action_taken: string | null;
       ai_recommendations: string | null;
       created_at: Date;
+      created_by_email: string;
     }>`
       SELECT * FROM referrals WHERE id = ${req.id}
     `;
 
     if (!row) {
       throw APIError.notFound("Support request not found");
+    }
+
+    if (!auth.isAdmin && row.created_by_email !== auth.email) {
+      throw APIError.permissionDenied("You do not have permission to view this support request.");
     }
 
     return {

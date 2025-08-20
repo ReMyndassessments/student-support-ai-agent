@@ -1,6 +1,6 @@
-import { api } from "encore.dev/api";
-import { Query } from "encore.dev/api";
+import { api, Query } from "encore.dev/api";
 import { referralDB } from "./db";
+import { getAuthData } from "~encore/auth";
 
 export interface ListSupportRequestsRequest {
   limit?: Query<number>;
@@ -32,8 +32,9 @@ export interface ListSupportRequestsResponse {
 
 // Retrieves all support requests, optionally filtered by teacher.
 export const list = api<ListSupportRequestsRequest, ListSupportRequestsResponse>(
-  { expose: true, method: "GET", path: "/referrals" },
+  { expose: true, method: "GET", path: "/referrals", auth: true },
   async (req) => {
+    const auth = getAuthData()!;
     const limit = req.limit || 50;
     let query = `
       SELECT 
@@ -57,16 +58,22 @@ export const list = api<ListSupportRequestsRequest, ListSupportRequestsResponse>
     `;
     
     const params: any[] = [];
-    
-    if (req.teacher) {
-      query += ` WHERE teacher = $1`;
+    const whereClauses: string[] = [];
+
+    if (!auth.isAdmin) {
+      whereClauses.push(`created_by_email = $${params.length + 1}`);
+      params.push(auth.email);
+    } else if (req.teacher) {
+      whereClauses.push(`teacher = $${params.length + 1}`);
       params.push(req.teacher);
-      query += ` ORDER BY created_at DESC LIMIT $2`;
-      params.push(limit);
-    } else {
-      query += ` ORDER BY created_at DESC LIMIT $1`;
-      params.push(limit);
     }
+
+    if (whereClauses.length > 0) {
+      query += ` WHERE ${whereClauses.join(" AND ")}`;
+    }
+    
+    query += ` ORDER BY created_at DESC LIMIT $${params.length + 1}`;
+    params.push(limit);
 
     const rows = await referralDB.rawQueryAll<{
       id: number;

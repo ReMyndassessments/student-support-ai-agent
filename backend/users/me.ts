@@ -1,4 +1,4 @@
-import { api } from "encore.dev/api";
+import { api, APIError } from "encore.dev/api";
 import { userDB } from "./db";
 import { getAuthData } from "~encore/auth";
 import { secret } from "encore.dev/config";
@@ -9,6 +9,7 @@ export interface UserProfile {
   id: number;
   email: string;
   name?: string;
+  isAdmin: boolean;
   schoolName?: string;
   schoolDistrict?: string;
   primaryGrade?: string;
@@ -52,10 +53,25 @@ type UserRow = {
 };
 
 // Retrieves the authenticated user's profile information.
-export const getProfile = api<void, UserProfile>(
-  { expose: true, method: "GET", path: "/users/profile", auth: true },
+export const me = api<void, UserProfile>(
+  { expose: true, method: "GET", path: "/users/me", auth: true },
   async () => {
     const auth = getAuthData()!;
+
+    if (auth.isAdmin) {
+      return {
+        id: 0,
+        email: auth.email,
+        name: auth.name,
+        isAdmin: true,
+        supportRequestsUsedThisMonth: 0,
+        supportRequestsLimit: 9999,
+        additionalSupportRequestPackages: 0,
+        hasDeepSeekApiKey: !!adminDeepSeekApiKey(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+    }
     
     let user = await userDB.queryRow<UserRow>`
       SELECT 
@@ -67,39 +83,15 @@ export const getProfile = api<void, UserProfile>(
       WHERE email = ${auth.email}
     `;
 
-    // Create user if doesn't exist
     if (!user) {
-      user = await userDB.queryRow<UserRow>`
-        INSERT INTO users (email, name, deepseek_api_key, created_at, updated_at)
-        VALUES (${auth.email}, ${auth.name}, ${adminDeepSeekApiKey()}, NOW(), NOW())
-        RETURNING 
-          id, email, name, school_name, school_district, primary_grade, primary_subject, 
-          class_id, additional_grades, additional_subjects, teacher_type, school_year,
-          referrals_used_this_month, referrals_limit, additional_referral_packages,
-          subscription_start_date, subscription_end_date, deepseek_api_key, created_at, updated_at
-      `;
-    } else if (!user.deepseek_api_key) {
-      // If user exists but has no API key, update them with the admin key.
-      user = await userDB.queryRow<UserRow>`
-        UPDATE users
-        SET deepseek_api_key = ${adminDeepSeekApiKey()}, updated_at = NOW()
-        WHERE email = ${auth.email}
-        RETURNING 
-          id, email, name, school_name, school_district, primary_grade, primary_subject, 
-          class_id, additional_grades, additional_subjects, teacher_type, school_year,
-          referrals_used_this_month, referrals_limit, additional_referral_packages,
-          subscription_start_date, subscription_end_date, deepseek_api_key, created_at, updated_at
-      `;
-    }
-
-    if (!user) {
-      throw new Error("Failed to create or retrieve user");
+      throw APIError.notFound("User profile not found.");
     }
 
     return {
       id: user.id,
       email: user.email,
       name: user.name || undefined,
+      isAdmin: auth.isAdmin,
       schoolName: user.school_name || undefined,
       schoolDistrict: user.school_district || undefined,
       primaryGrade: user.primary_grade || undefined,
