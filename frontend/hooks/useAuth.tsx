@@ -32,7 +32,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = async (credentials: LoginRequest) => {
-    await backend.auth.login(credentials);
+    const response = await backend.auth.login(credentials);
+    // After successful login, get the user profile
+    try {
+      const profile = await backend.users.me();
+      setUser(profile);
+    } catch (error) {
+      console.error('Failed to get user profile after login:', error);
+      setUser(null);
+    }
   };
 
   const logout = async () => {
@@ -43,8 +51,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // so we ignore the error and proceed with local logout.
       console.error("Logout API call failed, clearing session locally:", error);
     }
+    
+    // Clear user state immediately
     setUser(null);
-    // Full page reload to clear all state and ensure cookies are cleared.
+    
+    // Clear any cached data
+    localStorage.clear();
+    sessionStorage.clear();
+    
+    // Force a full page reload to clear all state and ensure cookies are cleared
     window.location.href = '/';
   };
 

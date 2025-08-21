@@ -10,6 +10,7 @@ export function Navigation() {
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   // Monitor online/offline status
   useEffect(() => {
@@ -42,6 +43,17 @@ export function Navigation() {
       document.body.style.overflow = 'unset';
     };
   }, [isMobileMenuOpen]);
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    setIsMobileMenuOpen(false);
+    try {
+      await logout();
+    } catch (error) {
+      console.error('Logout error:', error);
+      setIsLoggingOut(false);
+    }
+  };
 
   const adminNavItems = [
     { to: '/', icon: Home, label: 'Home' },
@@ -122,13 +134,14 @@ export function Navigation() {
                 {user && <NotificationCenter />}
                 {user && (
                   <Button
-                    onClick={logout}
+                    onClick={handleLogout}
+                    disabled={isLoggingOut}
                     variant="outline"
                     size="sm"
                     className="border-gray-300 text-gray-700 hover:bg-gray-50 rounded-xl touch-manipulation"
                   >
                     <LogOut className="h-4 w-4 mr-2" />
-                    <span className="hidden xl:inline">Logout</span>
+                    <span className="hidden xl:inline">{isLoggingOut ? 'Logging Out...' : 'Logout'}</span>
                   </Button>
                 )}
               </div>
@@ -245,15 +258,13 @@ export function Navigation() {
               <div className="p-4 border-t border-gray-200">
                 {user && (
                   <Button
-                    onClick={() => {
-                      setIsMobileMenuOpen(false);
-                      logout();
-                    }}
+                    onClick={handleLogout}
+                    disabled={isLoggingOut}
                     variant="outline"
                     className="w-full justify-start border-gray-300 text-gray-700 hover:bg-gray-50 rounded-xl touch-manipulation active:scale-95 transition-transform"
                   >
                     <LogOut className="h-4 w-4 mr-2" />
-                    Logout
+                    {isLoggingOut ? 'Logging Out...' : 'Logout'}
                   </Button>
                 )}
               </div>

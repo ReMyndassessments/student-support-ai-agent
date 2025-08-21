@@ -57,7 +57,6 @@ export function AdminDashboard() {
         description: "There was an issue logging out. Please try again.",
         variant: "destructive"
       });
-    } finally {
       setIsLoggingOut(false);
     }
   };
