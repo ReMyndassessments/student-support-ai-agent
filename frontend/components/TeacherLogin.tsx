@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, User, Eye, EyeOff, GraduationCap, AlertTriangle } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 
 export function TeacherLogin() {
@@ -16,7 +16,6 @@ export function TeacherLogin() {
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const { toast } = useToast();
   const { login } = useAuth();
-  const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,7 +36,7 @@ export function TeacherLogin() {
         title: "Login Successful",
         description: `Welcome back!`
       });
-      navigate('/new-referral');
+      window.location.href = '/new-referral';
     } catch (error) {
       console.error('Login error:', error);
       const errorMessage = error instanceof Error ? error.message : "Invalid email or password.";

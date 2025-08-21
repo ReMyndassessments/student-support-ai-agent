@@ -7,7 +7,6 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, Shield, Eye, EyeOff, Lock } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { useAuth } from '../hooks/useAuth';
-import { useNavigate } from 'react-router-dom';
 
 export function AdminLogin() {
   const [password, setPassword] = useState('');
@@ -15,7 +14,6 @@ export function AdminLogin() {
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const { toast } = useToast();
   const { login } = useAuth();
-  const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,7 +34,7 @@ export function AdminLogin() {
         title: "Login Successful",
         description: "Welcome to the Concern2Care demo!"
       });
-      navigate('/admin');
+      window.location.href = '/admin';
     } catch (error) {
       console.error('Login error:', error);
       const errorMessage = error instanceof Error ? error.message : "Invalid admin password.";

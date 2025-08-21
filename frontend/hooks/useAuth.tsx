@@ -32,16 +32,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = async (credentials: LoginRequest) => {
-    const response = await backend.auth.login(credentials);
-    if (response.success) {
-      const profile = await backend.users.me();
-      setUser(profile);
-    }
+    await backend.auth.login(credentials);
   };
 
   const logout = async () => {
-    await backend.auth.logout();
+    try {
+      await backend.auth.logout();
+    } catch (error) {
+      // The session might already be invalid if the cookie expired,
+      // so we ignore the error and proceed with local logout.
+      console.error("Logout API call failed, clearing session locally:", error);
+    }
     setUser(null);
+    // Full page reload to clear all state and ensure cookies are cleared.
+    window.location.href = '/';
   };
 
   const value = {
