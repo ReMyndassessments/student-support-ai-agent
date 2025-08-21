@@ -8,7 +8,7 @@ export interface LogoutResponse {
 
 // Logs out the current user by deleting their session.
 export const logout = api<void, LogoutResponse>(
-  { expose: true, method: "POST", path: "/auth/logout", auth: true },
+  { expose: true, method: "POST", path: "/auth/logout" },
   async (_, { req }) => {
     const token = req.cookies.app_session;
     if (token) {
