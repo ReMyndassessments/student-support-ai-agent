@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Checkbox } from '@/components/ui/checkbox';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Loader2, AlertTriangle, CheckCircle, ArrowLeft, Sparkles, HelpCircle, User, Calendar, MapPin, AlertCircle, Key, ChevronDown, ChevronUp, ShoppingCart, Lock } from 'lucide-react';
+import { Loader2, AlertTriangle, CheckCircle, ArrowLeft, Sparkles, HelpCircle, User, Calendar, MapPin, AlertCircle, ChevronDown, ChevronUp } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { Link, useNavigate } from 'react-router-dom';
 import backend from '~backend/client';
@@ -386,7 +386,7 @@ export function ReferralForm() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 pb-safe">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 sm:py-8 space-y-4 sm:space-y-8">
         {/* Back Button */}
         <div className="flex items-center">

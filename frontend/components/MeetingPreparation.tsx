@@ -108,7 +108,7 @@ export function MeetingPreparation() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex items-center justify-center p-4">
         <div className="text-center space-y-4">
           <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-3xl flex items-center justify-center animate-pulse">
             <Loader2 className="h-8 w-8 animate-spin text-white" />
@@ -121,7 +121,7 @@ export function MeetingPreparation() {
 
   if (!supportRequest) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex items-center justify-center p-4">
         <Card className="max-w-md border-0 bg-white/80 backdrop-blur-sm shadow-xl rounded-3xl">
           <CardContent className="text-center py-8">
             <p className="text-gray-500">Support request not found.</p>
@@ -135,43 +135,43 @@ export function MeetingPreparation() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
-      <div className="max-w-5xl mx-auto px-6 py-8 space-y-8">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 pb-safe">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 sm:py-8 space-y-4 sm:space-y-8">
         {/* Header */}
         <div className="text-center space-y-4 relative">
           {/* Decorative elements */}
-          <div className="absolute top-0 left-1/4 w-16 h-16 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full opacity-20 animate-pulse"></div>
-          <div className="absolute top-5 right-1/3 w-12 h-12 bg-gradient-to-br from-pink-400 to-rose-500 rounded-full opacity-20 animate-pulse delay-1000"></div>
+          <div className="hidden sm:block absolute top-0 left-1/4 w-16 h-16 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full opacity-20 animate-pulse"></div>
+          <div className="hidden sm:block absolute top-5 right-1/3 w-12 h-12 bg-gradient-to-br from-pink-400 to-rose-500 rounded-full opacity-20 animate-pulse delay-1000"></div>
           
           <div className="relative">
-            <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 rounded-3xl shadow-2xl mb-6">
-              <Users className="h-10 w-10 text-white" />
+            <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 rounded-2xl sm:rounded-3xl shadow-2xl mb-4 sm:mb-6">
+              <Users className="h-8 w-8 sm:h-10 sm:w-10 text-white" />
             </div>
-            <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2">
               Student Support Meeting Preparation
             </h1>
-            <p className="text-gray-600 text-lg">
+            <p className="text-gray-600 text-base sm:text-lg">
               Comprehensive documentation for {supportRequest.studentFirstName} {supportRequest.studentLastInitial}.
             </p>
           </div>
         </div>
 
         {/* Quick Actions */}
-        <Card className="border-0 bg-gradient-to-br from-blue-50 via-cyan-50 to-teal-50 shadow-xl rounded-3xl overflow-hidden">
-          <CardHeader className="bg-gradient-to-r from-blue-500 via-cyan-500 to-teal-500 text-white rounded-t-3xl">
-            <CardTitle className="flex items-center gap-3 text-xl">
-              <div className="w-10 h-10 bg-white/20 rounded-2xl flex items-center justify-center">
-                <FileText className="h-6 w-6" />
+        <Card className="border-0 bg-gradient-to-br from-blue-50 via-cyan-50 to-teal-50 shadow-xl rounded-2xl sm:rounded-3xl overflow-hidden">
+          <CardHeader className="bg-gradient-to-r from-blue-500 via-cyan-500 to-teal-500 text-white rounded-t-2xl sm:rounded-t-3xl">
+            <CardTitle className="flex items-center gap-3 text-lg sm:text-xl">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-white/20 rounded-xl sm:rounded-2xl flex items-center justify-center">
+                <FileText className="h-5 w-5 sm:h-6 sm:w-6" />
               </div>
               Meeting Documents
             </CardTitle>
           </CardHeader>
-          <CardContent className="p-6">
-            <div className="flex flex-wrap gap-4">
+          <CardContent className="p-4 sm:p-6">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               <Button
                 onClick={handleGeneratePDF}
                 disabled={isGeneratingPDF}
-                className="bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 text-white shadow-lg rounded-2xl px-6 py-3 transform hover:scale-105 transition-all duration-200"
+                className="bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 text-white shadow-lg rounded-xl sm:rounded-2xl px-4 sm:px-6 py-3 transform hover:scale-105 transition-all duration-200 touch-manipulation active:scale-95"
               >
                 {isGeneratingPDF ? (
                   <>
@@ -186,12 +186,12 @@ export function MeetingPreparation() {
                 )}
               </Button>
               
-              <Button variant="outline" className="border-gray-300 text-gray-700 hover:bg-white/80 rounded-2xl px-6 py-3">
+              <Button variant="outline" className="border-gray-300 text-gray-700 hover:bg-white/80 rounded-xl sm:rounded-2xl px-4 sm:px-6 py-3 touch-manipulation active:scale-95">
                 <Printer className="h-4 w-4 mr-2" />
                 Print Summary
               </Button>
               
-              <Button variant="outline" className="border-gray-300 text-gray-700 hover:bg-white/80 rounded-2xl px-6 py-3">
+              <Button variant="outline" className="border-gray-300 text-gray-700 hover:bg-white/80 rounded-xl sm:rounded-2xl px-4 sm:px-6 py-3 touch-manipulation active:scale-95">
                 <Mail className="h-4 w-4 mr-2" />
                 Email to Team
               </Button>
@@ -200,42 +200,42 @@ export function MeetingPreparation() {
         </Card>
 
         {/* Student Overview */}
-        <Card className="border-0 bg-white/90 backdrop-blur-sm shadow-xl rounded-3xl overflow-hidden">
-          <CardHeader className="bg-gradient-to-r from-purple-500 via-pink-500 to-rose-500 text-white rounded-t-3xl">
-            <CardTitle className="flex items-center gap-3 text-xl">
-              <div className="w-10 h-10 bg-white/20 rounded-2xl flex items-center justify-center">
-                <User className="h-6 w-6" />
+        <Card className="border-0 bg-white/90 backdrop-blur-sm shadow-xl rounded-2xl sm:rounded-3xl overflow-hidden">
+          <CardHeader className="bg-gradient-to-r from-purple-500 via-pink-500 to-rose-500 text-white rounded-t-2xl sm:rounded-t-3xl">
+            <CardTitle className="flex items-center gap-3 text-lg sm:text-xl">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-white/20 rounded-xl sm:rounded-2xl flex items-center justify-center">
+                <User className="h-5 w-5 sm:h-6 sm:w-6" />
               </div>
               Student Overview
             </CardTitle>
           </CardHeader>
-          <CardContent className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="space-y-6">
+          <CardContent className="p-4 sm:p-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
+              <div className="space-y-4 sm:space-y-6">
                 <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-3xl flex items-center justify-center shadow-lg">
-                    <span className="text-white font-bold text-xl">
+                  <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl sm:rounded-3xl flex items-center justify-center shadow-lg">
+                    <span className="text-white font-bold text-lg sm:text-xl">
                       {supportRequest.studentFirstName[0]}{supportRequest.studentLastInitial}
                     </span>
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-gray-900">
+                    <h3 className="text-lg sm:text-xl font-bold text-gray-900">
                       {supportRequest.studentFirstName} {supportRequest.studentLastInitial}.
                     </h3>
-                    <p className="text-gray-600 text-lg">Grade {supportRequest.grade}</p>
+                    <p className="text-gray-600 text-base sm:text-lg">Grade {supportRequest.grade}</p>
                   </div>
                 </div>
                 
                 <div className="space-y-3">
-                  <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-4 rounded-2xl">
+                  <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-3 sm:p-4 rounded-xl sm:rounded-2xl">
                     <span className="font-medium text-gray-700">Teacher:</span>
                     <span className="text-gray-600 ml-2">{supportRequest.teacher}</span>
                   </div>
-                  <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-4 rounded-2xl">
+                  <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-3 sm:p-4 rounded-xl sm:rounded-2xl">
                     <span className="font-medium text-gray-700">Position:</span>
                     <span className="text-gray-600 ml-2">{supportRequest.teacherPosition}</span>
                   </div>
-                  <div className="bg-gradient-to-r from-pink-50 to-rose-50 p-4 rounded-2xl">
+                  <div className="bg-gradient-to-r from-pink-50 to-rose-50 p-3 sm:p-4 rounded-xl sm:rounded-2xl">
                     <span className="font-medium text-gray-700">Support Request ID:</span>
                     <span className="text-gray-600 ml-2">#{supportRequest.id}</span>
                   </div>
@@ -243,7 +243,7 @@ export function MeetingPreparation() {
               </div>
               
               <div className="space-y-4">
-                <div className="flex items-center gap-3 bg-gradient-to-r from-blue-50 to-cyan-50 p-4 rounded-2xl">
+                <div className="flex items-center gap-3 bg-gradient-to-r from-blue-50 to-cyan-50 p-3 sm:p-4 rounded-xl sm:rounded-2xl">
                   <Calendar className="h-5 w-5 text-blue-500" />
                   <div>
                     <span className="font-medium text-gray-700">Incident Date:</span>
@@ -251,7 +251,7 @@ export function MeetingPreparation() {
                   </div>
                 </div>
                 
-                <div className="flex items-center gap-3 bg-gradient-to-r from-green-50 to-emerald-50 p-4 rounded-2xl">
+                <div className="flex items-center gap-3 bg-gradient-to-r from-green-50 to-emerald-50 p-3 sm:p-4 rounded-xl sm:rounded-2xl">
                   <MapPin className="h-5 w-5 text-green-500" />
                   <div>
                     <span className="font-medium text-gray-700">Location:</span>
@@ -259,7 +259,7 @@ export function MeetingPreparation() {
                   </div>
                 </div>
                 
-                <div className="flex items-center gap-3 bg-gradient-to-r from-orange-50 to-red-50 p-4 rounded-2xl">
+                <div className="flex items-center gap-3 bg-gradient-to-r from-orange-50 to-red-50 p-3 sm:p-4 rounded-xl sm:rounded-2xl">
                   <Target className="h-5 w-5 text-orange-500" />
                   <div>
                     <span className="font-medium text-gray-700">Severity:</span>
@@ -269,7 +269,7 @@ export function MeetingPreparation() {
                   </div>
                 </div>
                 
-                <div className="flex items-center gap-3 bg-gradient-to-r from-purple-50 to-pink-50 p-4 rounded-2xl">
+                <div className="flex items-center gap-3 bg-gradient-to-r from-purple-50 to-pink-50 p-3 sm:p-4 rounded-xl sm:rounded-2xl">
                   <Clock className="h-5 w-5 text-purple-500" />
                   <div>
                     <span className="font-medium text-gray-700">Submitted:</span>
@@ -282,11 +282,11 @@ export function MeetingPreparation() {
         </Card>
 
         {/* Concern Summary */}
-        <Card className="border-0 bg-white/90 backdrop-blur-sm shadow-xl rounded-3xl overflow-hidden">
-          <CardHeader className="bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 text-white rounded-t-3xl">
-            <CardTitle className="text-xl">Concern Summary</CardTitle>
+        <Card className="border-0 bg-white/90 backdrop-blur-sm shadow-xl rounded-2xl sm:rounded-3xl overflow-hidden">
+          <CardHeader className="bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 text-white rounded-t-2xl sm:rounded-t-3xl">
+            <CardTitle className="text-lg sm:text-xl">Concern Summary</CardTitle>
           </CardHeader>
-          <CardContent className="p-6 space-y-6">
+          <CardContent className="p-4 sm:p-6 space-y-4 sm:space-y-6">
             <div>
               <h4 className="font-medium text-gray-900 mb-3">Concern Types</h4>
               <div className="flex flex-wrap gap-3">
@@ -305,7 +305,7 @@ export function MeetingPreparation() {
             
             <div>
               <h4 className="font-medium text-gray-900 mb-3">Detailed Description</h4>
-              <div className="bg-gradient-to-r from-amber-50 to-orange-50 p-6 rounded-2xl border border-amber-200">
+              <div className="bg-gradient-to-r from-amber-50 to-orange-50 p-4 sm:p-6 rounded-xl sm:rounded-2xl border border-amber-200">
                 <p className="text-gray-700 leading-relaxed">
                   {supportRequest.concernDescription}
                 </p>
@@ -316,16 +316,16 @@ export function MeetingPreparation() {
 
         {/* Actions Taken */}
         {supportRequest.actionsTaken.length > 0 && (
-          <Card className="border-0 bg-white/90 backdrop-blur-sm shadow-xl rounded-3xl overflow-hidden">
-            <CardHeader className="bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500 text-white rounded-t-3xl">
-              <CardTitle className="flex items-center gap-3 text-xl">
-                <div className="w-10 h-10 bg-white/20 rounded-2xl flex items-center justify-center">
-                  <CheckCircle className="h-6 w-6" />
+          <Card className="border-0 bg-white/90 backdrop-blur-sm shadow-xl rounded-2xl sm:rounded-3xl overflow-hidden">
+            <CardHeader className="bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500 text-white rounded-t-2xl sm:rounded-t-3xl">
+              <CardTitle className="flex items-center gap-3 text-lg sm:text-xl">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-white/20 rounded-xl sm:rounded-2xl flex items-center justify-center">
+                  <CheckCircle className="h-5 w-5 sm:h-6 sm:w-6" />
                 </div>
                 Actions Already Taken
               </CardTitle>
             </CardHeader>
-            <CardContent className="p-6">
+            <CardContent className="p-4 sm:p-6">
               <div className="flex flex-wrap gap-3">
                 {supportRequest.actionsTaken.map((action, index) => (
                   <Badge key={index} variant="outline" className="bg-gradient-to-r from-green-50 to-emerald-50 text-green-700 border-green-200 rounded-xl px-4 py-2">
@@ -344,12 +344,12 @@ export function MeetingPreparation() {
 
         {/* AI Recommendations */}
         {supportRequest.aiRecommendations && (
-          <Card className="border-0 bg-white/90 backdrop-blur-sm shadow-xl rounded-3xl overflow-hidden">
-            <CardHeader className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white rounded-t-3xl">
-              <CardTitle className="text-xl">Recommended Tier 2 Interventions</CardTitle>
+          <Card className="border-0 bg-white/90 backdrop-blur-sm shadow-xl rounded-2xl sm:rounded-3xl overflow-hidden">
+            <CardHeader className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white rounded-t-2xl sm:rounded-t-3xl">
+              <CardTitle className="text-lg sm:text-xl">Recommended Tier 2 Interventions</CardTitle>
             </CardHeader>
-            <CardContent className="p-6 space-y-6">
-              <div className="bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 p-6 rounded-2xl border border-indigo-200">
+            <CardContent className="p-4 sm:p-6 space-y-4 sm:space-y-6">
+              <div className="bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 p-4 sm:p-6 rounded-xl sm:rounded-2xl border border-indigo-200">
                 <div className="prose max-w-none">
                   <pre className="whitespace-pre-wrap font-sans text-sm text-gray-700 leading-relaxed">
                     {supportRequest.aiRecommendations}
@@ -368,16 +368,16 @@ export function MeetingPreparation() {
         )}
 
         {/* Meeting Checklist */}
-        <Card className="border-0 bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 shadow-xl rounded-3xl overflow-hidden">
-          <CardHeader className="bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500 text-white rounded-t-3xl">
-            <CardTitle className="flex items-center gap-3 text-xl">
-              <div className="w-10 h-10 bg-white/20 rounded-2xl flex items-center justify-center">
-                <CheckCircle className="h-6 w-6" />
+        <Card className="border-0 bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 shadow-xl rounded-2xl sm:rounded-3xl overflow-hidden">
+          <CardHeader className="bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500 text-white rounded-t-2xl sm:rounded-t-3xl">
+            <CardTitle className="flex items-center gap-3 text-lg sm:text-xl">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-white/20 rounded-xl sm:rounded-2xl flex items-center justify-center">
+                <CheckCircle className="h-5 w-5 sm:h-6 sm:w-6" />
               </div>
               Meeting Preparation Checklist
             </CardTitle>
           </CardHeader>
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-6">
             <div className="space-y-4">
               {[
                 "Review student's academic and behavioral history",
@@ -387,7 +387,7 @@ export function MeetingPreparation() {
                 "Plan timeline for intervention implementation and progress monitoring",
                 "Determine next steps if interventions are not effective"
               ].map((item, index) => (
-                <div key={index} className="flex items-center gap-4 p-4 bg-white/60 rounded-2xl hover:bg-white/80 transition-colors">
+                <div key={index} className="flex items-center gap-4 p-3 sm:p-4 bg-white/60 rounded-xl sm:rounded-2xl hover:bg-white/80 transition-colors">
                   <input type="checkbox" className="w-5 h-5 rounded-lg border-gray-300 text-green-600 focus:ring-green-500" />
                   <span className="text-sm text-green-800 font-medium">{item}</span>
                 </div>
